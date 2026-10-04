@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "derived_schema_version": "1.0",
+  "reference_sha256": "51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357",
+  "prompt_version": "execution-brief-1.0+approved-restructure-3",
+  "rubric_version": "phase1-reference-review-3.0",
+  "config_version": "3.0",
+  "model_id": null,
+  "source_block_counts": {
+    "part_1_framework": {
+      "paragraph": 8,
+      "list": 3,
+      "key_point": 3,
+      "table": 2
+    },
+    "part_2_answering": {
+      "paragraph": 7,
+      "table": 6,
+      "key_point": 2,
+      "list": 1
+    },
+    "part_4_mission_command": {
+      "paragraph": 2,
+      "key_point": 1
+    },
+    "part_5_additional_questions": {
+      "paragraph": 1
+    },
+    "part_6_preparation": {
+      "paragraph": 5,
+      "list": 3,
+      "table": 2,
+      "template": 1,
+      "key_point": 1
+    }
+  },
+  "counts": {
+    "competencies": 8,
+    "competency_questions": 113,
+    "mission_command_principles": 6,
+    "mission_command_questions": 12,
+    "additional_questions": 2,
+    "total_questions": 127,
+    "unique_question_ids": 127,
+    "primary_questions": 89,
+    "alternate_questions": 38,
+    "variant_pairs": 16,
+    "lessons": 6,
+    "exercises": 138
+  }
+}

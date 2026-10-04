@@ -1,0 +1,82 @@
+[
+  {
+    "id": "VG01",
+    "canonical": "C5-S1",
+    "variant": "C5-S3"
+  },
+  {
+    "id": "VG02",
+    "canonical": "C5-S2",
+    "variant": "C5-S4"
+  },
+  {
+    "id": "VG03",
+    "canonical": "C5-B1",
+    "variant": "C5-B3"
+  },
+  {
+    "id": "VG04",
+    "canonical": "C5-B2",
+    "variant": "C5-B4"
+  },
+  {
+    "id": "VG05",
+    "canonical": "C6-S1",
+    "variant": "C6-S3"
+  },
+  {
+    "id": "VG06",
+    "canonical": "C6-S2",
+    "variant": "C6-S4"
+  },
+  {
+    "id": "VG07",
+    "canonical": "C6-B1",
+    "variant": "C6-B3"
+  },
+  {
+    "id": "VG08",
+    "canonical": "C6-B2",
+    "variant": "C6-B4"
+  },
+  {
+    "id": "VG09",
+    "canonical": "C7-S1",
+    "variant": "C7-S3"
+  },
+  {
+    "id": "VG10",
+    "canonical": "C7-S2",
+    "variant": "C7-S4"
+  },
+  {
+    "id": "VG11",
+    "canonical": "C7-B1",
+    "variant": "C7-B3"
+  },
+  {
+    "id": "VG12",
+    "canonical": "C7-B2",
+    "variant": "C7-B4"
+  },
+  {
+    "id": "VG13",
+    "canonical": "C8-S1",
+    "variant": "C8-S3"
+  },
+  {
+    "id": "VG14",
+    "canonical": "C8-S2",
+    "variant": "C8-S4"
+  },
+  {
+    "id": "VG15",
+    "canonical": "C8-B1",
+    "variant": "C8-B3"
+  },
+  {
+    "id": "VG16",
+    "canonical": "C8-B2",
+    "variant": "C8-B4"
+  }
+]

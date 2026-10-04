@@ -1,0 +1,145 @@
+[J1 health notice] ✓ خدمة المحاكاة متصلة وجاهزة للاختبار.
+[J1 modes] ▤ / سؤال واحد /  / سؤال مع تقييم وتقرير سريع. /  / 2–4 دقائق / ● || ◎ / محاكاة واقعية /  / كفاءة واحدة وأسئلة متنوعة مع متابعات. /  / نحو 7 دقائق / ○ || ▥ / محاكاة ممتدة /  / عدة كفاءات أو مسار قيادة المهمة. /  / نحو 16 دقيقة / ○
+[J1 default mode] سؤال واحد
+[J1 default answer mode] ▤إجابة نصية
+[J1 question header] السؤال 1 من 1
+[J1 question] M4-B1 :: أخبرني عن موقف قمت فيه بتفويض صلاحيات اتخاذ القرار لأحد مرؤوسيك أو لفريقك، وكيف 
+[J1 progress bar] 100
+[J1 empty submit toast] اكتب الإجابة أو سجّلها ثم راجع التفريغ أولًا.
+[J1 report hero] التصنيف النوعي إجابة قوية 84 من 100
+[J1 trust notice] ✓ اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J1 report sections] إجابتك المعتمدة | بنية الإجابة المكتشفة | تفصيل المعايير | ✓نقاط القوة | !ما ينقص الإجابة | ↗خطوات التحسين | مؤشرات قيادة المهمة
+[J1 action buttons] قارن بنموذج الدليل | الإجابة عن سؤال المتابعة | إنهاء وعرض الملخص
+[J1 null/undefined in report] 0
+[J1 compare dialog open] true :: ⓘ هذا نموذج من الدليل للمقارنة بعد التقييم، وليس الإجابة الصحيحة الوحيدة. نموذج STAR-L الموقف خلال تنفيذ مشروع يتطلب قرا
+[J1 followup card] ؟ ما المؤشر الذي استخدمته لقياس النتيجة؟ (متابعة تجريبية) أجب بإيجاز وركّز على هذا المحور فقط. سبب السؤال: مؤشر رقمي للنتيجة (تجريبي)
+[J1 followup merged in report] true
+[J1 followup button still shown after 1 followup?] 0
+[J1 summary] اكتملت المحاكاة ملخص الجلسة 1 إجابة تم تحليلها 84% المتوسط التدريبي
+[J1 summary buttons] طباعة أو تصدير PDF | محاكاة جديدة | سجل الجلسات | العودة للرئيسية
+[J1 sessions list] سؤال واحد نصي 04‏/10‏/2026، 5:26 م 1 إجابة اضغط لفتح التقرير الكامل 84%
+[J1 saved session view headings] سؤال واحد | ملخص الجلسة | ✓أبرز نقاط القوة | ↗خطوات التحسين | المقارنة بنموذج الدليل | نموذج STAR-L
+[J1 saved view shows criteria/quotes?] 0
+[J1 print media hides chrome] {"nav":"none","header":"none","noPrint":"none"}
+[J1b flags shown] ملاحظات مهمة الدور الشخصي غير واضح
+[J1b comparison with previous] المقارنة مع آخر جلسة موثقة +1 نقطة السابق 84 · الحالي 85
+[J1c after save&exit: home mentions resume?] false
+[J1c sessions page lists in-progress session?] false
+[J1c IndexedDB sessions] [{"status":"completed","n":1},{"status":"completed","n":1},{"status":"in_progress","draft":"مسودة غير مرسلة","n":0}]
+[J1 page errors] []
+[J2 voice panel] أوافق على إرسال التسجيل لمزود الذكاء الاصطناعي للتفريغ ثم حذفه من ذاكرة الخادم. 00:00 جاهز للتسجيل بدء التسجيل
+[J2 textarea hidden before recording] true
+[J2 start without consent → toast] اقرأ إشعار الخصوصية ووافق قبل التسجيل.
+[J2 recording state] جارٍ التسجيل… clock=00:03
+[J2 transcript in editable textarea] هذا تفريغ تجريبي للتسجيل الصوتي، في بداية المشروع كان الفريق متأخرًا وأنا أعدت ت
+[J2 state after transcription] راجع النص وصححه قبل التقييم
+[J2 evaluation auto-started?] false
+[J2 provider transcribe call] {"url":"https://generativelanguage.googleapis.com/v1beta/interactions","model":"gemini-3.8-flash","kind":"transcribe","mime":"audio/webm","audioBytes":50322}
+[J2 report uses corrected text] true
+[J2 page errors] []
+[J3 SW caches] {"keys":["leadership-interview-coach-v0.5.0-phase2-51d413de"],"count":43}
+[J3 offline learn U1 h1] افهم المقابلة
+[J3 offline bank C1-B1 h2] صف موقفاً كنت بحاجة فيه إلى توصيل رسالة مهمة لفريقك وتأكدت من أنهم فهموها بالكامل. ماذا فعلت؟
+[J3 offline self-intro h1] بناء تقديم الذات
+[J3 offline simulation notice] ⓘ التعلّم والبنك يعملان، لكن خدمة المحاكاة غير متاحة الآن.
+[J3 offline start button enabled?] true
+[J3 offline submit error] ⓘ تعذّر الاتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.
+[J3 offline answer preserved] true
+[J3 page errors] ["Failed to load resource: net::ERR_INTERNET_DISCONNECTED","Failed to load resource: net::ERR_INTERNET_DISCONNECTED"]
+[J4 unconfigured notice] ⚙ الواجهة جاهزة، لكن مسؤول التطبيق يحتاج إلى تهيئة مفتاح الخدمة في الخادم ثم إعادة النشر.
+[J4 unconfigured submit error] ⓘ خدمة المحاكاة غير مهيأة بعد. أضف مفتاح الذكاء الاصطناعي في إعدادات الخادم.
+[J5 provider-429 message shown to user] ⓘ Resource has been exhausted (e.g. check quota). [Gemini quota detail]
+[J5 untrusted report hero] التصنيف النوعي إجابة غير موثوق بلا درجة :: ! لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية.
+[J5 invalid JSON message shown to user] ⓘ تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.
+[J5 answer preserved after error] true
+[J6 realistic/random first screen] تقديم الذات — حتى 60 ثانية
+[J6 realistic self-intro report] التصنيف النوعي إجابة متوسطة 71 من 100
+[J6 realistic/random question ids] C7-B6,C7-S5
+[J6 realistic summary] اكتملت المحاكاة ملخص الجلسة 3 إجابة تم تحليلها 80% المتوسط التدريبي
+[J6 extended/random first screen] تقديم الذات — حتى 60 ثانية
+[J6 extended self-intro report] التصنيف النوعي إجابة متوسطة 71 من 100
+[J6 extended/random question ids] C1-S1,C2-B5,C6-B9,C3-B1,C7-S2
+[J6 extended summary] اكتملت المحاكاة ملخص الجلسة 6 إجابة تم تحليلها 82% المتوسط التدريبي
+[J6 extended/mission first screen] تقديم الذات — حتى 60 ثانية
+[J6 extended self-intro report] التصنيف النوعي إجابة متوسطة 71 من 100
+[J6 extended/mission question ids] M1-S1,M2-S1,M3-B1,M4-B1,M5-S1,M6-S1
+[J6 extended summary] اكتملت المحاكاة ملخص الجلسة 7 إجابة تم تحليلها 83% المتوسط التدريبي
+[J7 missing fields toast] أكمل التعريف المهني والمنصب والتدرج والإنجاز والهدف المستقبلي أولًا.
+[J7 draft] أعرّف بنفسي، أنا قائد عمليات. وعلى مستوى التأهيل، أنجزت بكالوريوس إدارة. بدأت مسيرتي في مشرف عمليات. وتطورت مسؤولياتي لاحقًا من خلال الإشراف ثم إدارة وحدة ثم قي
+[J7 metrics] 75 كلمة المدة التقديرية: 39 ثانية الهدف: حتى 60 ثانية :: ⓘ النص أقصر من المدة المختارة. أضف تفاصيل أكثر عن مسؤولياتك أو إنجازاتك.
+[J7 alternative differs] true
+[J7 manual edit persisted after leaving page?] false (result visible=false)
+[J7 AI candidate] نسخة محسّنة مقترحة تحتاج اعتمادك ⓘ قارن النصين. لن يُستبدل نصك المحلي إلا إذا ضغطت «اعتماد النسخة». ما الذي تغيّر؟ تحسين الربط بين الجمل (تجريبي) اعتماد النسخة 
+[J7 original untouched before approval] true
+[J7 replaced after approval] true
+[J7 offline improve message] ⓘ تعذّر الاتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('button:has-text("حذف كل بياناتي المحلية")')[22m
+[2m    - locator resolved to <button type="button" class="button danger small">حذف كل بياناتي المحلية</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not stable[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is not stable[22m
+[2m  - retrying click action[22m
+[2m    - waiting 100ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+[2m    - element is outside of the viewport[22m
+[2m  - retrying click action[22m
+[2m    - waiting 100ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is not stable[22m
+[2m  14 × retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <button type="button" class="button ghost small">استيراد نسخة</button> from <section class="card settings-card">…</section> subtree intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div class="button-row">…</div> intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <button type="button" class="button ghost small">استيراد نسخة</button> from <section class="card settings-card">…</section> subtree intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <button type="button" class="button ghost small">استيراد نسخة</button> from <section class="card settings-card">…</section> subtree intercepts pointer events[22m
+[2m  - retrying click action[22m
+[2m    - waiting 500ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+[2m    - <button type="button" class="button ghost small">استيراد نسخة</button> from <section class="card settings-card">…</section> subtree intercepts pointer events[22m
+[2m  - retrying click action[22m
+[2m    - waiting 500ms[22m
+
+    at /home/user/Stimulator-interview-/work/audit-harness/journeys.mjs:337:67 {
+  name: 'TimeoutError'
+}
+
+Node.js v22.22.0
+EXIT=1
