@@ -3,7 +3,7 @@
 [J1 default mode] سؤال واحد
 [J1 default answer mode] ▤إجابة نصية
 [J1 question header] السؤال 1 من 1
-[J1 question] C2-S1 :: لاحظت ظهور مشكلة متوقعة في سير العمل، ويمكن أن تتطور خلال الأيام القادمة إذا لم 
+[J1 question] C5-S1 :: لديك مهمة طويلة المدى تتضمن عدة مراحل وفريقاً متنوعاً. كيف ستحدد الاتجاه العام و
 [J1 progress bar] 100
 [J1 empty submit toast] اكتب الإجابة أو سجّلها ثم راجع التفريغ أولًا.
 [J1 scrollY after report (item 8)] 0
@@ -13,24 +13,24 @@
 [J1 report sections] إجابتك المعتمدة | بنية الإجابة المكتشفة | تفصيل المعايير | تغطية النقاط المتوقعة | ✓نقاط القوة | !ما ينقص الإجابة | ↗خطوات التحسين
 [J1 action buttons] قارن بنموذج الدليل | الإجابة عن سؤال المتابعة | إنهاء وعرض الملخص
 [J1 null/undefined in report] 0
-[J1 compare dialog open] true :: ⓘ هذا نموذج من الدليل للمقارنة بعد التقييم، وليس الإجابة الصحيحة الوحيدة. نموذج إجابة لاحظت تأخر توريد مادة أساسية للمشر
+[J1 compare dialog open] true :: ⓘ هذا نموذج من الدليل للمقارنة بعد التقييم، وليس الإجابة الصحيحة الوحيدة. نموذج إجابة قبل بدء المشروع قدمت عرضاً يوضح ال
 [J1 followup card] ؟ ما المؤشر الذي استخدمته لقياس النتيجة؟ (متابعة تجريبية) أجب بإيجاز وركّز على هذا المحور فقط.
 [J1 followup merged in report] true
 [J1 followup button still shown after 1 followup?] 0
 [J1 summary] اكتملت المحاكاة ملخص الجلسة 1 إجابة تم تحليلها 85% المتوسط التدريبي
 [J1 summary buttons] طباعة أو تصدير PDF | محاكاة جديدة | سجل الجلسات | العودة للرئيسية
-[J1 sessions list] سؤال واحد نصي 04‏/10‏/2026، 5:46 م 1 إجابة اضغط لفتح الملخص وتقارير الإجابات كاملة 85%
+[J1 sessions list] سؤال واحد نصي 04‏/10‏/2026، 6:43 م 1 إجابة اضغط لفتح الملخص وتقارير الإجابات كاملة 85%
 [J1 saved session view headings] سؤال واحد | ملخص الجلسة | ✓أبرز نقاط القوة | ↗خطوات التحسين | تقارير الإجابات |  |  |  |  |  |  |  |  | المقارنة بنموذج الدليل | نموذج إجابة
 [J1 saved view shows criteria/quotes?] 7
 [J1 print: saved report criteria visible (item 7)] 1
 [J1 print media hides chrome] {"nav":"none","header":"none","noPrint":"none"}
 [J1b flags shown] ملاحظات مهمة الدور الشخصي غير واضح
-[J1b comparison with previous] المقارنة مع آخر جلسة موثقة -8 نقطة السابق 85 · الحالي 77
+[J1b comparison with previous] المقارنة مع آخر جلسة موثقة +0 نقطة السابق 85 · الحالي 85
 [J1c after save&exit: home mentions resume?] true
 [J1c sessions page lists in-progress session?] true
 [J1c IndexedDB sessions] [{"status":"completed","n":1},{"status":"in_progress","draft":"مسودة غير مرسلة","n":0},{"status":"completed","n":1}]
 [J1d resume card shown on simulation setup] 1 :: لديك جلسة غير مكتملة السؤال 1 من 1 — سؤال واحد استئناف حذف الجلسة
-[J1d resumed same question?] true (C2-S4)
+[J1d resumed same question?] true (C3-B10)
 [J1d draft restored?] true
 [J1d after finish: sessions by status (item 6)] {"completed":3,"in_progress":0,"drafts":0}
 [J1d home resume card gone after finish] 0
@@ -42,7 +42,7 @@
 [J2 transcript in editable textarea] هذا تفريغ تجريبي للتسجيل الصوتي، في بداية المشروع كان الفريق متأخرًا وأنا أعدت ت
 [J2 state after transcription] راجع النص وصححه قبل التقييم
 [J2 evaluation auto-started?] false
-[J2 provider transcribe call] {"url":"https://generativelanguage.googleapis.com/v1beta/interactions","model":"gemini-3.8-flash","kind":"transcribe","mime":"audio/webm","audioBytes":50976}
+[J2 provider transcribe call] {"url":"https://generativelanguage.googleapis.com/v1beta/interactions","model":"gemini-3.8-flash","kind":"transcribe","mime":"audio/webm","audioBytes":49356}
 [J2 report uses corrected text] true
 [J2 page errors] []
 [J2b transcription failure message] ⓘ الخدمة مشغولة حاليًا. حاول بعد دقيقة. يمكنك إعادة إرسال التسجيل نفسه أو إعادة التسجيل.
@@ -63,25 +63,25 @@
 [J4 unconfigured notice] ⚙ الواجهة جاهزة، لكن مسؤول التطبيق يحتاج إلى تهيئة مفتاح الخدمة في الخادم ثم إعادة النشر.
 [J4 unconfigured submit error] ⓘ خدمة المحاكاة غير مهيأة بعد. أضف مفتاح الذكاء الاصطناعي في إعدادات الخادم.
 [J5 provider-429 message shown to user] ⓘ الخدمة مشغولة حاليًا. حاول بعد دقيقة.
-[J5 untrusted report hero] التصنيف النوعي إجابة غير موثوق بلا درجة :: ! لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية.
+[J5 untrusted report hero] التصنيف النوعي تقييم غير موثوق بلا درجة :: ! لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية.
 [dialog] confirm: لديك جلسة غير مكتملة. بدء جلسة جديدة سيحذفها. هل تريد المتابعة؟
 [J5 invalid JSON message shown to user] ⓘ تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.
 [J5 answer preserved after error] true
 [J6 realistic/random first screen] تقديم الذات — حتى 60 ثانية
 [J6 realistic self-intro report] التصنيف النوعي إجابة متوسطة 71 من 100
 [J6 realistic scrollY after drawQuestion (item 8)] 0
-[J6 realistic/random question ids] C4-B5,C4-S7
-[J6 realistic summary] اكتملت المحاكاة ملخص الجلسة 3 إجابة تم تحليلها 77% المتوسط التدريبي
+[J6 realistic/random question ids] C8-B1,C8-S6
+[J6 realistic summary] اكتملت المحاكاة ملخص الجلسة 3 إجابة تم تحليلها 80% المتوسط التدريبي
 [J6 extended/random first screen] تقديم الذات — حتى 60 ثانية
 [J6 extended self-intro report] التصنيف النوعي إجابة متوسطة 71 من 100
 [J6 extended scrollY after drawQuestion (item 8)] 0
-[J6 extended/random question ids] C3-B5,C4-B6,C8-S1,C6-S6,C4-S6
+[J6 extended/random question ids] C7-B5,C3-S2,C8-B2,C1-S2,C7-B2
 [J6 extended summary] اكتملت المحاكاة ملخص الجلسة 6 إجابة تم تحليلها 82% المتوسط التدريبي
 [J6 extended/mission first screen] تقديم الذات — حتى 60 ثانية
 [J6 extended self-intro report] التصنيف النوعي إجابة متوسطة 71 من 100
 [J6 extended scrollY after drawQuestion (item 8)] 0
-[J6 extended/mission question ids] M1-B1,M2-B1,M3-B1,M4-S1,M5-B1,M6-S1
-[J6 extended summary] اكتملت المحاكاة ملخص الجلسة 7 إجابة تم تحليلها 82% المتوسط التدريبي
+[J6 extended/mission question ids] M1-S1,M2-S1,M3-B1,M4-B1,M5-S1,M6-S1
+[J6 extended summary] اكتملت المحاكاة ملخص الجلسة 7 إجابة تم تحليلها 83% المتوسط التدريبي
 [J7 missing fields toast] أكمل التعريف المهني والمنصب والتدرج والإنجاز والهدف المستقبلي أولًا.
 [J7 draft] أعرّف بنفسي، أنا قائد عمليات. وعلى مستوى التأهيل، أنجزت بكالوريوس إدارة. بدأت مسيرتي في مشرف عمليات. وتطورت مسؤولياتي لاحقًا من خلال الإشراف ثم إدارة وحدة ثم قي
 [J7 metrics] 75 كلمة المدة التقديرية: 39 ثانية الهدف: حتى 60 ثانية :: ⓘ النص أقصر من المدة المختارة. أضف تفاصيل أكثر عن مسؤولياتك أو إنجازاتك.

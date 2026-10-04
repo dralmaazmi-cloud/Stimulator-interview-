@@ -45,6 +45,9 @@ assert.ok(biasSuite.fixtures.length >= 55, 'Live bias suite must contain at leas
 assert.equal(biasSuite.counts.copied_reference, 10);
 assert.equal(biasSuite.counts.hypothetical_drift, 5);
 assert.equal(biasSuite.counts.off_competency, 5);
+assert.equal(biasSuite.counts.prompt_injection, 5, 'alpha-3: five prompt-injection cases');
+assert.equal(biasSuite.counts.total, 95);
+assert.ok(biasSuite.fixtures.filter(item => item.group === 'prompt_injection').every(item => item.injection_text && item.answer.includes(item.injection_text) && biasSuite.fixtures.some(other => other.id === item.expectation.compare_to)));
 
 const context = getQuestionContext('C1-B1');
 const sourceSamples = sampleAnswerTexts(context.question);
@@ -162,6 +165,38 @@ try {
   else process.env.GOOGLE_API_KEY = savedGoogle;
 }
 
+// alpha-3 البند 1: بوابة الثقة بثلاث حالات (أ، ب، ج) عبر verifyEvidence + الحالة القائمة (5/6 → 74) تبقى.
+{
+  const keys = ['context', 'personal_role_or_options', 'action_or_plan', 'result_or_effect', 'learning', 'competency_evidence'];
+  const trustedBy = verified => verified.failureRate <= 0.3 && verified.unverifiedCriteria <= Math.floor(verified.scoredCriteria / 2);
+  const emptyElements = () => Object.fromEntries(['situation', 'task', 'action', 'result', 'learning'].map(key => [key, { present: false, quote: null }]));
+  const buildRaw = criteria => ({ ...structuredClone(rawReport), elements: emptyElements(), criteria, strengths: [], missing: [], flags: ['generic'] });
+  // (أ) معياران بدرجة 2 ودليل صحيح + أربعة بدرجة 0 بلا دليل
+  const caseA = verifyEvidence(sanitizeEvaluation(buildRaw(keys.map((key, index) => ({
+    key, score: index < 2 ? 2 : 0, evidence: index < 2 ? ['في بداية المشروع كان الفريق متأخرًا'] : [], justification: 'x'
+  }))), context), userText);
+  assert.equal(caseA.scoredCriteria, 2);
+  assert.equal(caseA.unverifiedCriteria, 0);
+  assert.equal(trustedBy(caseA), true, '(أ) must be trusted');
+  const scoreA = calculateScore(caseA.report, 'behavioural', userText);
+  assert.ok(scoreA.final_score > 0 && scoreA.final_score < 50, '(أ) low numeric score');
+  assert.equal(scoreA.classification, 'ضعيفة');
+  // (ب) ستة معايير بدرجات 3–5 بلا أي اقتباس
+  const caseB = verifyEvidence(sanitizeEvaluation(buildRaw(keys.map((key, index) => ({ key, score: 3 + (index % 3), evidence: [], justification: 'x' }))), context), userText);
+  assert.equal(caseB.scoredCriteria, 6);
+  assert.equal(caseB.unverifiedCriteria, 6);
+  assert.equal(trustedBy(caseB), false, '(ب) must be untrusted');
+  // (ج) كل المعايير 0 بلا اقتباسات
+  const caseC = verifyEvidence(sanitizeEvaluation(buildRaw(keys.map(key => ({ key, score: 0, evidence: [], justification: 'x' }))), context), userText);
+  assert.equal(caseC.scoredCriteria, 0);
+  assert.equal(caseC.unverifiedCriteria, 0);
+  assert.equal(trustedBy(caseC), true, '(ج) must be trusted');
+  // الحالة القائمة: 5/6 موثقة
+  assert.equal(verified.scoredCriteria, 6);
+  assert.equal(verified.unverifiedCriteria, 1);
+  assert.equal(trustedBy(verified), true);
+}
+
 // البند 5: طول الاقتباس — كلمة واحدة تُرفض، وثلاث كلمات تُقبل.
 {
   const shortQuoteReport = sanitizeEvaluation(structuredClone(rawReport), context);
@@ -207,6 +242,15 @@ try {
     }
     assert.equal(providerBody.response_format.mime_type, 'application/json');
     sourceSamples.forEach(sample => assert.ok(!providerBody.input.includes(sample), 'Provider request leaked a source model answer'));
+    if (providerBody.input.includes('ALL-ZERO') || providerBody.input.includes('NO-QUOTES')) {
+      const zero = providerBody.input.includes('ALL-ZERO');
+      const variant = {
+        ...structuredClone(rawReport),
+        elements: Object.fromEntries(Object.keys(rawReport.elements).map(key => [key, { present: false, quote: null }])),
+        criteria: rawReport.criteria.map((item, index) => ({ ...item, score: zero ? 0 : 3 + (index % 3), evidence: [] }))
+      };
+      return new Response(JSON.stringify(restPayload(JSON.stringify(variant))), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
     if (providerBody.input.includes('FAILED-STATUS')) {
       return new Response(JSON.stringify(restPayload('', { status: 'failed', steps: [] })), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
@@ -226,6 +270,32 @@ try {
   assert.equal(livePathRes.payload.report.verification.rejected_quotes, 1);
   assert.equal(livePathRes.payload.report.verification.verified_criteria, 5);
   assert.equal(livePathRes.payload.meta.reference_sha256, manifest.reference_sha256);
+
+  // alpha-3 البند 1 عبر المعالج: (ج) كل المعايير 0 بلا اقتباسات → 200، موثوق، الدرجة 0، «ضعيفة».
+  const zeroRes = mockResponse();
+  await evaluateHandler({
+    method: 'POST',
+    headers: { 'x-client-id': 'phase2-all-zero', 'x-forwarded-for': '10.0.0.5' },
+    socket: { remoteAddress: '127.0.0.1' },
+    body: { question_id: 'C1-B1', answer: `${userText} ALL-ZERO` }
+  }, zeroRes);
+  assert.equal(zeroRes.statusCode, 200, JSON.stringify(zeroRes.payload));
+  assert.equal(zeroRes.payload.report.trusted, true);
+  assert.equal(zeroRes.payload.report.final_score, 0);
+  assert.equal(zeroRes.payload.report.classification, 'ضعيفة');
+  assert.equal(zeroRes.payload.report.verification.scored_criteria, 0);
+  // (ب) عبر المعالج: ستة معايير مُدرَّجة بلا اقتباسات → غير موثوق بلا درجة.
+  const noQuotesRes = mockResponse();
+  await evaluateHandler({
+    method: 'POST',
+    headers: { 'x-client-id': 'phase2-no-quotes', 'x-forwarded-for': '10.0.0.6' },
+    socket: { remoteAddress: '127.0.0.1' },
+    body: { question_id: 'C1-B1', answer: `${userText} NO-QUOTES` }
+  }, noQuotesRes);
+  assert.equal(noQuotesRes.statusCode, 200, JSON.stringify(noQuotesRes.payload));
+  assert.equal(noQuotesRes.payload.report.trusted, false);
+  assert.equal(noQuotesRes.payload.report.final_score, null);
+  assert.equal(noQuotesRes.payload.report.verification.unverified_criteria, 6);
 
   // البند 1: status غير completed → 502 برسالة عربية ثابتة.
   const failedRes = mockResponse();
@@ -259,6 +329,35 @@ try {
     body: { text: 'أنا مدير فريق العمليات وأتولى حاليًا قيادة فريق متعدد التخصصات. بدأت مسيرتي مشرف عمليات.', duration: 60 }
   }, selfIntroRes);
   assert.equal(selfIntroRes.statusCode, 200, JSON.stringify(selfIntroRes.payload));
+
+  // alpha-3 البند 2: حدّان معًا — (IP + معرّف) 40/ساعة، وIP 200/ساعة مشترك.
+  {
+    const call = async (client, ip) => {
+      const res = mockResponse();
+      await evaluateHandler({
+        method: 'POST',
+        headers: { 'x-client-id': client, 'x-forwarded-for': ip },
+        socket: { remoteAddress: '127.0.0.1' },
+        body: { question_id: 'C1-B1', answer: 'قصير' }
+      }, res);
+      return res;
+    };
+    let last;
+    for (let index = 0; index < 41; index += 1) last = await call('rl-same', '10.0.0.77');
+    assert.equal(last.statusCode, 429, '41st request with the same client id must be rate limited');
+    assert.equal(last.payload.code, 'RATE_LIMITED');
+    const other = await call('rl-other', '10.0.0.77');
+    assert.equal(other.statusCode, 400, 'another client id from the same IP still passes (validation 400, not 429)');
+    let hit = null;
+    for (let index = 0; index < 220 && hit == null; index += 1) {
+      const res = await call(`rl-fresh-${index}`, '10.0.0.77');
+      if (res.statusCode === 429) hit = index;
+    }
+    // 41 + 1 + 158 = 200 → الطلب 201 من العنوان يُرفض.
+    assert.equal(hit, 158, 'the IP cap must trigger exactly when the address reaches 200 requests');
+    const otherIp = await call('rl-fresh-0', '10.0.0.78');
+    assert.equal(otherIp.statusCode, 400, 'a different IP is unaffected');
+  }
 
   const kinds = providerBodies.map(body => Array.isArray(body.input) ? 'transcribe' : body.response_format?.schema?.properties?.facts_preserved ? 'self-intro' : 'evaluate');
   assert.ok(['evaluate', 'transcribe', 'self-intro'].every(kind => kinds.includes(kind)), 'All three provider request kinds must be exercised');

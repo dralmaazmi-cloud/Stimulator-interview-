@@ -37,6 +37,8 @@ function buildEvaluation(prompt) {
   const schemaFail = /BADSCHEMA/.test(answer) || seqMode === 'BADSCHEMA';
   const noFollowup = /NOFOLLOWUP/.test(answer);
   const noQuotes = /NOQUOTES/.test(answer);
+  const lowScore = /LOWSCORE/.test(answer); // two criteria scored 2 with real quotes, four scored 0 without evidence
+  const allZero = /ALLZERO/.test(answer); // every criterion 0, no quotes anywhere
   const quotes = bad ? ['اقتباس مختلق غير موجود في الإجابة', 'اقتباس آخر مختلق', 'ثالث مختلق'] : pick(answer, 5);
   const qt = i => (noQuotes ? [] : [quotes[i % quotes.length] || quotes[0]]);
   const elementQuote = i => (noQuotes ? null : (quotes[i % quotes.length] || quotes[0]));
@@ -46,7 +48,7 @@ function buildEvaluation(prompt) {
       : ['context', 'personal_role_or_options', 'action_or_plan', 'result_or_effect', 'learning', 'competency_evidence'];
   const elements = {};
   const elementKeys = mode === 'star_l' ? ['situation', 'task', 'action', 'result', 'learning'] : mode === 'seal' ? ['situation', 'evaluation', 'action', 'leadership_effect'] : [];
-  elementKeys.forEach((k, i) => { elements[k] = { present: !noQuotes, quote: elementQuote(i) }; });
+  elementKeys.forEach((k, i) => { elements[k] = { present: !noQuotes && !lowScore && !allZero, quote: (lowScore || allZero) ? null : elementQuote(i) }; });
   const pointsMatch = prompt.split('النقاط المتوقعة:\n')[1].split('\n\n')[0];
   let points = [];
   try { points = JSON.parse(pointsMatch); } catch { points = []; }
@@ -54,8 +56,13 @@ function buildEvaluation(prompt) {
     question_id: schemaFail ? 'WRONG-ID' : q.id,
     rubric_mode: mode,
     elements,
-    criteria: criteriaKeys.map((key, i) => ({ key, score: 3 + (i % 3), evidence: qt(i), justification: `تبرير تجريبي للمعيار ${key}.` })),
-    expected_points_coverage: points.map((p, i) => ({ point: p, covered: i % 2 === 0, quote: i % 2 === 0 ? elementQuote(i) : null })),
+    criteria: criteriaKeys.map((key, i) => ({
+      key,
+      score: allZero ? 0 : lowScore ? (i < 2 ? 2 : 0) : 3 + (i % 3),
+      evidence: allZero ? [] : lowScore ? (i < 2 ? qt(i) : []) : qt(i),
+      justification: `تبرير تجريبي للمعيار ${key}.`
+    })),
+    expected_points_coverage: points.map((p, i) => ({ point: p, covered: !(lowScore || allZero) && i % 2 === 0, quote: !(lowScore || allZero) && i % 2 === 0 ? elementQuote(i) : null })),
     behaviours_observed: { supporting: [], negative: [] },
     mission_command_indicators: q.id.startsWith('M') ? ['M1'] : [],
     flags: /نحن/.test(answer) ? ['we_not_i'] : [],

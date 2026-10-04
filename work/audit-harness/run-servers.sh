@@ -2,7 +2,9 @@
 # Restarts the five harness servers (normal, rest-shape, unconfigured, 429, 400). Logs under shots/logs.
 cd "$(dirname "$0")"
 mkdir -p shots/logs
-if [ -f shots/logs/pids ]; then kill $(cat shots/logs/pids) 2>/dev/null; sleep 0.5; fi
+if [ -f shots/logs/pids ]; then kill $(cat shots/logs/pids) 2>/dev/null; fi
+for p in 4173 4174 4175 4176 4177; do fuser -k "$p/tcp" >/dev/null 2>&1; done
+sleep 0.5
 : > shots/logs/pids
 start() { "$@" & echo $! >> shots/logs/pids; }
 start env node server.mjs > shots/logs/4173.log 2>&1

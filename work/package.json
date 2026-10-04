@@ -1,11 +1,11 @@
 {
   "name": "leadership-interview-coach",
-  "version": "0.5.1-alpha-2",
+  "version": "0.5.1-alpha-3",
   "private": true,
   "type": "module",
   "scripts": {
     "derive": "node tools/build-derived.js && node tools/apply-exercise-overrides.js",
-    "exercise-overrides": "node tools/build-exercise-overrides.js && node tools/apply-exercise-overrides.js",
+    "exercise-overrides": "node tools/build-derived.js && node tools/build-exercise-overrides.js && node tools/apply-exercise-overrides.js",
     "fixtures": "node tools/build-bias-fixtures.js",
     "test:phase1": "node tests/phase1.test.mjs",
     "test:phase2": "node tests/phase2.test.mjs",

@@ -89,3 +89,13 @@ export function clientKey(req) {
 export function clientIdForLog(req) {
   return String(req.headers['x-client-id'] || '').slice(0, 80) || 'anonymous';
 }
+
+// alpha-3: حدّان معًا — لكل IP (مشترك بين كل النقاط، 200/ساعة أو RATE_LIMIT_IP)،
+// ولكل (IP + X-Client-Id) حد النقطة نفسها.
+export function rateLimitScopes(req, endpoint) {
+  const ip = clientKey(req);
+  return {
+    ip: { key: `ip:${ip}`, limit: Number(process.env.RATE_LIMIT_IP) || 200 },
+    client: { key: `${endpoint}:${ip}:${clientIdForLog(req)}` }
+  };
+}

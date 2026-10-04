@@ -125,6 +125,8 @@ export function quoteLongEnough(normalizedQuote) {
 
 export function verifyEvidence(report, userText) {
   const normalizedUser = normalizeArabic(userText);
+  // عدد المعايير التي أعطاها النموذج درجة > 0 قبل أي تخفيض.
+  const scoredCriteria = report.criteria.filter(criterion => criterion.score > 0).length;
   let checked = 0;
   let failed = 0;
   const validQuote = quote => {
@@ -167,13 +169,17 @@ export function verifyEvidence(report, userText) {
 
   // عدد المعايير ذات الدرجة > 0 التي بقي لها دليل موثّق واحد على الأقل بعد التحقق.
   const verifiedCriteria = report.criteria.filter(criterion => criterion.score > 0 && criterion.evidence.length > 0).length;
+  // عدد المعايير الموسومة unverified (درجة > 0 بلا دليل موثّق).
+  const unverifiedCriteria = report.criteria.filter(criterion => criterion.unverified).length;
 
   return {
     report,
     checked,
     failed,
     failureRate: checked ? failed / checked : 0,
-    verifiedCriteria
+    verifiedCriteria,
+    scoredCriteria,
+    unverifiedCriteria
   };
 }
 

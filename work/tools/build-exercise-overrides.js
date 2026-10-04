@@ -1,5 +1,6 @@
 // يولّد tools/exercise-overrides.json من نصوص المرجع فقط (v0.5.1 — البند 11).
-// التفسيرات تستند إلى reference.json ولا تنسب إليه ما ليس فيه. يُشغَّل مرة عند تغيير المرجع أو التمارين.
+// التفسيرات تستند إلى reference.json ولا تنسب إليه ما ليس فيه. يُشغَّل على مخرجات build-derived.js الخام
+// (قبل التطبيق) عبر `npm run exercise-overrides`؛ تشغيله على ملف مُطبَّق سابقًا يُفرغ قائمة الحذف.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -66,6 +67,40 @@ reference.part_4_mission_command.principles.forEach(principle => {
 // الدرس 7: نصائح لغة الجسد من جدول القسم 6.5.
 table('part_6_preparation', '6.5').rows.forEach((row, index) => {
   explanations[`L7-BODY-${index + 1}`] = `النصيحة «${clean(row[0])}» هي العنوان الذي يضعه المرجع لهذا التفصيل في جدول لغة الجسد، لأن التفصيل يشرح طريقة تطبيقها أثناء المقابلة — القسم 6.5.`;
+});
+
+// alpha-3 (البند 5): توسيع التفسيرات ذات السطر الواحد إلى جملة تشرح السبب من نص المرجع.
+const competencyById = new Map(competencies.map(item => [item.id, item]));
+const comparisonTable = table('part_1_framework', '1.2');
+exercises.filter(item => /^L1-CLASS-/.test(item.id)).forEach(item => {
+  const row = comparisonTable.rows.find(candidate => candidate.includes(item.stimulus));
+  if (!row) return;
+  const column = row.indexOf(item.stimulus);
+  const header = comparisonTable.headers[column] || '';
+  const definition = clean(row[1]);
+  const role = clean(row[3]);
+  explanations[item.id] = column === 1
+    ? `العبارة واردة في صف «${clean(row[0])}» من جدول المقارنة في القسم 1.2 تحت عمود «${header}»، ويبيّن الجدول أن دور هذا العنصر في التقييم: ${role.replace(/[.،]$/, '')}.`
+    : `العبارة واردة في صف «${clean(row[0])}» من جدول المقارنة في القسم 1.2 تحت عمود «${header}»، لأن الجدول يعرّف «${clean(row[0])}» بأنها ${definition.replace(/[.،]$/, '')}.`;
+});
+exercises.filter(item => /^L5-BEH-[SN]-/.test(item.id)).forEach(item => {
+  const competency = competencyById.get(item.id.match(/^L5-BEH-[SN]-(C\d)/)[1]);
+  if (!competency) return;
+  const definition = firstSentence(competency.definition).replace(/[.،]$/, '');
+  explanations[item.id] = /-S-/.test(item.id)
+    ? `«${clean(item.stimulus).replace(/[.،]$/, '')}» مذكور في قائمة السلوكيات الداعمة لكفاءة «${competency.name}» في المرجع، لأنه يجسّد تعريفها: ${definition}.`
+    : `«${clean(item.stimulus).replace(/[.،]$/, '')}» مذكور في قائمة السلوكيات السلبية لكفاءة «${competency.name}» في المرجع، لأنه يتعارض مع تعريفها: ${definition}.`;
+});
+exercises.filter(item => /^L5-MODE-/.test(item.id)).forEach(item => {
+  explanations[item.id] = item.answer === 0 || /سلوكي/.test(item.choices[item.answer])
+    ? `صيغة السؤال تطلب موقفًا حدث فعلًا من خبرتك؛ وهذا هو السؤال السلوكي الذي يُجاب عنه بنموذج STAR-L (الموقف، المهمة، الإجراء، النتيجة، التعلّم) وفق القسم 2.1 في المرجع.`
+    : `السؤال يضع موقفًا افتراضيًا ويسأل ماذا ستفعل؛ وهذا سؤال سيناريو يُجاب عنه بنموذج SEAL (الوضع، التقييم، الإجراء القيادي، الأثر القيادي) وفق القسم 2.2 في المرجع.`;
+});
+exercises.filter(item => /^L7-PREP-/.test(item.id)).forEach(item => {
+  explanations[item.id] = `هذا الإجراء مذكور في قائمة التحضير الأولي (القسم 6.1) التي تجمع ما يُنجز قبل المقابلة، وليس من عناصر تقديم الذات (القسم 6.3) ولا من نصائح لغة الجسد (القسم 6.5).`;
+});
+exercises.filter(item => /^L8-GENERAL-/.test(item.id)).forEach(item => {
+  explanations[item.id] = `هذا السؤال من الأسئلة العامة التي لا تطلب موقفًا حدث فعلًا ولا سيناريو افتراضيًا؛ لذلك تُنظَّم إجابته بالوضوح وعمق التحليل والربط بالممارسة والواقعية بدل STAR-L أو SEAL.`;
 });
 
 // التكرار: من كل زوج متطابق المحفّز يُحذف التمرين الأقل تفسيرًا (L5-BEH-S-Cx-1) ويبقى L5-COMP-Cx.

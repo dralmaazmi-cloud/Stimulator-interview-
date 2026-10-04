@@ -1,4 +1,22 @@
-# سجل التغييرات — v0.5.1-alpha-2 (إصلاح تقرير التدقيق المستقل، 4 أكتوبر 2026)
+# سجل التغييرات — v0.5.1
+
+## alpha-3 (4 أكتوبر 2026) — خمسة بنود فوق alpha-2
+
+| البند | الملفات | التغيير | الاختبار المُثبِت | الحالة |
+|---|---|---|---|---|
+| 1 بوابة الثقة | `api/_lib/validation.js` (`verifyEvidence` → `scoredCriteria`, `unverifiedCriteria`)، `api/evaluate.js` (`trusted = failureRate ≤ 0.3 && unverified ≤ floor(scored/2)`؛ `scored = 0` → درجة 0 «ضعيفة»؛ `verification.scored_criteria/unverified_criteria`)، `dist/js/report.js` (العنوان «تقييم غير موثوق» ورسالة عدم الثقة عند `trusted === false` فقط) | حُذف شرطا `checked > 0` و`verifiedCriteria ≥ ceil(n/2)` | `phase2.test.mjs`: الحالات أ/ب/ج عبر `verifyEvidence` وعبر المعالج + الحالة القائمة 5/6 → 74؛ `api-scenarios`: «trust gate (أ)» score=8 ضعيفة، «zero quotes» (ب) بلا درجة، «trust gate (ج)» score=0 ضعيفة | مُثبَت |
+| 2 حدّان للمعدل | `api/_lib/http.js` (`rateLimitScopes`)، `api/evaluate.js`، `api/transcribe.js`، `api/self-intro.js`، `api/_lib/rate-limit.js` (توثيق) | IP 200/ساعة مشترك (`RATE_LIMIT_IP`) + (IP + `X-Client-Id`) 40/30/20 (`RATE_LIMIT_EVALUATE` يرفع حد التقييم فقط) | `phase2.test.mjs`: الطلب 41 → 429، معرّف آخر → 400، الطلب 201 من العنوان → 429، عنوان آخر يمر؛ `api-scenarios` 16 (محدّث) + 21 (سقف IP، يُشغَّل أخيرًا) | مُثبَت |
+| 3 حالات الحقن | `tools/build-bias-fixtures.js` (`INJECTIONS`, مجموعة `prompt_injection`)، `tests/answers/bias-suite.json` (95 حالة، `suite_version 1.1`)، `tests/live-evaluation.mjs` (قاعدتا `injection_not_rewarded` و`injection_text_not_used_as_evidence`)، `tests/phase2.test.mjs` (العدد 5 والإجمالي 95) | 5 حالات = نص حقن + إجابة `dialect-N-msa` النظيفة | `npm test` (العدّ والبنية)؛ **لا تشغيل حي** | مُثبَت محليًا (البنية فقط) |
+| 4 مدة التفريغ | `api/transcribe.js` (الرسالة)، `dist/js/evaluate-client.js` (`toFixed(2)`) | مدة ≤ 0 → «التسجيل قصير جدًا. سجّل ثانية واحدة على الأقل.»؛ العميل يرسل كسرًا عشريًا | `api-scenarios` «missing X-Audio-Duration → 400» PASS؛ `journeys` J2/J2b تفريغ ناجح بالمدة العشرية | مُثبَت |
+| 5 التفسيرات | `tools/build-exercise-overrides.js`، `tools/exercise-overrides.json` (100 تفسير)، `dist/data/exercises.json`، `package.json` (`exercise-overrides` يبدأ من `build-derived.js` الخام) | «موجز التنفيذ» → عبارة للمستخدم (8)؛ توسيع قوالب «ورد ضمن السلوكيات…» (22)، «سؤال سيناريو/سلوكي…» (16)، «العبارة واردة في صف…» (12)، «ورد في قائمة التحضير الأولي» (5) إلى جمل تشرح السبب من المرجع | `npm test` (130 تمرينًا، لا تفسير = الخيار، لا أسماء حقول، ≤ 5 خيارات، لا تكرار، أعلى موضع 30%)؛ `grep "موجز التنفيذ" dist/data/exercises.json` = 0؛ الطبقة المشتقة مطابقة بايت-ببايت | مُثبَت |
+
+ثوابت: بصمة المرجع `51d413de…a357` دون تغيير؛ `dist/data/derived/*` مطابق بايت-ببايت؛ نصوص الأسئلة والمحفّزات لم تُمس. تعديل الاختبارات في هذه الجولة بالإضافة فقط وفي البنود 1–3 (وسيناريو 16 في الأداة حُدّث نصه لأن قاعدته تغيّرت بالبند 2).
+
+ملاحظة: اسم كاش `sw.js` لم يتغيّر (`v0.5.1`) لأن alpha-2 لم تُنشر؛ عند النشر فوق نسخة منشورة سابقًا غيّر اللاحقة.
+
+---
+
+# alpha-2 (إصلاح تقرير التدقيق المستقل، 4 أكتوبر 2026)
 
 الوسم `alpha-2` وليس `beta` لأن الصفوف 8–10 من بوابة القبول (Smoke حي، `npm run test:live`، iPhone) تحتاج مفتاحًا ونشرًا تجريبيًا وجهازًا حقيقيًا غير متوفرة في بيئة التنفيذ. كل البنود المحلية (1–15) مُثبَتة آليًا.
 

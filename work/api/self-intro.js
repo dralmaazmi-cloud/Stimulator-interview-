@@ -1,4 +1,4 @@
-import { clientKey, handleApiError, httpError, methodAllowed, readJson, sendJson } from './_lib/http.js';
+import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
 import { complete } from './_lib/provider.js';
 import { selfIntroSchema } from './_lib/schemas.js';
@@ -9,7 +9,9 @@ export default async function handler(req, res) {
   const started = Date.now();
   if (!methodAllowed(req, res, ['POST'])) return;
   try {
-    enforceRateLimit(`self-intro:${clientKey(req)}`, { limit: 20, windowMs: 60 * 60 * 1000 });
+    const scopes = rateLimitScopes(req, 'self-intro');
+    enforceRateLimit(scopes.ip.key, { limit: scopes.ip.limit, windowMs: 60 * 60 * 1000 });
+    enforceRateLimit(scopes.client.key, { limit: 20, windowMs: 60 * 60 * 1000 });
     const body = await readJson(req, 80_000);
     const text = String(body.text || '').trim();
     const duration = Number(body.duration) === 120 ? 120 : 60;

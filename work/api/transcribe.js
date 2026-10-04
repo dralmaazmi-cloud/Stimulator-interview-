@@ -1,4 +1,4 @@
-import { clientKey, handleApiError, httpError, methodAllowed, readBuffer, sendJson } from './_lib/http.js';
+import { handleApiError, httpError, methodAllowed, rateLimitScopes, readBuffer, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
 import { transcribe } from './_lib/provider.js';
 import { recordUsage } from './_lib/usage.js';
@@ -21,13 +21,15 @@ export default async function handler(req, res) {
   if (!methodAllowed(req, res, ['POST'])) return;
   let audio;
   try {
-    enforceRateLimit(`transcribe:${clientKey(req)}`, { limit: 30, windowMs: 60 * 60 * 1000 });
+    const scopes = rateLimitScopes(req, 'transcribe');
+    enforceRateLimit(scopes.ip.key, { limit: scopes.ip.limit, windowMs: 60 * 60 * 1000 });
+    enforceRateLimit(scopes.client.key, { limit: 30, windowMs: 60 * 60 * 1000 });
     const rawMime = String(req.headers['content-type'] || '').toLowerCase();
     const mime = rawMime.split(';')[0].trim();
     const duration = Number(req.headers['x-audio-duration'] || 0);
     const contentLength = Number(req.headers['content-length'] || 0);
     if (!ALLOWED_MIME.has(mime)) throw httpError(415, 'صيغة التسجيل غير مدعومة.');
-    if (!Number.isFinite(duration) || duration <= 0) throw httpError(400, 'مدة التسجيل مطلوبة.');
+    if (!Number.isFinite(duration) || duration <= 0) throw httpError(400, 'التسجيل قصير جدًا. سجّل ثانية واحدة على الأقل.');
     if (duration > 120) throw httpError(413, 'مدة التسجيل تتجاوز 120 ثانية.');
     if (contentLength > MAX_AUDIO_BYTES) throw httpError(413, 'حجم التسجيل يتجاوز 4 MB.');
     audio = await readBuffer(req, MAX_AUDIO_BYTES);

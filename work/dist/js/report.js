@@ -113,12 +113,12 @@ export function renderEvaluationReport(options) {
     : el('strong', { class: 'final-score' }, el('bdi', { text: String(report.final_score) }), ' من 100');
   const panel = el('section', { class: 'evaluation-report section-block' },
     el('header', { class: `score-hero ${tone}` },
-      el('div', {}, el('small', { text: 'التصنيف النوعي' }), el('h2', { text: `إجابة ${report.classification}` })),
+      el('div', {}, el('small', { text: 'التصنيف النوعي' }), el('h2', { text: report.trusted === false ? 'تقييم غير موثوق' : `إجابة ${report.classification}` })),
       finalScore
     ),
-    report.trusted
-      ? notice('اجتاز التقرير فحص المخطط والاقتباسات الحرفية.', '', '✓')
-      : notice('لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية.', 'danger', '!'),
+    report.trusted === false
+      ? notice('لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية.', 'danger', '!')
+      : notice('اجتاز التقرير فحص المخطط والاقتباسات الحرفية.', '', '✓'),
     report.near_reference_model
       ? notice('إجابتك قريبة من نموذج الدليل. استخدم موقفًا حقيقيًا من خبرتك بدل حفظ المثال.', 'warning')
       : null,

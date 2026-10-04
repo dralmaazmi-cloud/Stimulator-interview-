@@ -1,5 +1,5 @@
-// مفتاح الحد = عنوان IP فقط (أول قيمة في x-forwarded-for). المعرّف X-Client-Id يُستخدم للسجل فقط.
-// المرحلة الثالثة: الانتقال إلى مخزن KV خادمي للحصص.
+// حدّان معًا (alpha-3): لكل IP 200/ساعة مشترك بين النقاط (RATE_LIMIT_IP)، ولكل (IP + X-Client-Id) حد النقطة
+// (التقييم 40 أو RATE_LIMIT_EVALUATE، التفريغ 30، تقديم الذات 20). المرحلة الثالثة: مخزن KV خادمي للحصص.
 const buckets = new Map();
 
 export function enforceRateLimit(key, options = {}) {

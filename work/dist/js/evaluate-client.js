@@ -58,7 +58,7 @@ export async function transcribeWithAi(blob, durationSeconds) {
     timeout: 60_000,
     headers: {
       'Content-Type': blob.type || 'audio/webm',
-      'X-Audio-Duration': String(Math.max(0, Math.round(durationSeconds || 0)))
+      'X-Audio-Duration': Math.max(0, Number(durationSeconds) || 0).toFixed(2)
     }
   });
 }

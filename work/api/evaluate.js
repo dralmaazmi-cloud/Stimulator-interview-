@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { clientKey, handleApiError, httpError, methodAllowed, readJson, sendJson } from './_lib/http.js';
+import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
 import { complete } from './_lib/provider.js';
 import { getQuestionContext, sampleAnswerTexts } from './_lib/data.js';
@@ -38,7 +38,9 @@ export default async function handler(req, res) {
   const started = Date.now();
   if (!methodAllowed(req, res, ['POST'])) return;
   try {
-    enforceRateLimit(`evaluate:${clientKey(req)}`, { limit: Number(process.env.RATE_LIMIT_EVALUATE) || 40, windowMs: 60 * 60 * 1000 });
+    const scopes = rateLimitScopes(req, 'evaluate');
+    enforceRateLimit(scopes.ip.key, { limit: scopes.ip.limit, windowMs: 60 * 60 * 1000 });
+    enforceRateLimit(scopes.client.key, { limit: Number(process.env.RATE_LIMIT_EVALUATE) || 40, windowMs: 60 * 60 * 1000 });
     const body = await readJson(req, 160_000);
     const questionId = String(body.question_id || '').trim();
     const answer = String(body.answer || '').trim();
@@ -89,13 +91,16 @@ export default async function handler(req, res) {
       const competencyCriterion = evaluated.report.criteria.find(item => item.key === 'competency_evidence');
       if (competencyCriterion) competencyCriterion.score = Math.min(3, competencyCriterion.score);
     }
-    const criteriaCount = evaluated.report.criteria.length;
-    const trusted = evaluated.checked > 0
-      && evaluated.failureRate <= 0.3
-      && evaluated.verifiedCriteria >= Math.ceil(criteriaCount / 2);
-    const score = trusted
-      ? calculateScore(evaluated.report, context.question.type, evaluated.combinedText)
-      : { final_score: null, classification: 'غير موثوق', action_ratio: null, weights_version: 'phase2-1.0' };
+    // بوابة الثقة (alpha-3): نسبة فشل الاقتباسات ≤ 30% وعدد المعايير غير الموثقة ≤ نصف المعايير المُدرَّجة.
+    // إذا لم يُدرِّج النموذج أي معيار (scoredCriteria = 0) فالتقرير موثوق بدرجة 0 وتصنيف «ضعيفة».
+    const trusted = evaluated.failureRate <= 0.3
+      && evaluated.unverifiedCriteria <= Math.floor(evaluated.scoredCriteria / 2);
+    let score;
+    if (!trusted) score = { final_score: null, classification: 'غير موثوق', action_ratio: null, weights_version: 'phase2-1.0' };
+    else {
+      score = calculateScore(evaluated.report, context.question.type, evaluated.combinedText);
+      if (evaluated.scoredCriteria === 0) score = { ...score, final_score: 0, classification: 'ضعيفة' };
+    }
     const report = {
       ...evaluated.report,
       ...score,
@@ -108,6 +113,8 @@ export default async function handler(req, res) {
         rejected_quotes: evaluated.failed,
         failure_rate: Number(evaluated.failureRate.toFixed(3)),
         verified_criteria: evaluated.verifiedCriteria,
+        scored_criteria: evaluated.scoredCriteria,
+        unverified_criteria: evaluated.unverifiedCriteria,
         retried: Boolean(firstError)
       }
     };
