@@ -1,0 +1,24 @@
+export const CONFIG = Object.freeze({
+  appVersion: '0.5.1-alpha-4',
+  referenceSha256: '51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357',
+  promptVersion: 'evaluation-1.1',
+  rubricVersion: 'reference-rubric-1.0',
+  configVersion: '4.0',
+  review: {
+    repeatAfterMistake: true,
+    maxExercisesPerLessonSession: 3
+  },
+  selfIntroduction: { wordsPerMinute: 115, durations: [60, 120] },
+  ai: {
+    enabled: true,
+    maximumAudioSeconds: 120,
+    audioWarningSeconds: 90,
+    maximumAudioBytes: 4 * 1024 * 1024,
+    endpoints: {
+      health: '/api/health',
+      evaluate: '/api/evaluate',
+      transcribe: '/api/transcribe',
+      selfIntro: '/api/self-intro'
+    }
+  }
+});

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-labelledby="title desc">
+  <title id="title">مسار الاستعداد للمقابلة</title>
+  <desc id="desc">جبال هادئة وطريق متدرج نحو راية ترمز إلى إكمال المسار التعليمي</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dff1ee"/>
+      <stop offset="1" stop-color="#fff4d7"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff9e9"/>
+      <stop offset="1" stop-color="#f3dfae"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="300" rx="26" fill="url(#sky)"/>
+  <circle cx="675" cy="76" r="46" fill="#f6dca0" opacity=".9"/>
+  <path d="M0 190 150 85l105 93 117-125 154 151 115-115 159 111v100H0Z" fill="#6ab0ad" opacity=".48"/>
+  <path d="M0 222 205 123l125 95 130-108 126 111 116-75 198 92v62H0Z" fill="#297f7a" opacity=".74"/>
+  <path d="M0 257 178 181l112 68 144-93 136 85 141-65 189 88v36H0Z" fill="#0f5b57"/>
+  <path d="M405 300c32-38 113-54 101-92-9-30-78-31-51-64 16-20 69-18 87-41" fill="none" stroke="url(#road)" stroke-width="25" stroke-linecap="round"/>
+  <path d="M543 101V43" stroke="#083b39" stroke-width="6" stroke-linecap="round"/>
+  <path d="m546 45 47 14-47 17Z" fill="#0e7c73"/>
+</svg>

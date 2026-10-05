@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="مدرّب المقابلات القيادية">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0e7c73"/>
+      <stop offset="1" stop-color="#083b39"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <circle cx="256" cy="256" r="158" fill="none" stroke="#faf6ee" stroke-width="22" opacity=".22"/>
+  <path d="M145 194c0-33 27-60 60-60h102c33 0 60 27 60 60v78c0 33-27 60-60 60h-40l-64 54 13-54h-11c-33 0-60-27-60-60z" fill="#faf6ee"/>
+  <circle cx="207" cy="235" r="15" fill="#0e7c73"/>
+  <circle cx="256" cy="235" r="15" fill="#0e7c73"/>
+  <circle cx="305" cy="235" r="15" fill="#0e7c73"/>
+</svg>

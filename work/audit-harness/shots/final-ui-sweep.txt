@@ -1,0 +1,54 @@
+[NO-BACK] #/home [light]: back button hidden
+[ENGLISH] #/learn/U1 [light]: Behavioural,Evidence,Behavioural,Questions,Scenario,Questions,Korn,Ferry
+[ENGLISH] #/learn/U2 [light]: Situation,Task,Action,Result,Learning,Situation,Evaluation,Action
+[ENGLISH] #/learn/U6 [light]: Rehearsal,Mock,Interviews
+[ENGLISH] #/bank/C1-B1 [light]: Situation,Task,Action,Result,Learning
+[ENGLISH] #/search?q=النتيجة [light]: Rehearsal,Rehearsal
+[SMALL-TARGET] #/settings [light]: 1/24: input[] 1x1
+[MODEL-TOGGLE] #/bank/C1-B1: closed by default=true, opens on tap=true
+[M6-ORDER] #/bank/M6-S1: {"q":37,"o1":66,"o2":124,"c":201} OK
+[C4-SAMPLES] #/bank/C4-S10: {"count":14,"summary":"إظهار الإجابة النموذجية (14)","titles":["الشيخ زايد بن سلطان آل نهيان (رحمه الله)","الشيخ محمد بن زايد آل نهيان","الشيخ محمد بن راشد آل مكتوم"]}
+[EXERCISE] #/learn/U2: feedback: إجابة غير صحيحة /  / الإجابة الصحيحة: S — الموقف /  / هذا المقطع هو عنصر الموقف (S) في نموذج الدليل للسؤال C1-B3، لأنه يؤدي ما يحدده المرجع لهذا العنصر: «الموقف
+[NO-BACK] #/home [dark]: back button hidden
+[ENGLISH] #/learn/U1 [dark]: Behavioural,Evidence,Behavioural,Questions,Scenario,Questions,Korn,Ferry
+[ENGLISH] #/learn/U2 [dark]: Situation,Task,Action,Result,Learning,Situation,Evaluation,Action
+[ENGLISH] #/learn/U6 [dark]: Rehearsal,Mock,Interviews
+[ENGLISH] #/bank/C1-B1 [dark]: Situation,Task,Action,Result,Learning
+[ENGLISH] #/search?q=النتيجة [dark]: Rehearsal,Rehearsal
+[SMALL-TARGET] #/settings [dark]: 1/24: input[] 1x1
+[MODEL-TOGGLE] #/bank/C1-B1: closed by default=true, opens on tap=true
+[M6-ORDER] #/bank/M6-S1: {"q":37,"o1":66,"o2":124,"c":201} OK
+[C4-SAMPLES] #/bank/C4-S10: {"count":14,"summary":"إظهار الإجابة النموذجية (14)","titles":["الشيخ زايد بن سلطان آل نهيان (رحمه الله)","الشيخ محمد بن زايد آل نهيان","الشيخ محمد بن راشد آل مكتوم"]}
+[EXERCISE] #/learn/U2: feedback: إجابة غير صحيحة /  / الإجابة الصحيحة: S — الموقف /  / هذا المقطع هو عنصر الموقف (S) في نموذج الدليل للسؤال C1-B3، لأنه يؤدي ما يحدده المرجع لهذا العنصر: «الموقف
+
+Console errors (light): []
+Console errors (dark): []
+
+Page summary (light):
+#/home | استعد للمقابلة القيادية بثقة | small 0/15 | docH 1284
+#/learn | المسار التعليمي | small 0/16 | docH 1372
+#/learn/U1 | افهم المقابلة | small 0/18 | docH 6179
+#/learn/U2 | ابنِ إجابة قوية | small 0/19 | docH 9391
+#/learn/U3 | قدّم نفسك | small 0/15 | docH 2795
+#/learn/U4 | الكفاءات الثماني | small 0/117 | docH 5788
+#/learn/U5 | قيادة المهمة | small 0/42 | docH 8944
+#/learn/U6 | الجاهزية النهائية | small 0/24 | docH 7447
+#/bank | بنك الأسئلة والأجوبة | small 0/32 | docH 6701
+#/bank/C1-B1 | السؤال والإجابة | small 0/15 | docH 2148
+#/bank/M6-S1 | السؤال والإجابة | small 0/15 | docH 2292
+#/bank/C4-S10 | السؤال والإجابة | small 0/15 | docH 2068
+#/bank/C5-S3 | السؤال والإجابة | small 0/15 | docH 2347
+#/bank/X1 | السؤال والإجابة | small 0/15 | docH 2074
+#/competencies | الكفاءات الثماني | small 0/19 | docH 1530
+#/competencies/C1 | التواصل الفعّال والتأثير الإيجابي | small 0/21 | docH 3248
+#/quick-review | مراجعة سريعة | small 0/12 | docH 1109
+#/answer-guide | بناء الإجابة | small 0/12 | docH 2004
+#/self-intro | بناء تقديم الذات | small 0/24 | docH 3130
+#/tools | أدوات الاستعداد | small 0/16 | docH 1222
+#/tools/saved | الأسئلة المحفوظة | small 0/11 | docH 664
+#/search?q=النتيجة | ابحث في المرجع والأسئلة | small 0/36 | docH 5708
+#/settings | الإعدادات | small 1/24 | docH 1967
+#/sessions | سجل الجلسات | small 0/11 | docH 664
+#/simulation | اختيار المحاكاة | small 0/18 | docH 1326
+#/nope | undefined | small 0/11 | docH 664
+EXIT=0

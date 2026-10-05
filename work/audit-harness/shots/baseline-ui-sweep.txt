@@ -1,0 +1,218 @@
+[SMALL-TARGET] #/home [light]: 4/15: a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[NO-BACK] #/home [light]: back button hidden
+[SMALL-TARGET] #/learn [light]: 5/16: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[H-OVERFLOW] #/learn/U1 [light]: scrollWidth>viewport; wide=table.source-table,thead.,tr.,th.,th.
+[SMALL-TARGET] #/learn/U1 [light]: 7/18: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42
+[ENGLISH] #/learn/U1 [light]: Behavioural,Evidence,Behavioural,Questions,Scenario,Questions,Korn,Ferry
+[H-OVERFLOW] #/learn/U2 [light]: scrollWidth>viewport; wide=table.source-table,tbody.,tr.,td.,span.
+[SMALL-TARGET] #/learn/U2 [light]: 7/19: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42
+[ENGLISH] #/learn/U2 [light]: Situation,Task,Action,Result,Learning,Situation,Evaluation,Action
+[SMALL-TARGET] #/learn/U3 [light]: 7/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42
+[SMALL-TARGET] #/learn/U4 [light]: 12/121: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42 | summary[C2 — المبادرةصفحة ] 330x30 | summary[C4 — القيادة المله] 330x30 | summary[C5 — التفكير الاست] 330x30 | summary[C6 — تطوير المهارا] 330x30 | summary[C7 — القدرة على ال] 330x30
+[SMALL-TARGET] #/learn/U5 [light]: 19/44: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42
+[H-OVERFLOW] #/learn/U6 [light]: scrollWidth>viewport; wide=table.source-table,thead.,tr.,th.,tbody.
+[SMALL-TARGET] #/learn/U6 [light]: 12/24: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42 | input[] 22x22 | input[] 22x22 | input[] 22x22 | input[] 22x22 | input[] 22x22
+[ENGLISH] #/learn/U6 [light]: Rehearsal,Mock,Interviews
+[SMALL-TARGET] #/bank [light]: 22/32: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | button[مسح المرشحات] 122x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42
+[SMALL-TARGET] #/bank/C1-B1 [light]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[ENGLISH] #/bank/C1-B1 [light]: Situation,Task,Action,Result,Learning
+[SMALL-TARGET] #/bank/M6-S1 [light]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/bank/C4-S10 [light]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/bank/C5-S3 [light]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/bank/X1 [light]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/competencies [light]: 5/19: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/competencies/C1 [light]: 5/21: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/quick-review [light]: 5/12: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/answer-guide [light]: 5/12: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/self-intro [light]: 5/24: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/tools [light]: 5/16: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/tools/saved [light]: 5/11: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/search?q=النتيجة [light]: 5/36: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[ENGLISH] #/search?q=النتيجة [light]: Rehearsal,Rehearsal,scenario,seal,behavioural,star,behavioural,star
+[H-OVERFLOW] #/settings [light]: scrollWidth>viewport; wide=header.app-header,div.header-inner,button.icon-button,main.app-main,header.page-head
+[SMALL-TARGET] #/settings [light]: 9/23: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | button[تصدير JSON] 104x42 | button[استيراد نسخة] 107x42 | input[] 1x1 | button[حذف كل بياناتي الم] 158x42
+[ENGLISH] #/settings [light]: phase,alpha,acbad
+[SMALL-TARGET] #/sessions [light]: 5/11: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[SMALL-TARGET] #/simulation [light]: 6/18: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36 | input[] 22x22
+[SMALL-TARGET] #/nope [light]: 5/11: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[◐] 36x36
+[MODEL-TOGGLE] #/bank/C1-B1: closed by default=true, opens on tap=true
+[M6-ORDER] #/bank/M6-S1: {"q":37,"o1":66,"o2":124,"c":201} OK
+[C4-SAMPLES] #/bank/C4-S10: {"count":14,"summary":"إظهار الإجابة النموذجية (14)","titles":["الشيخ زايد بن سلطان آل نهيان (رحمه الله)","الشيخ محمد بن زايد آل نهيان","الشيخ محمد بن راشد آل مكتوم"]}
+[EXERCISE] #/learn/U2: feedback: إجابة صحيحة ✓ /  / هذا النص محفوظ في حقل situation للسؤال C1-B3. /  / المرجع: C1-B3السؤال التالي
+[SMALL-TARGET] #/home [dark]: 4/15: a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[NO-BACK] #/home [dark]: back button hidden
+[SMALL-TARGET] #/learn [dark]: 5/16: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[H-OVERFLOW] #/learn/U1 [dark]: scrollWidth>viewport; wide=table.source-table,thead.,tr.,th.,th.
+[SMALL-TARGET] #/learn/U1 [dark]: 7/18: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42
+[ENGLISH] #/learn/U1 [dark]: Behavioural,Evidence,Behavioural,Questions,Scenario,Questions,Korn,Ferry
+[H-OVERFLOW] #/learn/U2 [dark]: scrollWidth>viewport; wide=table.source-table,tbody.,tr.,td.,span.
+[SMALL-TARGET] #/learn/U2 [dark]: 7/19: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42
+[ENGLISH] #/learn/U2 [dark]: Situation,Task,Action,Result,Learning,Situation,Evaluation,Action
+[SMALL-TARGET] #/learn/U3 [dark]: 7/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42
+[SMALL-TARGET] #/learn/U4 [dark]: 12/121: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42 | summary[C2 — المبادرةصفحة ] 330x30 | summary[C4 — القيادة المله] 330x30 | summary[C5 — التفكير الاست] 330x30 | summary[C6 — تطوير المهارا] 330x30 | summary[C7 — القدرة على ال] 330x30
+[SMALL-TARGET] #/learn/U5 [dark]: 19/44: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42 | a[عرض السؤال ونموذجه] 330x42
+[H-OVERFLOW] #/learn/U6 [dark]: scrollWidth>viewport; wide=table.source-table,thead.,tr.,th.,tbody.
+[SMALL-TARGET] #/learn/U6 [dark]: 12/24: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | a[التعلّم] 29x25 | button[وضع علامة مكتمل] 129x42 | input[] 22x22 | input[] 22x22 | input[] 22x22 | input[] 22x22 | input[] 22x22
+[ENGLISH] #/learn/U6 [dark]: Rehearsal,Mock,Interviews
+[SMALL-TARGET] #/bank [dark]: 22/32: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | button[مسح المرشحات] 122x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42 | a[فتح السؤال والإجاب] 139x42
+[SMALL-TARGET] #/bank/C1-B1 [dark]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[ENGLISH] #/bank/C1-B1 [dark]: Situation,Task,Action,Result,Learning
+[SMALL-TARGET] #/bank/M6-S1 [dark]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/bank/C4-S10 [dark]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/bank/C5-S3 [dark]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/bank/X1 [dark]: 5/15: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/competencies [dark]: 5/19: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/competencies/C1 [dark]: 5/21: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/quick-review [dark]: 5/12: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/answer-guide [dark]: 5/12: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/self-intro [dark]: 5/24: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/tools [dark]: 5/16: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/tools/saved [dark]: 5/11: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/search?q=النتيجة [dark]: 5/36: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[ENGLISH] #/search?q=النتيجة [dark]: Rehearsal,Rehearsal,scenario,seal,behavioural,star,behavioural,star
+[H-OVERFLOW] #/settings [dark]: scrollWidth>viewport; wide=header.app-header,div.header-inner,button.icon-button,main.app-main,header.page-head
+[SMALL-TARGET] #/settings [dark]: 9/23: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | button[تصدير JSON] 104x42 | button[استيراد نسخة] 107x42 | input[] 1x1 | button[حذف كل بياناتي الم] 158x42
+[ENGLISH] #/settings [dark]: phase,alpha,acbad
+[SMALL-TARGET] #/sessions [dark]: 5/11: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[SMALL-TARGET] #/simulation [dark]: 6/18: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36 | input[] 22x22
+[SMALL-TARGET] #/nope [dark]: 5/11: button[‹] 42x42 | a[ق
+        
+       ] 89x16 | a[⌕] 36x36 | a[⚙] 36x36 | button[☀] 36x36
+[MODEL-TOGGLE] #/bank/C1-B1: closed by default=true, opens on tap=true
+[M6-ORDER] #/bank/M6-S1: {"q":37,"o1":66,"o2":124,"c":201} OK
+[C4-SAMPLES] #/bank/C4-S10: {"count":14,"summary":"إظهار الإجابة النموذجية (14)","titles":["الشيخ زايد بن سلطان آل نهيان (رحمه الله)","الشيخ محمد بن زايد آل نهيان","الشيخ محمد بن راشد آل مكتوم"]}
+[EXERCISE] #/learn/U2: feedback: إجابة صحيحة ✓ /  / هذا النص محفوظ في حقل situation للسؤال C1-B3. /  / المرجع: C1-B3السؤال التالي
+
+Console errors (light): []
+Console errors (dark): []
+
+Page summary (light):
+#/home | استعد للمقابلة القيادية بثقة | small 4/15 | docH 1284
+#/learn | المسار التعليمي | small 5/16 | docH 1372
+#/learn/U1 | افهم المقابلة | small 7/18 | docH 4800
+#/learn/U2 | ابنِ إجابة قوية | small 7/19 | docH 5903
+#/learn/U3 | قدّم نفسك | small 7/15 | docH 2774
+#/learn/U4 | الكفاءات الثماني | small 12/121 | docH 5892
+#/learn/U5 | قيادة المهمة | small 19/44 | docH 9019
+#/learn/U6 | الجاهزية النهائية | small 12/24 | docH 6072
+#/bank | بنك الأسئلة والأجوبة | small 22/32 | docH 6659
+#/bank/C1-B1 | السؤال والإجابة | small 5/15 | docH 2148
+#/bank/M6-S1 | السؤال والإجابة | small 5/15 | docH 2292
+#/bank/C4-S10 | السؤال والإجابة | small 5/15 | docH 2068
+#/bank/C5-S3 | السؤال والإجابة | small 5/15 | docH 2347
+#/bank/X1 | السؤال والإجابة | small 5/15 | docH 2074
+#/competencies | الكفاءات الثماني | small 5/19 | docH 1530
+#/competencies/C1 | التواصل الفعّال والتأثير الإيجابي | small 5/21 | docH 3248
+#/quick-review | مراجعة سريعة | small 5/12 | docH 1109
+#/answer-guide | بناء الإجابة | small 5/12 | docH 2004
+#/self-intro | بناء تقديم الذات | small 5/24 | docH 3130
+#/tools | أدوات الاستعداد | small 5/16 | docH 1222
+#/tools/saved | الأسئلة المحفوظة | small 5/11 | docH 664
+#/search?q=النتيجة | ابحث في المرجع والأسئلة | small 5/36 | docH 5708
+#/settings | الإعدادات | small 9/23 | docH 1861
+#/sessions | سجل الجلسات | small 5/11 | docH 664
+#/simulation | اختيار المحاكاة | small 6/18 | docH 1336
+#/nope | undefined | small 5/11 | docH 664
+EXIT=0
