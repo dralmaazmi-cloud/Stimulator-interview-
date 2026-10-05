@@ -16,6 +16,9 @@ export function recordingSupported() {
   return Boolean(globalThis.MediaRecorder && navigator.mediaDevices?.getUserMedia && supportedRecordingMime());
 }
 
+// alpha-4 (C1): المدة تُحسب من ساعة monotonic محلية (performance.now) لا من ساعة الحائط.
+const monotonicNow = () => (globalThis.performance?.now ? performance.now() : Date.now());
+
 export class AudioRecorder {
   constructor(options = {}) {
     this.onTick = options.onTick || (() => {});
@@ -55,18 +58,18 @@ export class AudioRecorder {
       }
     });
     this.recorder.addEventListener('stop', () => {
-      const duration = Math.min(this.maximumSeconds, (Date.now() - this.startedAt) / 1000);
+      const duration = Math.min(this.maximumSeconds, Math.max(0, (monotonicNow() - this.startedAt) / 1000));
       const blob = new Blob(this.chunks, { type: this.recorder?.mimeType || mimeType });
       this.cleanupStream();
       this.stopResolve?.({ blob, duration, mime: blob.type, limitReason: this.limitReason });
       this.stopResolve = null;
       this.onState('stopped');
     }, { once: true });
-    this.startedAt = Date.now();
+    this.startedAt = monotonicNow();
     this.recorder.start(500);
     this.onState('recording');
     this.timer = setInterval(() => {
-      const seconds = (Date.now() - this.startedAt) / 1000;
+      const seconds = (monotonicNow() - this.startedAt) / 1000;
       this.onTick(Math.min(this.maximumSeconds, seconds), this.maximumSeconds);
       if (seconds >= this.maximumSeconds) {
         this.limitReason = 'اكتملت مدة التسجيل القصوى.';
@@ -74,6 +77,14 @@ export class AudioRecorder {
         this.stop();
       }
     }, 250);
+  }
+
+  isRecording() {
+    return this.recorder?.state === 'recording';
+  }
+
+  elapsedSeconds() {
+    return this.startedAt ? Math.min(this.maximumSeconds, Math.max(0, (monotonicNow() - this.startedAt) / 1000)) : 0;
   }
 
   async stop() {

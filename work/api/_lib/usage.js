@@ -7,6 +7,11 @@ export function recordUsage(event) {
     output_tokens: Number(event.output_tokens) || 0,
     thought_tokens: Number(event.thought_tokens) || 0,
     attempts: Number(event.attempts) || 0,
+    // alpha-4: عدد نداءات المزود الفعلية، هل استُخدم الاحتياطي، آخر حالة من المزود، ورمز الخطأ. لا نصوص.
+    provider_call_count: Number(event.provider_call_count) || 0,
+    fallback_used: Boolean(event.fallback_used),
+    final_provider_status: event.final_provider_status == null ? null : Number(event.final_provider_status) || null,
+    error_code: event.error_code ? String(event.error_code) : null,
     validation: String(event.validation || 'unknown'),
     success: Boolean(event.success)
   };

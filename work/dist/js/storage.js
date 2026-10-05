@@ -1,6 +1,11 @@
 const DB_NAME = 'leadership-interview-coach';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORES = ['settings', 'progress', 'stories', 'sessions', 'checklists', 'review'];
+// alpha-4 (A3): مخزن مستقل للتسجيل الصوتي المعلق؛ لا يدخل في التصدير ولا يُكتب في localStorage.
+const PENDING_RECORDINGS = 'pending_recordings';
+const PENDING_RECORDING_TTL_MS = 24 * 60 * 60 * 1000;
+const memoryPendingRecordings = new Map();
+let pendingStorageDegraded = false;
 let dbPromise = null;
 
 function openDb() {
@@ -10,7 +15,7 @@ function openDb() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
-      STORES.forEach(store => {
+      [...STORES, PENDING_RECORDINGS].forEach(store => {
         if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: 'id' });
       });
     };
@@ -91,7 +96,8 @@ export async function clearStore(store) {
 }
 
 export async function clearAll() {
-  await Promise.all(STORES.map(clearStore));
+  await Promise.all([...STORES, PENDING_RECORDINGS].map(clearStore).map(promise => promise.catch(() => {})));
+  memoryPendingRecordings.clear();
   Object.keys(localStorage)
     .filter(key => key.startsWith('lic:'))
     .forEach(key => localStorage.removeItem(key));
@@ -119,6 +125,88 @@ export async function importBackup(backup) {
     for (const value of backup.stores?.[store] || []) await set(store, value);
   }
   localStorage.setItem('lic:bookmarked-questions', JSON.stringify(Array.isArray(backup.bookmarks) ? backup.bookmarks : []));
+}
+
+// ---------- التسجيل الصوتي المعلق (A3) ----------
+export function pendingRecordingId(sessionId, questionId) {
+  return `${sessionId}:${questionId}`;
+}
+
+// يعيد true إذا تعذر IndexedDB وتم الحفظ في الذاكرة فقط (يُعرض تنبيه مرة واحدة).
+export function pendingRecordingStorageDegraded() {
+  return pendingStorageDegraded;
+}
+
+export async function savePendingRecording(record) {
+  const value = { ...record, created_at: record.created_at || Date.now() };
+  if (!value.id) throw new Error('Pending recordings require an id.');
+  try {
+    const db = await openDb();
+    if (!db) throw new Error('IndexedDB unavailable');
+    await transaction(PENDING_RECORDINGS, 'readwrite', objectStore => objectStore.put(value));
+    memoryPendingRecordings.delete(value.id);
+    return { stored: 'indexeddb' };
+  } catch {
+    pendingStorageDegraded = true;
+    memoryPendingRecordings.set(value.id, value);
+    return { stored: 'memory' };
+  }
+}
+
+export async function getPendingRecording(id, now = Date.now()) {
+  const memory = memoryPendingRecordings.get(id);
+  if (memory) return memory;
+  try {
+    const db = await openDb();
+    if (!db) return null;
+    const record = await new Promise((resolve, reject) => {
+      const tx = db.transaction(PENDING_RECORDINGS, 'readonly');
+      const request = tx.objectStore(PENDING_RECORDINGS).get(id);
+      request.onsuccess = () => resolve(request.result ?? null);
+      request.onerror = () => reject(request.error);
+    });
+    if (record && now - Number(record.created_at || 0) > PENDING_RECORDING_TTL_MS) {
+      await removePendingRecording(id);
+      return null;
+    }
+    return record;
+  } catch {
+    return null;
+  }
+}
+
+export async function removePendingRecording(id) {
+  memoryPendingRecordings.delete(id);
+  try {
+    const db = await openDb();
+    if (!db) return;
+    await transaction(PENDING_RECORDINGS, 'readwrite', objectStore => objectStore.delete(id));
+  } catch { /* ignore */ }
+}
+
+// تنظيف السجلات المنتهية (أقدم من 24 ساعة) عند تشغيل التطبيق.
+export async function purgeExpiredRecordings(now = Date.now()) {
+  let removed = 0;
+  for (const [id, record] of memoryPendingRecordings) {
+    if (now - Number(record.created_at || 0) > PENDING_RECORDING_TTL_MS) { memoryPendingRecordings.delete(id); removed += 1; }
+  }
+  try {
+    const db = await openDb();
+    if (!db) return removed;
+    const records = await new Promise((resolve, reject) => {
+      const tx = db.transaction(PENDING_RECORDINGS, 'readonly');
+      const request = tx.objectStore(PENDING_RECORDINGS).getAll();
+      request.onsuccess = () => resolve(request.result || []);
+      request.onerror = () => reject(request.error);
+    });
+    for (const record of records) {
+      if (now - Number(record.created_at || 0) > PENDING_RECORDING_TTL_MS) {
+        await transaction(PENDING_RECORDINGS, 'readwrite', objectStore => objectStore.delete(record.id));
+        removed += 1;
+      }
+    }
+  } catch { /* ignore */ }
+  return removed;
 }
 
 export async function completedLessons() {

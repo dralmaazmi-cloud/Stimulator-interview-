@@ -1,9 +1,26 @@
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readBuffer, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { transcribe } from './_lib/provider.js';
+import { createBudget, transcribe } from './_lib/provider.js';
 import { recordUsage } from './_lib/usage.js';
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024;
+// alpha-4 (C2): نطاق واسع موثق لحجم البايتات لكل ثانية وفق MIME؛ يُرفض المتطرف بوضوح فقط
+// (تسجيل صامت شبه فارغ، أو ملف أكبر بكثير من أي ترميز صوتي معقول لمدة التسجيل).
+const BYTES_PER_SECOND_RANGE = Object.freeze({
+  'audio/webm': { min: 100, max: 64 * 1024 },
+  'audio/mp4': { min: 100, max: 96 * 1024 },
+  'audio/m4a': { min: 100, max: 96 * 1024 },
+  'audio/x-m4a': { min: 100, max: 96 * 1024 },
+  'audio/mpeg': { min: 100, max: 64 * 1024 },
+  'audio/wav': { min: 100, max: 400 * 1024 }
+});
+
+export function plausibleSizeForDuration(mime, bytes, durationSeconds) {
+  const range = BYTES_PER_SECOND_RANGE[mime];
+  if (!range || !(durationSeconds > 0)) return true;
+  const perSecond = bytes / durationSeconds;
+  return perSecond >= range.min && perSecond <= range.max;
+}
 const ALLOWED_MIME = new Set(['audio/webm', 'audio/mp4', 'audio/m4a', 'audio/x-m4a', 'audio/mpeg', 'audio/wav']);
 
 // البند 14: فحص الترويسة الثنائية؛ لا نثق بترويسة Content-Type وحدها.
@@ -20,6 +37,8 @@ export default async function handler(req, res) {
   const started = Date.now();
   if (!methodAllowed(req, res, ['POST'])) return;
   let audio;
+  // ميزانية واحدة: 50 ثانية من بداية المعالج وأربعة نداءات كحد أقصى (ثلاثة أساسية + احتياطي واحد).
+  const budget = createBudget({ startedAt: started, maxCalls: 4 });
   try {
     const scopes = rateLimitScopes(req, 'transcribe');
     enforceRateLimit(scopes.ip.key, { limit: scopes.ip.limit, windowMs: 60 * 60 * 1000 });
@@ -35,18 +54,19 @@ export default async function handler(req, res) {
     audio = await readBuffer(req, MAX_AUDIO_BYTES);
     if (audio.length < 100) throw httpError(400, 'التسجيل فارغ أو غير مكتمل.');
     if (!matchesAudioSignature(mime, audio)) throw httpError(415, 'صيغة التسجيل غير مدعومة.');
+    if (!plausibleSizeForDuration(mime, audio.length, duration)) throw httpError(400, 'حجم التسجيل لا يتناسب مع مدته المذكورة. أعد التسجيل ثم أرسله مرة أخرى.');
 
-    const result = await transcribe(audio, mime);
+    const result = await transcribe(audio, mime, { budget });
     const transcript = String(result.transcript || '').trim();
     if (!transcript) throw httpError(502, 'تعذر استخراج نص من التسجيل.', 'AI_EMPTY_TRANSCRIPT');
-    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, ...result.usage, validation: 'passed', success: true });
+    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, ...result.usage, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: budget.lastProviderStatus, validation: 'passed', success: true });
     sendJson(res, 200, {
       transcript,
       duration_seconds: duration || null,
       word_count: transcript.split(/\s+/).filter(Boolean).length
     });
   } catch (error) {
-    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, validation: error?.code || 'failed', success: false });
+    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
     handleApiError(res, error);
   } finally {
     if (Buffer.isBuffer(audio)) audio.fill(0);

@@ -1,5 +1,34 @@
 # سجل التغييرات — v0.5.1
 
+## alpha-4 (5 أكتوبر 2026) — إصلاح التشغيل الحي والصمود (الأمر التنفيذي 3.2، المرحلة 1)
+
+| البند | الملفات | التغيير | الاختبار المُثبِت | الحالة |
+|---|---|---|---|---|
+| A1 Wake Lock | `dist/js/wake-lock.js` (جديد)، `dist/sw.js` (APP_SHELL)، `vercel.json` (`screen-wake-lock=(self)`)، `dist/js/simulation.js`، `dist/js/self-intro.js` | مجموعة أسباب (`recording`, `transcribing`, `evaluating`, `self-intro-timer`)، طلب عند أول سبب وتحرير عند آخره، إعادة طلب عند العودة، تحرير في كل مسارات النجاح/الفشل/الإلغاء/`pagehide`، لا listener مكرر | `tests/wake-lock.test.mjs` (mock كامل: الطلب، التحرير، السقوط، إعادة الطلب، الأسباب الأربعة، 5 جولات دخول/خروج)؛ `journeys` A1: الطلب أثناء التسجيل والتحرير بعده | مُثبَت (iPhone الحقيقي: غير مختبر — نقطة التوقف A) |
+| A2 الخروج أثناء التسجيل | `dist/js/simulation.js` (`finishRecording` مسار إيقاف واحد، `onVisibilityChange`, `showPendingCard`)، `dist/js/recorder.js` (`isRecording`, ساعة monotonic) | إيقاف نظيف مرة واحدة دون إرسال تلقائي، بطاقة «توقّف التسجيل… سُجّل منه N ثانية» بزرين؛ أقل من ثانية → إعادة التسجيل فقط | `journeys` A2 (البطاقة، الزران، إرسال التسجيل نفسه، التسجيل دون ثانية) | مُثبَت |
+| A3 التسجيل المعلق في IndexedDB | `dist/js/storage.js` (`pending_recordings`, DB v2, `savePendingRecording`/`getPendingRecording`/`removePendingRecording`/`purgeExpiredRecordings`, fallback للذاكرة)، `dist/js/app.js` (تنظيف عند التشغيل)، `dist/js/simulation.js` | سجل واحد لكل جلسة/سؤال بلا تفريغ؛ حذف عند النجاح/إعادة التسجيل/الحذف/24 ساعة؛ خارج التصدير؛ لا Blob في localStorage؛ تنبيه مرة واحدة عند fallback | `journeys` A3 (حفظ، استعادة بعد reload، حذف بعد النجاح، تنظيف 24 ساعة) | مُثبَت (fallback الذاكرة: مُثبَت بمسار الكود، غير مُشغَّل في المتصفح) |
+| A4 المسودة | `dist/js/simulation.js` (`draft_question_id`, debounce، flush عند hidden/pagehide، نقل آمن عند الانتقال) | المسودة مرتبطة بمعرّف السؤال؛ تُحذف عند تقييم موثوق أو بعد النقل؛ تبقى عند `AI_OVERLOADED` | `journeys` A4 (اكتب، أخفِ، reload، يعود النص؛ غير موثوق → التالي فارغ والإجابة الأولى محفوظة) | مُثبَت |
+| A5 غياب الدعم | `dist/js/wake-lock.js` (`unsupportedNoticeOnce`) | تنبيه مرة واحدة في شاشة التسجيل فقط | `tests/wake-lock.test.mjs` | مُثبَت |
+| B1 فصل النماذج | `api/_lib/provider.js` (`fallbackModelId`)، `HANDOFF.md` | `GEMINI_EVALUATION_FALLBACK_MODEL` و`GEMINI_TRANSCRIBE_FALLBACK_MODEL`؛ يُتجاهل الفارغ أو المساوي للأساسي؛ لا تبادل بين الدورين | `tests/resilience.test.mjs` (12) | مُثبَت |
+| B2 إعادة المحاولة | `api/_lib/provider.js` (`callWithRetry`, `singleCall`, `jitteredDelay`, `configureProviderDeps`) | 5xx/اتصال فقط؛ 3 محاولات أساسية بتأخير 1.5s/4s ±25%؛ احتياطي واحد؛ تسلسلي | `tests/resilience.test.mjs` (1–7، 10) | مُثبَت |
+| B3 الميزانية والسقف | `api/_lib/provider.js` (`createBudget`)، `api/evaluate.js`، `api/transcribe.js`، `api/self-intro.js` | deadline 50s من بداية المعالج، مهلة النداء min(28s، المتبقي−1s)، لا نداء تحت 5s، سقف 4/5 نداءات | `tests/resilience.test.mjs` (8، 9، سقف النداءين) | مُثبَت |
+| B4 الأخطاء والسجلات | `api/_lib/provider.js`، `api/_lib/http.js` (`AI_OVERLOADED`, `retry_after`)، `api/_lib/usage.js` | 503 `AI_OVERLOADED` برسالة ثابتة؛ 429 يبقى `AI_RATE_LIMITED` مع `retry_after`؛ سجل منظم بلا نصوص | `tests/resilience.test.mjs` (2، 5، 13) | مُثبَت |
+| B5 العميل | `dist/js/evaluate-client.js` (70s، `onSlow` 8s، `retryAfter`)، `dist/js/simulation.js` (`createEvaluationRunner`, `applyRetryLock`, `retryLockPlan`) | «ما زلنا نحاول الاتصال…»، إعادة الإرسال مقفلة 15s مع عدّ استرشادي 60s، 429 مقفلة `retry_after`/60s، لا طلبين، تحرير القفل في finally | `journeys` B5 (الازدحام على 4178، البطء على 4179، الضغط المزدوج) | مُثبَت |
+| C1 مصدر المدة | `dist/js/recorder.js` (`performance.now`)، `api/transcribe.js` | المدة من ساعة monotonic؛ الترويسة مساعدة ضمن حدود المنتج | `journeys` J2؛ `api-scenarios` 17 | مُثبَت |
+| C2 الحجم مقابل المدة | `api/transcribe.js` (`plausibleSizeForDuration`, `BYTES_PER_SECOND_RANGE`) | نطاق واسع لكل MIME؛ رفض المتطرف فقط بـ400 | `api-scenarios` 17 (التسجيلات الصالحة تمر) | مُثبَت |
+| C3 توكنات الصوت | `HANDOFF.md` | غير مطبّق لغياب معدل موثق موثوق | — | موثّق «غير مطبق» |
+| D1 الرموز الداخلية | `tools/build-exercise-overrides.js`، `tests/phase1.test.mjs` | حذف `C1-SB1` من التفسيرات؛ اختبار يمنع `C\d+-(SB|NB)\d+` و`-EP\d+` في التمارين وملفات العميل (معرّفات الأسئلة `C1-B1` تُعرض عمدًا) | `npm test` | مُثبَت |
+| D2 الشروحات | `tools/build-exercise-overrides.js`، `tools/exercise-overrides.json` | الفحص البنيوي كشف 59 تفسيرًا بلا سبب أو بلا اقتباس (L2-STAR 20، L3-ERROR 10، L5-MODE 16، L7-PREP 5، L8-GENERAL 8)؛ أُصلحت كلها بسبب + اقتباس حرفي «…» من المرجع | `tests/phase1.test.mjs` (اختبار بنيوي: سبب + اقتباس ≥ كلمتين موجود في المرجع) | مُثبَت |
+| D3 عدد التمارين | `tools/apply-exercise-overrides.js`، `dist/data/derived/manifest.json` (`counts.exercises` 138 → 130) | الـmanifest يُكتب بعد التجاوزات | `tests/phase1.test.mjs` (manifest = الملف النهائي = 130) | مُثبَت |
+| D4 التوثيق | `HANDOFF.md` (جدول المتغيرات) | كل المتغيرات مع الغرض؛ `RATE_LIMIT_*` متغيرات اختبار | — | مُثبَت |
+
+ثوابت: بصمة المرجع `51d413de…a357` دون تغيير؛ `dist/data/derived/*` مطابق بايت-ببايت عدا `manifest.json` (`counts.exercises` فقط، بقرار D3). الإصدار `0.5.1-alpha-4` في `package.json` و`dist/js/config.js`، والمستخدم يرى «الإصدار 0.5.1 — نسخة اختبار»؛ كاش `sw.js` أصبح `v0.5.1-alpha-4`.
+
+انحرافات عن نص الأمر (1.4): أسماء الدوال الفعلية استُخدمت (`createVoicePanel`, `drawQuestion`)؛ نمط D1 ضُيّق إلى معرّفات السلوكيات والنقاط لأن النمط الحرفي `C\d+-?[SB]\w*\d+` يطابق معرّفات الأسئلة المعروضة عمدًا؛ تغيير `manifest.json` مطلوب صراحةً في D3.
+
+---
+
+
 ## alpha-3 (4 أكتوبر 2026) — خمسة بنود فوق alpha-2
 
 | البند | الملفات | التغيير | الاختبار المُثبِت | الحالة |

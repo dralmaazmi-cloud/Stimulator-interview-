@@ -1,6 +1,7 @@
 import { get, set } from './storage.js';
 import { improveSelfIntroduction } from './evaluate-client.js';
 import { el, button, clear, notice, pageHead, toast } from './ui.js';
+import { acquireWakeLock, releaseWakeLock } from './wake-lock.js';
 
 const WORDS_PER_MINUTE = 115;
 
@@ -335,10 +336,13 @@ export async function renderSelfIntroPage(root) {
   const stopTimer = () => {
     if (timerId) clearInterval(timerId);
     timerId = null;
+    releaseWakeLock('self-intro-timer');
   };
+  window.addEventListener('hashchange', stopTimer, { once: true });
   const startTimer = button('بدء المؤقّت', { variant: 'secondary small' });
   startTimer.addEventListener('click', () => {
     stopTimer();
+    acquireWakeLock('self-intro-timer');
     startedAt = Date.now();
     timerValue.textContent = '00:00';
     timerId = setInterval(() => {

@@ -74,5 +74,10 @@ if (positionShare(result) > (overrides.max_position_share ?? 0.35)) throw new Er
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
   fs.writeFileSync(target, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-  console.log(`Applied exercise overrides: ${source.length} → ${result.length} exercises, salt=${salt}, max position share=${positionShare(result).toFixed(3)}`);
+  // alpha-4 (D3): الـmanifest يُكتب بعد اكتمال التجاوزات كي يطابق العدد النهائي في exercises.json.
+  const manifestPath = path.join(project, 'dist/data/derived/manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  manifest.counts.exercises = result.length;
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  console.log(`Applied exercise overrides: ${source.length} → ${result.length} exercises, salt=${salt}, max position share=${positionShare(result).toFixed(3)}; manifest.counts.exercises=${result.length}`);
 }

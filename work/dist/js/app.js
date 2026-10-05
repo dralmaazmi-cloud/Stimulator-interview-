@@ -12,6 +12,7 @@ import { renderSavedQuestions } from './bookmarks.js';
 import { cleanupSimulation, renderSimulation } from './simulation.js';
 import { renderSavedSession, renderSessions } from './sessions.js';
 import { el, clear, notice } from './ui.js';
+import { purgeExpiredRecordings } from './storage.js';
 
 const root = document.querySelector('#main-content');
 const backButton = document.querySelector('#back-button');
@@ -125,6 +126,7 @@ async function init() {
   setupPreferences();
   setupBackButton();
   try {
+    purgeExpiredRecordings().catch(() => {});
     data = await loadData();
     if (data.manifest.counts.total_questions !== 127
       || data.manifest.counts.unique_question_ids !== 127

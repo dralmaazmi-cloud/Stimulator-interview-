@@ -8,7 +8,7 @@
 [MODEL-TOGGLE] #/bank/C1-B1: closed by default=true, opens on tap=true
 [M6-ORDER] #/bank/M6-S1: {"q":37,"o1":66,"o2":124,"c":201} OK
 [C4-SAMPLES] #/bank/C4-S10: {"count":14,"summary":"إظهار الإجابة النموذجية (14)","titles":["الشيخ زايد بن سلطان آل نهيان (رحمه الله)","الشيخ محمد بن زايد آل نهيان","الشيخ محمد بن راشد آل مكتوم"]}
-[EXERCISE] #/learn/U2: feedback: إجابة غير صحيحة /  / الإجابة الصحيحة: S — الموقف /  / هذا المقطع هو عنصر الموقف (S) في نموذج الدليل للسؤال C1-B3. /  / المرجع: C1-B3السؤال التالي
+[EXERCISE] #/learn/U2: feedback: إجابة غير صحيحة /  / الإجابة الصحيحة: S — الموقف /  / هذا المقطع هو عنصر الموقف (S) في نموذج الدليل للسؤال C1-B3، لأنه يؤدي ما يحدده المرجع لهذا العنصر: «الموقف
 [NO-BACK] #/home [dark]: back button hidden
 [ENGLISH] #/learn/U1 [dark]: Behavioural,Evidence,Behavioural,Questions,Scenario,Questions,Korn,Ferry
 [ENGLISH] #/learn/U2 [dark]: Situation,Task,Action,Result,Learning,Situation,Evaluation,Action
@@ -19,7 +19,7 @@
 [MODEL-TOGGLE] #/bank/C1-B1: closed by default=true, opens on tap=true
 [M6-ORDER] #/bank/M6-S1: {"q":37,"o1":66,"o2":124,"c":201} OK
 [C4-SAMPLES] #/bank/C4-S10: {"count":14,"summary":"إظهار الإجابة النموذجية (14)","titles":["الشيخ زايد بن سلطان آل نهيان (رحمه الله)","الشيخ محمد بن زايد آل نهيان","الشيخ محمد بن راشد آل مكتوم"]}
-[EXERCISE] #/learn/U2: feedback: إجابة غير صحيحة /  / الإجابة الصحيحة: S — الموقف /  / هذا المقطع هو عنصر الموقف (S) في نموذج الدليل للسؤال C1-B3. /  / المرجع: C1-B3السؤال التالي
+[EXERCISE] #/learn/U2: feedback: إجابة غير صحيحة /  / الإجابة الصحيحة: S — الموقف /  / هذا المقطع هو عنصر الموقف (S) في نموذج الدليل للسؤال C1-B3، لأنه يؤدي ما يحدده المرجع لهذا العنصر: «الموقف
 
 Console errors (light): []
 Console errors (dark): []

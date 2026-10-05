@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { complete } from './_lib/provider.js';
+import { complete, createBudget } from './_lib/provider.js';
 import { getQuestionContext, sampleAnswerTexts } from './_lib/data.js';
 import { evaluationSchema } from './_lib/schemas.js';
 import { buildEvaluationPrompt } from './_lib/prompts.js';
@@ -20,8 +20,8 @@ function cleanFollowups(value) {
   })).filter(item => item.question && item.answer);
 }
 
-async function runEvaluation(context, answer, followups, model) {
-  const response = await complete(buildEvaluationPrompt(context, answer, followups), evaluationSchema, { model });
+async function runEvaluation(context, answer, followups, model, budget) {
+  const response = await complete(buildEvaluationPrompt(context, answer, followups), evaluationSchema, { model, budget });
   const errors = shapeErrors(response.data, context.question.id, context.question.rubric_mode);
   if (errors.length) {
     const error = httpError(502, `Schema validation failed: ${errors.join(', ')}`, 'AI_SCHEMA_FAILED');
@@ -37,6 +37,8 @@ async function runEvaluation(context, answer, followups, model) {
 export default async function handler(req, res) {
   const started = Date.now();
   if (!methodAllowed(req, res, ['POST'])) return;
+  // ميزانية واحدة للطلب كله: 50 ثانية من بداية المعالج وخمسة نداءات كحد أقصى (نقل + احتياطي + إصلاح مخطط).
+  const budget = createBudget({ startedAt: started, maxCalls: 5 });
   try {
     const scopes = rateLimitScopes(req, 'evaluate');
     enforceRateLimit(scopes.ip.key, { limit: scopes.ip.limit, windowMs: 60 * 60 * 1000 });
@@ -69,16 +71,17 @@ export default async function handler(req, res) {
     let firstError;
     const attempt = async model => {
       attempts += 1;
-      return runEvaluation(context, answer, followups, model);
+      return runEvaluation(context, answer, followups, model, budget);
     };
     try {
       evaluated = await attempt();
     } catch (error) {
-      if (!RETRYABLE.has(error?.code)) throw error;
+      // إصلاح المخطط يستهلك ما بقي من السقف فقط؛ إن لم يبقَ نداء يُعاد الخطأ الأول.
+      if (!RETRYABLE.has(error?.code) || !budget.canStart()) throw error;
       firstError = error;
       evaluated = await attempt(retryModel);
     }
-    if (evaluated.failureRate > 0.3 && attempts < 2) {
+    if (evaluated.failureRate > 0.3 && attempts < 2 && budget.canStart()) {
       firstError = httpError(502, 'Too many unverified quotes.', 'AI_EVIDENCE_FAILED');
       firstError.usage = evaluated.usage;
       evaluated = await attempt(retryModel);
@@ -138,6 +141,9 @@ export default async function handler(req, res) {
       duration_ms: Date.now() - started,
       ...usage,
       attempts,
+      provider_call_count: budget.calls,
+      fallback_used: budget.fallbackUsed,
+      final_provider_status: budget.lastProviderStatus,
       validation: trusted ? 'passed' : 'untrusted',
       success: true
     });
@@ -151,7 +157,7 @@ export default async function handler(req, res) {
       }
     });
   } catch (error) {
-    recordUsage({ type: 'evaluate', duration_ms: Date.now() - started, validation: error?.code || 'failed', success: false });
+    recordUsage({ type: 'evaluate', duration_ms: Date.now() - started, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
     handleApiError(res, error);
   }
 }

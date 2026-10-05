@@ -68,7 +68,7 @@ export function renderSettings(root, data) {
 
   const info = el('section', { class: 'card settings-card' },
     el('h2', { text: 'معلومات النسخة' }),
-    el('p', { text: `الإصدار ${CONFIG.appVersion} — نسخة اختبار` }),
+    el('p', { text: `الإصدار ${String(CONFIG.appVersion).split('-')[0]} — نسخة اختبار` }),
     el('div', { class: 'divider' }),
     infoRow('الأسئلة الأساسية', `${data.manifest.counts.primary_questions} من 89`),
     infoRow('الصياغات الإضافية المحفوظة', String(data.manifest.counts.alternate_questions)),

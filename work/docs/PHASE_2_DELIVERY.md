@@ -1,6 +1,6 @@
-# ملاحظة تسليم المرحلة الثانية — v0.5.1-alpha-3 (ليست beta للمجموعة المغلقة)
+# ملاحظة تسليم المرحلة الثانية — v0.5.1-alpha-4 (ليست beta للمجموعة المغلقة)
 
-**الصفوف 8–10 من بوابة القبول (Smoke حي، `npm run test:live`، iPhone) لم تُجتَز لأنها تحتاج `GEMINI_API_KEY` ونشرًا تجريبيًا على Vercel وجهاز iPhone حقيقيًا، وكلها غير متوفرة في بيئة التنفيذ؛ لذلك الوسم `alpha-3`.** الصفوف 1–7 مُجتازة بالكامل.
+**الصفوف 8–10 من بوابة القبول (Smoke حي، `npm run test:live`، iPhone) لم تُجتَز لأنها تحتاج `GEMINI_API_KEY` ونشرًا تجريبيًا على Vercel وجهاز iPhone حقيقيًا، وكلها غير متوفرة في بيئة التنفيذ؛ لذلك الوسم `alpha-4`.** الصفوف 1–7 مُجتازة بالكامل.
 
 ## الحالة
 
@@ -12,10 +12,10 @@
 |---|---|---|
 | 1 | `sha256sum dist/data/reference.json` | `51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357` ✓ |
 | 2 | `node tools/build-derived.js` ثم مقارنة `dist/data/derived` | 8/8 ملفات مطابقة بايت-ببايت ✓ |
-| 3 | `npm test` | ناجح (phase1: 127 سؤالًا، 130 تمرينًا، 1000 جلسة؛ phase2 يشمل `steps[]`, `status: failed` → 502, `store: false` ×3، طول الاقتباس، إعادة الصياغة) ✓ |
-| 4 | `audit-harness/api-scenarios.mjs` | 32/32 (29 من alpha-2 + حالتا بوابة الثقة أ/ج + سقف IP) ✓ |
+| 3 | `npm test` | ناجح: phase1 (127 سؤالًا، 130 تمرينًا، manifest = 130، D1/D2)، phase2، resilience (B1–B13)، wake-lock (A1/A5) ✓ |
+| 4 | `audit-harness/api-scenarios.mjs` | 32/32 ✓ |
 | 5 | `audit-harness/ui-sweep.mjs` (26 مسارًا × مظهرين) | NULL-TEXT 0، H-OVERFLOW 0، SMALL-TARGET 0 عدا `input.sr-only` 1×1، CLIPPED 0، أخطاء كونسول 0 ✓ |
-| 6 | `audit-harness/journeys.mjs` | J1c home/sessions = true؛ J1d استئناف نفس السؤال والمسودة ثم إنهاء → `in_progress: 0`؛ J1 criteria/quotes = 7 وطباعة المعايير = 1؛ `scrollY` = 0 بعد التقرير وبعد السؤال التالي؛ `final-score` «85 من 100»؛ J2b إعادة الإرسال دون إعادة تسجيل = true؛ J5 رسالة 429 عربية فقط؛ J7 التعديل اليدوي محفوظ = true ✓ |
+| 6 | `audit-harness/journeys.mjs` | alpha-4: A1 قفل مطلوب أثناء التسجيل ومحرَّر بعده (requests 1 / releases 1)؛ A2 بطاقة التوقف بالزرين، ودون ثانية → إعادة التسجيل فقط؛ A3 محفوظ في IndexedDB، مستعاد بعد reload، مُرسَل مرة واحدة ثم محذوف، والمنتهي (25 ساعة) يُنظَّف عند التشغيل؛ A4 المسودة تعود بعد الإخفاء وreload مرتبطة بالسؤال، وغير موثوق → السؤال التالي فارغ والإجابة الأولى محفوظة؛ B5 رسالة الازدحام، النص ثابت، الزر مقفل 15 ثانية مع عدّ استرشادي، الضغط المزدوج = نداء معالج واحد (سجل 4178)، «ما زلنا نحاول الاتصال…» بعد 8 ثوانٍ؛ listeners visibilitychange بعد 4 دورات = 0؛ رحلات alpha-2/3 كلها كما كانت ✓ |
 | 7 | `grep -rn "Gemini\|GEMINI\|AIza\|phase2\|alpha" dist/` | 0 نتائج ✓ |
 | 8 | Smoke حي (3 نقاط، رموز غير صفرية) | **غير مُجتاز — لا مفتاح/نشر** |
 | 9 | `npm run test:live` (مخطط، اقتباسات، استقرار، 7 مجموعات، حقن 5/5) | **غير مُجتاز — لا مفتاح/نشر** |
@@ -61,4 +61,4 @@
 
 ## قرار الإصدار
 
-نسخة اختبار `0.5.1-alpha-3`. الخطوة التالية: نشرها على رابط تجريبي مع المفتاح، تشغيل Smoke و`npm run test:live` (مع `RATE_LIMIT_IP` و`RATE_LIMIT_EVALUATE` مرفوعين مؤقتًا)، ثم اختبار iPhone وتوثيقه في `docs/IPHONE_TEST_<date>.md`. لا تُعلن beta للمجموعة المغلقة قبل اجتياز الصفوف 8–10.
+نسخة اختبار `0.5.1-alpha-4`. الخطوة التالية: نشرها على رابط تجريبي مع المفتاح، تشغيل Smoke و`npm run test:live` (مع `RATE_LIMIT_IP` و`RATE_LIMIT_EVALUATE` مرفوعين مؤقتًا)، ثم اختبار iPhone وتوثيقه في `docs/IPHONE_TEST_<date>.md`. لا تُعلن beta للمجموعة المغلقة قبل اجتياز الصفوف 8–10.

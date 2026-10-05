@@ -2,8 +2,9 @@ import { selectSessionQuestions } from './sim.js';
 import { evaluateWithAi, getAiHealth, transcribeWithAi } from './evaluate-client.js';
 import { AudioRecorder, recordingSupported } from './recorder.js';
 import { renderEvaluationReport, renderSessionSummary } from './report.js';
-import { get, getAll, remove, set } from './storage.js';
+import { get, getAll, getPendingRecording, pendingRecordingId, remove, removePendingRecording, savePendingRecording, set } from './storage.js';
 import { el, button, clear, formatModel, formatType, notice, pageHead, tag, toast } from './ui.js';
+import { acquireWakeLock, releaseAllWakeLocks, releaseWakeLock, wakeLockUnsupportedNoticeOnce } from './wake-lock.js';
 
 const MODE_CONFIG = Object.freeze({
   single: { title: 'سؤال واحد', description: 'سؤال مع تقييم وتقرير سريع.', count: 1, minutes: '2–4 دقائق', icon: '▤' },
@@ -12,13 +13,93 @@ const MODE_CONFIG = Object.freeze({
 });
 
 let activeRecorder = null;
-// البند 14: آخر تسجيل فشل تفريغه يُحتفظ به مؤقتًا لإعادة الإرسال دون إعادة التسجيل، ويُحذف عند النجاح أو مغادرة الصفحة.
+// البند 14: آخر تسجيل فشل تفريغه يُحتفظ به للذاكرة لإعادة الإرسال دون إعادة التسجيل.
+// alpha-4 (A3): النسخة الدائمة في IndexedDB (pending_recordings) تُحذف عند النجاح أو إعادة التسجيل أو الحذف أو بعد 24 ساعة.
 let pendingRecording = null;
+// alpha-4: كل listener أو مؤقت يسجَّل هنا ويُزال في cleanupSimulation كي لا يبقى مكررًا بعد الدخول والخروج.
+const panelCleanups = new Set();
+let memoryStorageNoticeShown = false;
+
+function registerCleanup(fn) {
+  panelCleanups.add(fn);
+  return fn;
+}
 
 export function cleanupSimulation() {
   activeRecorder?.cancel();
   activeRecorder = null;
   pendingRecording = null;
+  panelCleanups.forEach(fn => { try { fn(); } catch { /* ignore */ } });
+  panelCleanups.clear();
+  releaseAllWakeLocks();
+}
+
+// alpha-4 (B5): عند الازدحام يُقفل زر إعادة الإرسال 15 ثانية فقط مع عدّ استرشادي من 60 ثانية؛
+// عند 429 يُقفل فعليًا مدة Retry-After أو دقيقة. النص والتسجيل يبقيان دون تغيير.
+export function retryLockPlan(error) {
+  if (error?.code === 'AI_RATE_LIMITED') {
+    const seconds = Number.isFinite(error.retryAfter) && error.retryAfter > 0 ? Math.ceil(error.retryAfter) : 60;
+    return { lockSeconds: seconds, adviceSeconds: seconds, advisory: false };
+  }
+  return { lockSeconds: 15, adviceSeconds: 60, advisory: true };
+}
+
+function applyRetryLock(retryButton, error, host) {
+  const plan = retryLockPlan(error);
+  const countdown = el('small', { class: 'retry-countdown', 'aria-live': 'polite' });
+  host.replaceChildren(notice(error.message || 'تعذّر إكمال الطلب الآن.', 'danger'), countdown);
+  retryButton.hidden = false;
+  retryButton.disabled = true;
+  let lockRemaining = plan.lockSeconds;
+  let adviceRemaining = plan.adviceSeconds;
+  const tick = () => {
+    countdown.textContent = plan.advisory
+      ? (adviceRemaining > 0 ? `يُفضَّل الانتظار ${adviceRemaining} ثانية قبل إعادة الإرسال.` : 'يمكنك إعادة الإرسال الآن.')
+      : (lockRemaining > 0 ? `يمكنك إعادة الإرسال بعد ${lockRemaining} ثانية.` : 'يمكنك إعادة الإرسال الآن.');
+    if (lockRemaining <= 0) retryButton.disabled = false;
+    if (lockRemaining <= 0 && adviceRemaining <= 0) { clearInterval(timer); panelCleanups.delete(stopTimer); }
+    lockRemaining -= 1;
+    adviceRemaining -= 1;
+  };
+  const timer = setInterval(tick, 1000);
+  const stopTimer = () => clearInterval(timer);
+  registerCleanup(stopTimer);
+  tick();
+}
+
+const RETRYABLE_CLIENT_CODES = new Set(['AI_OVERLOADED', 'AI_RATE_LIMITED']);
+
+// مشغّل تقييم واحد: يمنع الطلب المزدوج، يحمل قفل الشاشة أثناء الطلب، ويعرض «ما زلنا نحاول الاتصال…» بعد 8 ثوانٍ.
+function createEvaluationRunner({ status, submit, retryButton, workingText, workingHint }) {
+  let inFlight = false;
+  return async function run(request, onSuccess) {
+    if (inFlight) return;
+    inFlight = true;
+    submit.disabled = true;
+    retryButton.disabled = true;
+    const working = el('div', { class: 'card ai-working' },
+      el('span', { class: 'loader' }),
+      el('strong', { text: workingText }),
+      workingHint ? el('small', { text: workingHint }) : null
+    );
+    status.replaceChildren(working);
+    acquireWakeLock('evaluating');
+    try {
+      const response = await evaluateWithAi(request, { onSlow: text => working.append(el('small', { class: 'slow-notice', text })) });
+      await onSuccess(response);
+    } catch (error) {
+      if (RETRYABLE_CLIENT_CODES.has(error?.code)) {
+        submit.hidden = true;
+        applyRetryLock(retryButton, error, status);
+      } else {
+        status.replaceChildren(notice(error.message || 'تعذّر التقييم.', 'danger'));
+        submit.disabled = false;
+      }
+    } finally {
+      inFlight = false;
+      releaseWakeLock('evaluating');
+    }
+  };
 }
 
 function sessionId() {
@@ -100,7 +181,7 @@ function renderModeCard(id, config, selected, choose) {
   );
 }
 
-function createVoicePanel(transcriptArea, setAnswer) {
+function createVoicePanel(transcriptArea, setAnswer, options = {}) {
   const supported = recordingSupported();
   const panel = el('section', { class: 'card voice-answer-panel' });
   if (!supported) {
@@ -109,6 +190,7 @@ function createVoicePanel(transcriptArea, setAnswer) {
     return panel;
   }
 
+  const pendingKey = options.sessionId && options.questionId ? pendingRecordingId(options.sessionId, options.questionId) : '';
   const alreadyConsented = localStorage.getItem('lic:audio-consent') === 'yes';
   const consent = el('input', { type: 'checkbox', checked: alreadyConsented });
   const timer = el('strong', { class: 'recording-clock', text: '00:00' });
@@ -118,6 +200,8 @@ function createVoicePanel(transcriptArea, setAnswer) {
   const stop = button('إنهاء التسجيل', { variant: 'danger', className: 'record-stop', hidden: true });
   const resend = button('إعادة إرسال التسجيل نفسه', { variant: 'secondary', className: 'record-resend', hidden: true });
   const warning = el('div');
+  const interruptedHost = el('div', { class: 'interrupted-recording-host' });
+  let stopping = false;
 
   const setBusy = value => {
     start.disabled = value;
@@ -125,12 +209,39 @@ function createVoicePanel(transcriptArea, setAnswer) {
     resend.disabled = value;
   };
 
+  // A3: الحفظ الدائم للتسجيل المعلق (Blob + MIME + المدة + معرّفا الجلسة والسؤال)؛ لا تفريغ داخله.
+  const persistPending = async (recording, meta = {}) => {
+    pendingRecording = recording;
+    if (!pendingKey) return;
+    const stored = await savePendingRecording({
+      id: pendingKey,
+      blob: recording.blob,
+      mime: recording.mime || recording.blob.type || '',
+      duration: recording.duration,
+      session_id: options.sessionId,
+      question_id: options.questionId,
+      interrupted: Boolean(meta.interrupted),
+      created_at: Date.now()
+    });
+    if (stored.stored === 'memory' && !memoryStorageNoticeShown) {
+      memoryStorageNoticeShown = true;
+      warning.append(notice('احتُفظ بالتسجيل مؤقتًا في هذه الصفحة؛ لا تغلقها قبل الإرسال.', 'warning'));
+    }
+    try { await options.onPersistSession?.(); } catch { /* ignore */ }
+  };
+  const discardPending = async () => {
+    pendingRecording = null;
+    resend.hidden = true;
+    if (pendingKey) await removePendingRecording(pendingKey);
+  };
+
   const transcribeRecording = async recording => {
     stateText.textContent = 'جارٍ تحويل الصوت إلى نص…';
+    acquireWakeLock('transcribing');
     try {
-      const response = await transcribeWithAi(recording.blob, recording.duration);
-      pendingRecording = null;
-      resend.hidden = true;
+      const response = await transcribeWithAi(recording.blob, recording.duration, { onSlow: text => { stateText.textContent = text; } });
+      await discardPending();
+      interruptedHost.replaceChildren();
       transcriptArea.value = response.transcript;
       transcriptArea.hidden = false;
       setAnswer(response.transcript, recording.duration);
@@ -139,11 +250,14 @@ function createVoicePanel(transcriptArea, setAnswer) {
         recording.limitReason ? notice(recording.limitReason, 'warning') : notice('تم التفريغ. صحح أي كلمة لم تُفهم بدقة، ثم أرسل النص للتقييم.', '', '✓')
       );
     } catch (error) {
-      pendingRecording = recording;
+      await persistPending(recording);
       resend.hidden = false;
       stateText.textContent = 'تعذر التفريغ';
-      warning.replaceChildren(notice(`${error.message || 'تعذر تحويل التسجيل إلى نص.'} يمكنك إعادة إرسال التسجيل نفسه أو إعادة التسجيل.`, 'danger'));
       transcriptArea.hidden = false;
+      if (RETRYABLE_CLIENT_CODES.has(error?.code)) applyRetryLock(resend, error, warning);
+      else warning.replaceChildren(notice(`${error.message || 'تعذر تحويل التسجيل إلى نص.'} يمكنك إعادة إرسال التسجيل نفسه أو إعادة التسجيل.`, 'danger'));
+    } finally {
+      releaseWakeLock('transcribing');
     }
   };
 
@@ -160,6 +274,64 @@ function createVoicePanel(transcriptArea, setAnswer) {
     }
   });
 
+  // A2: بطاقة التسجيل المتوقف (خروج من الواجهة) أو المستعاد بعد إعادة التحميل.
+  const showPendingCard = (recording, { restored = false } = {}) => {
+    const seconds = Math.round(recording.duration);
+    const text = restored
+      ? `لديك تسجيل محفوظ لهذا السؤال لم يُفرَّغ بعد. مدته ${seconds} ثانية.`
+      : `توقّف التسجيل لأن التطبيق خرج من الواجهة. سُجّل منه ${seconds} ثانية.`;
+    const card = el('div', { class: 'card interrupted-recording' },
+      notice(text, 'warning'),
+      el('div', { class: 'button-row' },
+        recording.duration >= 1 ? button('أرسل ما سُجّل للتفريغ', { className: 'send-pending', onClick: async () => {
+          card.remove();
+          setBusy(true);
+          try { await transcribeRecording(recording); } finally { setBusy(false); }
+        } }) : null,
+        button('إعادة التسجيل', { variant: 'secondary', className: 'rerecord-pending', onClick: async () => {
+          await discardPending();
+          card.remove();
+          stateText.textContent = 'جاهز للتسجيل';
+          warning.replaceChildren();
+        } })
+      )
+    );
+    interruptedHost.replaceChildren(card);
+    stateText.textContent = recording.duration >= 1 ? 'تسجيل محفوظ بانتظار قرارك' : 'التسجيل أقصر من ثانية؛ أعد التسجيل';
+    start.hidden = false;
+    start.textContent = 'إعادة التسجيل';
+    stop.hidden = true;
+  };
+
+  // مسار الإيقاف الواحد: من زر الإنهاء (مع تفريغ تلقائي) أو من الخروج من الواجهة (بلا إرسال تلقائي).
+  const finishRecording = async ({ autoTranscribe }) => {
+    if (!activeRecorder || stopping) return;
+    stopping = true;
+    setBusy(true);
+    stateText.textContent = 'جارٍ تجهيز التسجيل…';
+    try {
+      const recording = await activeRecorder.stop();
+      releaseWakeLock('recording');
+      if (!recording?.blob?.size) throw new Error('لم يتم التقاط صوت.');
+      if (autoTranscribe) await transcribeRecording(recording);
+      else {
+        await persistPending(recording, { interrupted: true });
+        showPendingCard(recording);
+      }
+    } catch (error) {
+      stateText.textContent = 'تعذر التفريغ';
+      warning.replaceChildren(notice(error.message || 'تعذر تحويل التسجيل إلى نص.', 'danger'));
+      transcriptArea.hidden = false;
+    } finally {
+      setBusy(false);
+      start.hidden = false;
+      start.textContent = 'إعادة التسجيل';
+      stop.hidden = true;
+      activeRecorder = null;
+      stopping = false;
+    }
+  };
+
   start.addEventListener('click', async () => {
     if (!consent.checked) {
       toast('اقرأ إشعار الخصوصية ووافق قبل التسجيل.');
@@ -171,8 +343,8 @@ function createVoicePanel(transcriptArea, setAnswer) {
     transcriptArea.value = '';
     setAnswer('');
     warning.replaceChildren();
-    pendingRecording = null;
-    resend.hidden = true;
+    interruptedHost.replaceChildren();
+    await discardPending();
     activeRecorder?.cancel();
     activeRecorder = new AudioRecorder({
       onTick: (seconds, maximum) => {
@@ -190,33 +362,37 @@ function createVoicePanel(transcriptArea, setAnswer) {
       onLimit: () => { if (!stop.disabled) stop.click(); }
     });
     try {
+      // A1/A5: القفل يبدأ بعد تفاعل المستخدم؛ وتنبيه غياب الدعم يظهر مرة واحدة في شاشة التسجيل فقط.
+      acquireWakeLock('recording');
+      const unsupportedNotice = wakeLockUnsupportedNoticeOnce();
+      if (unsupportedNotice) warning.append(notice(unsupportedNotice, 'warning'));
       await activeRecorder.start();
     } catch (error) {
+      releaseWakeLock('recording');
       warning.replaceChildren(notice(error.message || 'تعذر بدء التسجيل.', 'danger'));
       start.hidden = false;
       stop.hidden = true;
     }
   });
 
-  stop.addEventListener('click', async () => {
-    setBusy(true);
-    stateText.textContent = 'جارٍ تجهيز التسجيل…';
-    try {
-      const recording = await activeRecorder.stop();
-      if (!recording?.blob?.size) throw new Error('لم يتم التقاط صوت.');
-      await transcribeRecording(recording);
-    } catch (error) {
-      stateText.textContent = 'تعذر التفريغ';
-      warning.replaceChildren(notice(error.message || 'تعذر تحويل التسجيل إلى نص.', 'danger'));
-      transcriptArea.hidden = false;
-    } finally {
-      setBusy(false);
-      start.hidden = false;
-      start.textContent = 'إعادة التسجيل';
-      stop.hidden = true;
-      activeRecorder = null;
-    }
-  });
+  stop.addEventListener('click', () => finishRecording({ autoTranscribe: true }));
+
+  // A2: الخروج من الواجهة أثناء التسجيل يوقفه إيقافًا نظيفًا مرة واحدة دون إرسال تلقائي.
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden' && activeRecorder?.isRecording()) finishRecording({ autoTranscribe: false });
+  };
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  registerCleanup(() => document.removeEventListener('visibilitychange', onVisibilityChange));
+
+  // A3: استعادة تسجيل معلق محفوظ لهذا السؤال (بعد إعادة التحميل أو الاستئناف).
+  if (pendingKey) {
+    getPendingRecording(pendingKey).then(record => {
+      if (!record?.blob?.size || activeRecorder) return;
+      const recording = { blob: record.blob, duration: Number(record.duration) || 0, mime: record.mime || record.blob.type };
+      pendingRecording = recording;
+      showPendingCard(recording, { restored: true });
+    }).catch(() => {});
+  }
 
   transcriptArea.addEventListener('input', () => setAnswer(transcriptArea.value));
   panel.append(
@@ -230,6 +406,7 @@ function createVoicePanel(transcriptArea, setAnswer) {
       stateText
     ),
     el('div', { class: 'button-row recording-actions' }, start, stop, resend),
+    interruptedHost,
     warning
   );
   return panel;
@@ -418,29 +595,26 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     });
     input.addEventListener('input', () => { answer = input.value; });
     if (session.answer_mode === 'voice') input.hidden = !answer;
+    const persistSession = () => set('sessions', { ...session, updated_at: new Date().toISOString() });
     const capture = session.answer_mode === 'voice'
-      ? createVoicePanel(input, (value, duration) => { answer = value; spokenDuration = duration || spokenDuration; })
+      ? createVoicePanel(input, (value, duration) => { answer = value; spokenDuration = duration || spokenDuration; }, { sessionId: session.id, questionId: 'SELF-INTRO', onPersistSession: persistSession })
       : el('label', { class: 'field card text-answer-card' }, el('span', { text: 'تقديمك الذاتي' }), input);
-    const status = el('div');
+    const status = el('div', { class: 'evaluation-status' });
     const submit = button('تقييم تقديم الذات', { className: 'wide' });
-    submit.addEventListener('click', async () => {
+    const retryButton = button('إعادة الإرسال', { className: 'wide resend-evaluation', hidden: true });
+    const runner = createEvaluationRunner({ status, submit, retryButton, workingText: 'جارٍ تقييم التغطية والترتيب والمدة…' });
+    const submitSelfIntro = () => {
       const corrected = input.value.trim();
       if (corrected.length < 20) {
         toast('أكمل تقديم الذات أولًا.');
         return;
       }
-      submit.disabled = true;
-      status.replaceChildren(el('div', { class: 'card ai-working' },
-        el('span', { class: 'loader' }),
-        el('strong', { text: 'جارٍ تقييم التغطية والترتيب والمدة…' })
-      ));
-      try {
-        const response = await evaluateWithAi({
-          question_id: 'SELF-INTRO',
-          answer: corrected,
-          target_duration: session.self_intro_duration,
-          spoken_duration: spokenDuration
-        });
+      return runner({
+        question_id: 'SELF-INTRO',
+        answer: corrected,
+        target_duration: session.self_intro_duration,
+        spoken_duration: spokenDuration
+      }, async response => {
         session.intro_response = {
           question: {
             id: 'SELF-INTRO',
@@ -456,11 +630,10 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         };
         await set('sessions', { ...session, updated_at: new Date().toISOString() });
         drawSelfIntroReport(session, questions);
-      } catch (error) {
-        status.replaceChildren(notice(error.message || 'تعذر تقييم تقديم الذات.', 'danger'));
-        submit.disabled = false;
-      }
-    });
+      });
+    };
+    submit.addEventListener('click', submitSelfIntro);
+    retryButton.addEventListener('click', submitSelfIntro);
 
     root.append(el('section', { class: 'answer-capture section-block' },
       capture,
@@ -469,6 +642,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         : null,
       status,
       submit,
+      retryButton,
       button('تخطي تقديم الذات', { variant: 'ghost', className: 'wide', onClick: () => drawQuestion(session, questions) })
     ));
   };
@@ -494,7 +668,9 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
   const drawQuestion = (session, questions) => {
     cleanupSimulation();
     const question = questions[session.current_index];
-    let answer = session.responses[session.current_index]?.answer || session.draft_answer || '';
+    // A4: المسودة مرتبطة بمعرّف السؤال؛ لا تُستعاد مسودة سؤال آخر.
+    const draftForThisQuestion = session.draft_question_id === question.id ? session.draft_answer : '';
+    let answer = session.responses[session.current_index]?.answer || draftForThisQuestion || '';
     const previousFollowups = session.responses[session.current_index]?.followups || [];
     clear(root);
     scrollToTop();
@@ -513,17 +689,41 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       value: answer,
       placeholder: session.answer_mode === 'voice' ? 'سيظهر التفريغ هنا بعد انتهاء التسجيل…' : 'اكتب إجابتك هنا…'
     });
-    answerInput.addEventListener('input', () => { answer = answerInput.value; });
+    // A4: حفظ المسودة أثناء الكتابة (debounce) وفورًا عند إخفاء الصفحة أو pagehide.
+    let draftTimer = null;
+    const persistDraft = async () => {
+      clearTimeout(draftTimer);
+      draftTimer = null;
+      session.draft_answer = answerInput.value;
+      session.draft_question_id = question.id;
+      await set('sessions', { ...session, updated_at: new Date().toISOString() });
+    };
+    const scheduleDraft = () => {
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(persistDraft, 600);
+    };
+    const flushDraft = () => { if (draftTimer) persistDraft(); };
+    const onDraftVisibility = () => { if (document.visibilityState === 'hidden') flushDraft(); };
+    document.addEventListener('visibilitychange', onDraftVisibility);
+    window.addEventListener('pagehide', flushDraft);
+    registerCleanup(() => {
+      document.removeEventListener('visibilitychange', onDraftVisibility);
+      window.removeEventListener('pagehide', flushDraft);
+      clearTimeout(draftTimer);
+    });
+    answerInput.addEventListener('input', () => { answer = answerInput.value; scheduleDraft(); });
     if (session.answer_mode === 'voice') answerInput.hidden = !answer;
 
     const capture = session.answer_mode === 'voice'
-      ? createVoicePanel(answerInput, value => { answer = value; })
+      ? createVoicePanel(answerInput, value => { answer = value; scheduleDraft(); }, { sessionId: session.id, questionId: question.id, onPersistSession: () => set('sessions', { ...session, updated_at: new Date().toISOString() }) })
       : el('label', { class: 'field card text-answer-card' },
         el('span', { text: 'إجابتك' }), answerInput,
         el('small', { text: 'قيّم التطبيق المضمون، وليس اللغة أو الطلاقة.' })
       );
     const status = el('div', { class: 'evaluation-status' });
     const submit = button('إرسال الإجابة للتقييم', { className: 'wide' });
+    const retryButton = button('إعادة الإرسال', { className: 'wide resend-evaluation', hidden: true });
+    const runner = createEvaluationRunner({ status, submit, retryButton, workingText: 'جارٍ تحليل الأدلة والتحقق من الاقتباسات…', workingHint: 'قد يستغرق ذلك عدة ثوانٍ.' });
 
     const submitEvaluation = async (followups = previousFollowups) => {
       const corrected = answerInput.value.trim();
@@ -532,13 +732,9 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         answerInput.focus();
         return;
       }
-      submit.disabled = true;
-      status.replaceChildren(el('div', { class: 'card ai-working' },
-        el('span', { class: 'loader' }), el('strong', { text: 'جارٍ تحليل الأدلة والتحقق من الاقتباسات…' }),
-        el('small', { text: 'قد يستغرق ذلك عدة ثوانٍ.' })
-      ));
-      try {
-        const response = await evaluateWithAi({ question_id: question.id, answer: corrected, followups });
+      clearTimeout(draftTimer);
+      draftTimer = null;
+      return runner({ question_id: question.id, answer: corrected, followups }, async response => {
         session.responses[session.current_index] = {
           question,
           answer: corrected,
@@ -547,16 +743,18 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
           meta: response.meta,
           evaluated_at: new Date().toISOString()
         };
-        delete session.draft_answer;
+        // تُحذف المسودة عند تقييم موثوق فقط؛ وإلا تبقى مرتبطة بهذا السؤال حتى الانتقال الآمن.
+        if (response.report?.trusted) {
+          delete session.draft_answer;
+          delete session.draft_question_id;
+        }
         await set('sessions', { ...session, updated_at: new Date().toISOString() });
         drawReport(session, questions);
-      } catch (error) {
-        status.replaceChildren(notice(error.message || 'تعذّر التقييم.', 'danger'));
-        submit.disabled = false;
-      }
+      });
     };
 
     submit.addEventListener('click', () => submitEvaluation(previousFollowups));
+    retryButton.addEventListener('click', () => submitEvaluation(previousFollowups));
     root.append(el('section', { class: 'answer-capture section-block' },
       capture,
       session.answer_mode === 'voice' ? el('label', { class: 'field transcript-field' },
@@ -564,11 +762,15 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       ) : null,
       status,
       submit,
+      retryButton,
       button('حفظ والخروج إلى الرئيسية', {
         variant: 'ghost',
         className: 'wide',
         onClick: async () => {
+          clearTimeout(draftTimer);
+          draftTimer = null;
           session.draft_answer = answerInput.value;
+          session.draft_question_id = question.id;
           await set('sessions', { ...session, updated_at: new Date().toISOString() });
           location.hash = '#/home';
         }
@@ -595,34 +797,33 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     input.addEventListener('input', () => { followupAnswer = input.value; });
     if (session.answer_mode === 'voice') input.hidden = true;
     const capture = session.answer_mode === 'voice'
-      ? createVoicePanel(input, value => { followupAnswer = value; })
+      ? createVoicePanel(input, value => { followupAnswer = value; }, { sessionId: session.id, questionId: `${current.question.id}:followup-${current.followups.length + 1}` })
       : el('label', { class: 'field card text-answer-card' }, el('span', { text: 'إجابة المتابعة' }), input);
-    const status = el('div');
+    const status = el('div', { class: 'evaluation-status' });
     const resubmit = button('إعادة التقييم مع المتابعة', { className: 'wide' });
-    resubmit.addEventListener('click', async () => {
+    const retryButton = button('إعادة الإرسال', { className: 'wide resend-evaluation', hidden: true });
+    const runner = createEvaluationRunner({ status, submit: resubmit, retryButton, workingText: 'جارٍ تحديث التقرير…' });
+    const submitFollowup = () => {
       const corrected = input.value.trim() || followupAnswer.trim();
       if (corrected.length < 3) {
         toast('أجب عن سؤال المتابعة أولًا.');
         return;
       }
       const followups = [...current.followups, { question: followupQuestion, answer: corrected, reason: followupReason || '' }].slice(0, 2);
-      resubmit.disabled = true;
-      status.replaceChildren(el('div', { class: 'card ai-working' }, el('span', { class: 'loader' }), el('strong', { text: 'جارٍ تحديث التقرير…' })));
-      try {
-        const response = await evaluateWithAi({ question_id: current.question.id, answer: current.answer, followups });
+      return runner({ question_id: current.question.id, answer: current.answer, followups }, async response => {
         session.responses[session.current_index] = { ...current, followups, report: response.report, meta: response.meta, evaluated_at: new Date().toISOString() };
         await set('sessions', { ...session, updated_at: new Date().toISOString() });
         drawReport(session, questions);
-      } catch (error) {
-        status.replaceChildren(notice(error.message || 'تعذر تحديث التقرير.', 'danger'));
-        resubmit.disabled = false;
-      }
-    });
+      });
+    };
+    resubmit.addEventListener('click', submitFollowup);
+    retryButton.addEventListener('click', submitFollowup);
     root.append(el('section', { class: 'answer-capture section-block' },
       capture,
       session.answer_mode === 'voice' ? el('label', { class: 'field transcript-field' }, el('span', { text: 'راجع التفريغ وصححه' }), input) : null,
       status,
       resubmit,
+      retryButton,
       button('تخطي المتابعة', { variant: 'ghost', className: 'wide', onClick: () => drawReport(session, questions) })
     ));
   };
@@ -640,8 +841,15 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         answer: current.answer,
         followups: current.followups,
         onFollowup: session.followups_enabled ? (question, reason) => drawFollowup(session, questions, question, reason) : null,
-        onNext: session.current_index < questions.length - 1 ? () => {
+        onNext: session.current_index < questions.length - 1 ? async () => {
+          // A4: الإجابة محفوظة في استجابة السؤال الحالي؛ تُمسح مسودة خانة الإدخال قبل الانتقال.
+          if (!session.responses[session.current_index]?.answer && session.draft_question_id === current.question.id && session.draft_answer) {
+            session.responses[session.current_index] = { ...current, answer: session.draft_answer };
+          }
+          delete session.draft_answer;
+          delete session.draft_question_id;
           session.current_index += 1;
+          await set('sessions', { ...session, updated_at: new Date().toISOString() });
           drawQuestion(session, questions);
         } : null,
         onFinish: session.current_index >= questions.length - 1 ? () => finishSession(session) : null
@@ -654,6 +862,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     session.status = 'completed';
     session.completed_at = new Date().toISOString();
     delete session.draft_answer;
+    delete session.draft_question_id;
     await set('sessions', session);
     const previousSessions = (await getAll('sessions'))
       .filter(item => item.status === 'completed' && item.id !== session.id)

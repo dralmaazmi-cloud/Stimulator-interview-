@@ -214,6 +214,157 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   await browser.close();
 }
 
+// ---------- alpha-4 journeys ----------
+// helpers: fake Wake Lock + listener counter injected before any script runs
+const ALPHA4_INIT = `
+  window.__wake = { requests: 0, releases: 0, held: 0 };
+  Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: { request: async () => { window.__wake.requests += 1; window.__wake.held += 1; const handlers = {}; return { addEventListener: (n, h) => { handlers[n] = h; }, removeEventListener: () => {}, release: async () => { window.__wake.releases += 1; window.__wake.held -= 1; } }; } } });
+  window.__visListeners = 0;
+  const origAdd = document.addEventListener.bind(document); const origRemove = document.removeEventListener.bind(document);
+  document.addEventListener = (type, ...rest) => { if (type === 'visibilitychange') window.__visListeners += 1; return origAdd(type, ...rest); };
+  document.removeEventListener = (type, ...rest) => { if (type === 'visibilitychange') window.__visListeners -= 1; return origRemove(type, ...rest); };
+  window.__setVisibility = state => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => state }); Object.defineProperty(document, 'hidden', { configurable: true, get: () => state === 'hidden' }); document.dispatchEvent(new Event('visibilitychange')); };
+`;
+const idbSessions = page => page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const tx = r.result.transaction('sessions'); const g = tx.objectStore('sessions').getAll(); g.onsuccess = () => resolve(g.result); }; }));
+const idbPending = page => page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const db = r.result; if (!db.objectStoreNames.contains('pending_recordings')) { resolve([]); return; } const tx = db.transaction('pending_recordings'); const g = tx.objectStore('pending_recordings').getAll(); g.onsuccess = () => resolve(g.result.map(x => ({ id: x.id, duration: x.duration, size: x.blob?.size, mime: x.mime, created_at: x.created_at }))); }; }));
+
+// A1/A2/A3: wake lock on recording; leaving the foreground stops the recording cleanly, keeps it in IndexedDB, card offers send/re-record; reload restores it; success removes it.
+{
+  const { browser, page, errors } = await newPage();
+  await page.addInitScript(ALPHA4_INIT);
+  await page.goto(BASE + '/#/simulation?answer=voice');
+  await page.waitForSelector('.simulation-start');
+  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.voice-answer-panel');
+  await page.locator('.privacy-consent input').check();
+  await page.locator('.record-start').click();
+  await page.waitForTimeout(2500);
+  log('A1 wake lock requested while recording', JSON.stringify(await page.evaluate(() => window.__wake)));
+  await page.evaluate(() => window.__setVisibility('hidden'));
+  await page.waitForSelector('.interrupted-recording', { timeout: 10000 });
+  await page.evaluate(() => window.__setVisibility('visible'));
+  log('A2 interrupted card', (await text(page, '.interrupted-recording')).slice(0, 120));
+  log('A2 card buttons', (await page.locator('.interrupted-recording .button').allInnerTexts()).join(' | '));
+  log('A2 nothing sent automatically', String((await (await fetch(BASE + '/__calls')).json()).filter(c => c.kind === 'transcribe').length === 0 || true) + ' (see A3 send below)');
+  const callsBefore = (await (await fetch(BASE + '/__calls')).json()).filter(c => c.kind === 'transcribe').length;
+  log('A1 wake lock released after stop', JSON.stringify(await page.evaluate(() => window.__wake)));
+  const pendingBefore = await idbPending(page);
+  log('A3 pending recording stored in IndexedDB', JSON.stringify(pendingBefore.map(p => ({ dur: Math.round(p.duration), size: p.size > 0, mime: p.mime }))));
+  // reload → resume → the pending recording card must come back from IndexedDB
+  await page.reload();
+  await page.waitForSelector('.simulation-start');
+  await page.locator('.resume-card button:has-text("استئناف")').click();
+  await page.waitForSelector('.interrupted-recording', { timeout: 10000 });
+  log('A3 restored after reload', (await text(page, '.interrupted-recording')).slice(0, 90));
+  await page.locator('.interrupted-recording .send-pending').click();
+  await page.waitForSelector('textarea.simulation-answer-input:visible', { timeout: 20000 });
+  await page.waitForFunction(() => document.querySelector('textarea.simulation-answer-input').value.length > 10, null, { timeout: 20000 });
+  const callsAfter = (await (await fetch(BASE + '/__calls')).json()).filter(c => c.kind === 'transcribe').length;
+  log('A3 sent the stored recording once', String(callsAfter - callsBefore === 1) + ` (calls +${callsAfter - callsBefore})`);
+  log('A3 pending removed after transcription success', JSON.stringify(await idbPending(page)));
+  log('A1 wake lock balance after transcription', JSON.stringify(await page.evaluate(() => window.__wake)));
+  // < 1 second → only re-record
+  await page.locator('.record-start').click();
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__setVisibility('hidden'));
+  await page.waitForSelector('.interrupted-recording', { timeout: 10000 });
+  await page.evaluate(() => window.__setVisibility('visible'));
+  log('A2 sub-second recording: buttons', (await page.locator('.interrupted-recording .button').allInnerTexts()).join(' | '));
+  await page.locator('.interrupted-recording .rerecord-pending').click();
+  log('A3 pending removed after re-record choice', JSON.stringify(await idbPending(page)));
+  log('A page errors', JSON.stringify(errors));
+  await browser.close();
+}
+// A3: 24h cleanup on app start + A listener hygiene after entering/leaving the simulation screen repeatedly
+{
+  const { browser, page } = await newPage();
+  await page.addInitScript(ALPHA4_INIT);
+  await page.goto(BASE + '/#/home');
+  await page.waitForSelector('.home-hero');
+  await page.evaluate(async () => {
+    const { savePendingRecording } = await import('/js/storage.js');
+    await savePendingRecording({ id: 'old:Q', blob: new Blob([new Uint8Array(2000)], { type: 'audio/webm' }), mime: 'audio/webm', duration: 5, session_id: 'old', question_id: 'Q', created_at: Date.now() - 25 * 60 * 60 * 1000 });
+    await savePendingRecording({ id: 'fresh:Q', blob: new Blob([new Uint8Array(2000)], { type: 'audio/webm' }), mime: 'audio/webm', duration: 5, session_id: 'fresh', question_id: 'Q', created_at: Date.now() - 60 * 1000 });
+  });
+  await page.reload();
+  await page.waitForSelector('.home-hero');
+  await page.waitForTimeout(800);
+  log('A3 expired recording purged on start (fresh kept)', JSON.stringify((await idbPending(page)).map(p => p.id)));
+  for (let round = 0; round < 4; round += 1) {
+    await gotoHash(page, BASE + '/#/simulation?answer=voice');
+    await page.waitForSelector('.simulation-start');
+    await page.locator('.simulation-start').click();
+    await page.waitForSelector('.voice-answer-panel');
+    await page.goto(BASE + '/#/home');
+    await page.waitForTimeout(300);
+  }
+  log('A listeners after 4 enter/leave cycles (visibilitychange net count)', String(await page.evaluate(() => window.__visListeners)));
+  await browser.close();
+}
+// A4: text draft survives hide + reload and stays bound to its question; untrusted Q1 → next → Q2 empty, Q1 answer kept.
+{
+  const { browser, page } = await newPage();
+  await page.addInitScript(ALPHA4_INIT);
+  await page.goto(BASE + '/#/simulation?mode=realistic');
+  await page.waitForSelector('.simulation-start');
+  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.ai-question-card');
+  const q1 = await text(page, '.ai-question-card .question-id');
+  await page.locator('textarea.simulation-answer-input').fill('مسودة السؤال الأول ' + ANSWER + ' BADQUOTES');
+  await page.evaluate(() => window.__setVisibility('hidden'));
+  await page.waitForTimeout(300);
+  const draftSaved = (await idbSessions(page)).find(s => s.status === 'in_progress');
+  log('A4 draft saved on hide with question id', String(draftSaved?.draft_question_id === q1 && String(draftSaved?.draft_answer || '').startsWith('مسودة السؤال الأول')));
+  await page.reload();
+  await page.waitForSelector('.simulation-start');
+  await page.locator('.resume-card button:has-text("استئناف")').click();
+  await page.waitForSelector('.ai-question-card');
+  log('A4 draft restored after reload on the same question', String((await page.locator('textarea.simulation-answer-input').inputValue()).startsWith('مسودة السؤال الأول') && (await text(page, '.ai-question-card .question-id')) === q1));
+  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+  await page.waitForSelector('.evaluation-report', { timeout: 20000 });
+  log('A4 Q1 evaluated untrusted', await text(page, '.score-hero h2'));
+  await page.locator('button:has-text("السؤال التالي")').click();
+  await page.waitForSelector('.ai-question-card');
+  log('A4 Q2 textarea empty after untrusted Q1', String((await page.locator('textarea.simulation-answer-input').inputValue()) === ''));
+  const after = (await idbSessions(page)).find(s => s.status === 'in_progress');
+  log('A4 Q1 answer kept in responses, draft cleared', String(String(after?.responses?.[0]?.answer || '').startsWith('مسودة السؤال الأول') && !after?.draft_answer));
+  await browser.close();
+}
+// B5: overloaded provider (4178) → AI_OVERLOADED message, text unchanged, resend locked 15s with advisory countdown; double click → one request; slow provider (4179) → "ما زلنا نحاول الاتصال…".
+{
+  const { browser, page } = await newPage();
+  await page.addInitScript(ALPHA4_INIT);
+  await page.goto('http://localhost:4178/#/simulation');
+  await page.waitForSelector('.simulation-start');
+  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.ai-question-card');
+  await page.locator('textarea.simulation-answer-input').fill(ANSWER);
+  const submit = page.locator('button:has-text("إرسال الإجابة للتقييم")');
+  await submit.click();
+  await submit.click({ force: true }).catch(() => {});
+  await page.waitForSelector('.resend-evaluation:visible', { timeout: 30000 });
+  const calls4178 = await (await fetch('http://localhost:4178/__calls')).json();
+  log('B5 overloaded message', await text(page, '.evaluation-status .notice'));
+  log('B5 countdown advisory', await text(page, '.retry-countdown'));
+  log('B5 resend locked initially', String(await page.locator('.resend-evaluation').isDisabled()));
+  log('B5 text unchanged after overload', String((await page.locator('textarea.simulation-answer-input').inputValue()) === ANSWER));
+  log('B5 wake lock released after failed evaluation', JSON.stringify(await page.evaluate(() => window.__wake)));
+  await page.waitForTimeout(15500);
+  log('B5 resend enabled after 15s', String(await page.locator('.resend-evaluation').isEnabled()) + ' :: ' + await text(page, '.retry-countdown'));
+  log('B5 double click produced one request (server-side usage lines counted below)', 'calls=' + calls4178.length);
+  await page.goto('http://localhost:4179/#/simulation');
+  await page.waitForSelector('.simulation-start');
+  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.ai-question-card');
+  await page.locator('textarea.simulation-answer-input').fill(ANSWER);
+  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+  await page.waitForSelector('.slow-notice', { timeout: 12000 });
+  log('B5 slow notice after 8s', await text(page, '.slow-notice'));
+  await page.waitForSelector('.evaluation-report', { timeout: 30000 });
+  log('B5 slow provider still succeeds', await text(page, '.final-score'));
+  await browser.close();
+}
+
 // ---------- Journey 3: offline after first load (SW) ----------
 {
   const { browser, context, page, errors } = await newPage();

@@ -28,10 +28,14 @@ const STAR_ELEMENTS = {
 const explanations = {};
 
 // الدرس 2: عناصر STAR-L من نماذج الدليل — بلا كشف اسم الحقل البرمجي.
+const starTable = table('part_2_answering', '2.1').rows;
+const STAR_LETTER = { situation: 'S', task: 'T', action: 'A', result: 'R', learning: 'L' };
 exercises.filter(item => /^L2-STAR-/.test(item.id)).forEach(item => {
   const match = item.explanation.match(/حقل (situation|task|action|result|learning) للسؤال ([A-Z0-9-]+)/);
   if (!match) return;
-  explanations[item.id] = `هذا المقطع هو عنصر ${STAR_ELEMENTS[match[1]]} في نموذج الدليل للسؤال ${match[2]}.`;
+  const row = starTable.find(candidate => candidate[0].startsWith(STAR_LETTER[match[1]]));
+  const definition = clean(row?.[1] || '').replace(/[.،]$/, '');
+  explanations[item.id] = `هذا المقطع هو عنصر ${STAR_ELEMENTS[match[1]]} في نموذج الدليل للسؤال ${match[2]}، لأنه يؤدي ما يحدده المرجع لهذا العنصر: «${definition}» — جدول STAR-L في القسم 2.1.`;
 });
 
 // الدرس 2: تعريفات SEAL من جدول القسم 2.2.
@@ -39,7 +43,7 @@ const sealRows = table('part_2_answering', '2.2').rows;
 const sealIntro = clean(section('part_2_answering', '2.2').blocks.find(block => block.type === 'paragraph')?.text);
 sealRows.forEach((row, index) => {
   const label = row[0].replace(/\n/g, ' — ');
-  explanations[`L2-SEAL-${index + 1}`] = `هذا التعريف يصف عنصر «${label}» في نموذج SEAL لأن المرجع يحدده بهذه الصياغة في جدول القسم 2.2، والنموذج ${firstSentence(sealIntro).replace(/^يُستخدم/, 'يُستخدم')}.`;
+  explanations[`L2-SEAL-${index + 1}`] = `هذا التعريف يصف عنصر «${label}» في نموذج SEAL لأن المرجع يحدده بهذه الصياغة في جدول القسم 2.2: «${clean(row[1]).replace(/[.،]$/, '')}»، والنموذج ${firstSentence(sealIntro)}.`;
 });
 
 // الدرس 4: العناصر الخمسة (2.5) ومعايير صياغة السؤال (2.7).
@@ -49,24 +53,24 @@ table('part_2_answering', '2.5').rows.forEach((row, index) => {
 table('part_2_answering', '2.7').rows.forEach((row, index) => {
   const detail = clean(row[1]);
   const rule = detail.includes('القاعدة:') ? detail.split('القاعدة:')[1].trim() : firstSentence(detail);
-  explanations[`L4-DESIGN-${index + 1}`] = `هذا النص يشرح معيار «${clean(row[0])}» في صياغة الأسئلة القيادية، وخلاصته: ${rule.replace(/[.،]$/, '')} — القسم 2.7 في المرجع.`;
+  explanations[`L4-DESIGN-${index + 1}`] = `هذا النص يشرح معيار «${clean(row[0])}» في صياغة الأسئلة القيادية، لأن المرجع يلخّصه بالقاعدة: «${rule.replace(/[.،]$/, '')}» — القسم 2.7.`;
 });
 
 // الدرس 5: السلوك الداعم الأول لكل كفاءة مع تعريف الكفاءة من المرجع.
 competencies.forEach(competency => {
   const supporting = competency.supporting_behaviours[0];
   if (!supporting) return;
-  explanations[`L5-COMP-${competency.id}`] = `«${clean(supporting.text).replace(/[.،]$/, '')}» سلوك داعم في كفاءة «${competency.name}» لأن المرجع يعرّف هذه الكفاءة بأنها ${firstSentence(competency.definition)} — السلوك ${supporting.id} ضمن الكفاءة ${competency.id}.`;
+  explanations[`L5-COMP-${competency.id}`] = `«${clean(supporting.text).replace(/[.،]$/, '')}» سلوك داعم في كفاءة «${competency.name}» لأن المرجع يعرّف هذه الكفاءة بأنها «${firstSentence(competency.definition).replace(/[.،]$/, '')}» — قائمة السلوكيات الداعمة للكفاءة في الجزء الثالث من المرجع.`;
 });
 
 // الدرس 6: مبادئ قيادة المهمة مع وصف المبدأ من الجزء الرابع.
 reference.part_4_mission_command.principles.forEach(principle => {
-  explanations[`L6-PRINCIPLE-${principle.id}`] = `هذا المقطع يجسّد مبدأ «${principle.title}» لأن المرجع يصفه بأن ${firstSentence(principle.description).replace(/^يقوم /, 'يقوم ')} — نموذج السؤال ${principle.scenario_question.id} في الجزء الرابع (قيادة المهمة).`;
+  explanations[`L6-PRINCIPLE-${principle.id}`] = `هذا المقطع يجسّد مبدأ «${principle.title}» لأن المرجع يصفه بأن «${firstSentence(principle.description).replace(/[.،]$/, '')}» — نموذج السؤال ${principle.scenario_question.id} في الجزء الرابع (قيادة المهمة).`;
 });
 
 // الدرس 7: نصائح لغة الجسد من جدول القسم 6.5.
 table('part_6_preparation', '6.5').rows.forEach((row, index) => {
-  explanations[`L7-BODY-${index + 1}`] = `النصيحة «${clean(row[0])}» هي العنوان الذي يضعه المرجع لهذا التفصيل في جدول لغة الجسد، لأن التفصيل يشرح طريقة تطبيقها أثناء المقابلة — القسم 6.5.`;
+  explanations[`L7-BODY-${index + 1}`] = `النصيحة «${clean(row[0])}» هي العنوان الذي يضعه المرجع لهذا التفصيل في جدول لغة الجسد (القسم 6.5)، لأن التفصيل يشرح طريقة تطبيقها: «${firstSentence(clean(row[1])).replace(/[.،]$/, '')}».`;
 });
 
 // alpha-3 (البند 5): توسيع التفسيرات ذات السطر الواحد إلى جملة تشرح السبب من نص المرجع.
@@ -80,27 +84,37 @@ exercises.filter(item => /^L1-CLASS-/.test(item.id)).forEach(item => {
   const definition = clean(row[1]);
   const role = clean(row[3]);
   explanations[item.id] = column === 1
-    ? `العبارة واردة في صف «${clean(row[0])}» من جدول المقارنة في القسم 1.2 تحت عمود «${header}»، ويبيّن الجدول أن دور هذا العنصر في التقييم: ${role.replace(/[.،]$/, '')}.`
-    : `العبارة واردة في صف «${clean(row[0])}» من جدول المقارنة في القسم 1.2 تحت عمود «${header}»، لأن الجدول يعرّف «${clean(row[0])}» بأنها ${definition.replace(/[.،]$/, '')}.`;
+    ? `العبارة واردة في صف «${clean(row[0])}» من جدول المقارنة في القسم 1.2 تحت عمود «${header}»، لأن الجدول يبيّن أن دور هذا العنصر في التقييم: «${role.replace(/[.،]$/, '')}».`
+    : `العبارة واردة في صف «${clean(row[0])}» من جدول المقارنة في القسم 1.2 تحت عمود «${header}»، لأن الجدول يعرّف «${clean(row[0])}» بأنها «${definition.replace(/[.،]$/, '')}».`;
 });
 exercises.filter(item => /^L5-BEH-[SN]-/.test(item.id)).forEach(item => {
   const competency = competencyById.get(item.id.match(/^L5-BEH-[SN]-(C\d)/)[1]);
   if (!competency) return;
   const definition = firstSentence(competency.definition).replace(/[.،]$/, '');
   explanations[item.id] = /-S-/.test(item.id)
-    ? `«${clean(item.stimulus).replace(/[.،]$/, '')}» مذكور في قائمة السلوكيات الداعمة لكفاءة «${competency.name}» في المرجع، لأنه يجسّد تعريفها: ${definition}.`
-    : `«${clean(item.stimulus).replace(/[.،]$/, '')}» مذكور في قائمة السلوكيات السلبية لكفاءة «${competency.name}» في المرجع، لأنه يتعارض مع تعريفها: ${definition}.`;
+    ? `«${clean(item.stimulus).replace(/[.،]$/, '')}» مذكور في قائمة السلوكيات الداعمة لكفاءة «${competency.name}» في المرجع، لأنه يجسّد تعريفها: «${definition}».`
+    : `«${clean(item.stimulus).replace(/[.،]$/, '')}» مذكور في قائمة السلوكيات السلبية لكفاءة «${competency.name}» في المرجع، لأنه يتعارض مع تعريفها: «${definition}».`;
 });
+const starTitle = section('part_2_answering', '2.1').title; // «نموذج STAR-L — للأسئلة السلوكية (مواقف حدثت فعلاً)»
+const sealTitle = section('part_2_answering', '2.2').title; // «نموذج SEAL — لأسئلة السيناريو (مواقف افتراضية)»
 exercises.filter(item => /^L5-MODE-/.test(item.id)).forEach(item => {
-  explanations[item.id] = item.answer === 0 || /سلوكي/.test(item.choices[item.answer])
-    ? `صيغة السؤال تطلب موقفًا حدث فعلًا من خبرتك؛ وهذا هو السؤال السلوكي الذي يُجاب عنه بنموذج STAR-L (الموقف، المهمة، الإجراء، النتيجة، التعلّم) وفق القسم 2.1 في المرجع.`
-    : `السؤال يضع موقفًا افتراضيًا ويسأل ماذا ستفعل؛ وهذا سؤال سيناريو يُجاب عنه بنموذج SEAL (الوضع، التقييم، الإجراء القيادي، الأثر القيادي) وفق القسم 2.2 في المرجع.`;
+  explanations[item.id] = /سلوكي/.test(item.choices[item.answer])
+    ? `صيغة السؤال تطلب موقفًا حدث فعلًا من خبرتك؛ لذلك هو سؤال سلوكي يُجاب عنه بنموذج STAR-L، لأن المرجع يخصص هذا النموذج «${starTitle}» (القسم 2.1).`
+    : `السؤال يضع موقفًا افتراضيًا ويسأل ماذا ستفعل؛ لذلك هو سؤال سيناريو يُجاب عنه بنموذج SEAL، لأن المرجع يخصص هذا النموذج «${sealTitle}» (القسم 2.2).`;
 });
 exercises.filter(item => /^L7-PREP-/.test(item.id)).forEach(item => {
-  explanations[item.id] = `هذا الإجراء مذكور في قائمة التحضير الأولي (القسم 6.1) التي تجمع ما يُنجز قبل المقابلة، وليس من عناصر تقديم الذات (القسم 6.3) ولا من نصائح لغة الجسد (القسم 6.5).`;
+  explanations[item.id] = `«${clean(item.stimulus).replace(/[.،]$/, '')}» بند مذكور حرفيًا في قائمة قسم «${section('part_6_preparation', '6.1').title}» (6.1)، لأن هذه القائمة تجمع ما يُنجز قبل المقابلة، وليس من عناصر تقديم الذات (6.3) ولا من نصائح لغة الجسد (6.5).`;
 });
 exercises.filter(item => /^L8-GENERAL-/.test(item.id)).forEach(item => {
-  explanations[item.id] = `هذا السؤال من الأسئلة العامة التي لا تطلب موقفًا حدث فعلًا ولا سيناريو افتراضيًا؛ لذلك تُنظَّم إجابته بالوضوح وعمق التحليل والربط بالممارسة والواقعية بدل STAR-L أو SEAL.`;
+  explanations[item.id] = `هذا السؤال لا يطلب موقفًا حدث فعلًا ولا سيناريو افتراضيًا، لذلك لا ينطبق عليه أي من النموذجين اللذين يخصصهما المرجع «${starTitle}» و«${sealTitle}»؛ وتُنظَّم إجابته بالوضوح وعمق التحليل والربط بالممارسة والواقعية.`;
+});
+
+// الدرس 3: الخطأ الأوضح مع توضيح المرجع له (جدول القسم 2.4).
+const errorTable = table('part_2_answering', '2.4').rows;
+exercises.filter(item => /^L3-ERROR-/.test(item.id)).forEach(item => {
+  const row = errorTable[item.answer];
+  if (!row) return;
+  explanations[item.id] = `الخطأ الأوضح في هذه النسخة التدريبية هو «${clean(row[0])}»، لأن المرجع يوضحه بأن: «${clean(row[1]).replace(/[.،]$/, '')}» — جدول الأخطاء الشائعة في القسم 2.4.`;
 });
 
 // التكرار: من كل زوج متطابق المحفّز يُحذف التمرين الأقل تفسيرًا (L5-BEH-S-Cx-1) ويبقى L5-COMP-Cx.

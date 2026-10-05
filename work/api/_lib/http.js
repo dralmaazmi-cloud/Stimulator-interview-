@@ -67,7 +67,9 @@ export function handleApiError(res, error) {
   // أي خطأ يحمل providerStatus يُعامَل كخطأ خادمي من حيث الرسالة الآمنة بغض النظر عن status.
   const fromProvider = error?.providerStatus != null;
   let safeMessage;
-  if (fromProvider) {
+  if (error?.code === 'AI_OVERLOADED') {
+    safeMessage = error.message;
+  } else if (fromProvider) {
     safeMessage = error?.code === 'AI_RATE_LIMITED'
       ? 'الخدمة مشغولة حاليًا. حاول بعد دقيقة.'
       : 'تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.';
@@ -77,7 +79,10 @@ export function handleApiError(res, error) {
       : 'تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.';
   } else safeMessage = error.message;
   if (status >= 500 || fromProvider) console.error('[api]', error?.code || error?.name, error?.providerStatus ?? '', error?.message);
-  sendJson(res, status, { error: safeMessage, code: error?.code || undefined });
+  const payload = { error: safeMessage, code: error?.code || undefined };
+  // 429: نمرر Retry-After كعدد ثوانٍ آمن فقط (لا ترويسات حساسة).
+  if (error?.code === 'AI_RATE_LIMITED' && Number.isFinite(error?.retryAfter) && error.retryAfter > 0) payload.retry_after = error.retryAfter;
+  sendJson(res, status, payload);
 }
 
 // البند 15: مفتاح الحد = IP فقط؛ معرّف العميل لا يدخل في المفتاح كي لا يُتجاوز الحد بتغييره.

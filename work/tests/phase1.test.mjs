@@ -74,6 +74,28 @@ assert.ok(exercises.every(exercise => exercise.explanation && exercise.explanati
   'No exercise may use its correct choice as the explanation');
 assert.ok(exercises.every(exercise => !/حقل (situation|task|action|result|learning)/.test(exercise.explanation)),
   'Explanations must not expose internal field names');
+// alpha-4 (D1): لا رموز داخلية (معرّفات السلوكيات C1-SB1/C1-NB1 أو النقاط المتوقعة C1-S1-EP1) في نصوص التمارين أو الواجهة.
+// معرّفات الأسئلة (C1-B1) تُعرض عمدًا في البنك والتمارين فليست رمزًا داخليًا.
+const INTERNAL_CODE = /\bC\d+-(?:SB|NB)\d+\b|\bC\d+-[SB]\d+-EP\d+\b|\bM\d+-[SB]\d+-EP\d+\b/;
+assert.ok(exercises.every(exercise => [exercise.prompt, exercise.stimulus, exercise.explanation, exercise.label, ...exercise.choices]
+  .filter(Boolean).every(value => !INTERNAL_CODE.test(String(value)))), 'Internal behaviour/point codes must not appear in exercise text');
+assert.ok(!INTERNAL_CODE.test(fs.readdirSync(path.join(project, 'dist/js')).map(file => read(`dist/js/${file}`).toString('utf8')).join('\n')),
+  'Internal behaviour/point codes must not appear in client code');
+// alpha-4 (D2): كل تفسير يحتوي سببًا واقتباسًا حرفيًا قصيرًا (≥ كلمتين) من نص المرجع.
+{
+  const normalizeText = value => String(value || '').normalize('NFKC').replace(/[\u064B-\u065F\u0670]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().toLowerCase();
+  const referenceTexts = [];
+  const collect = value => { if (typeof value === 'string') referenceTexts.push(value); else if (Array.isArray(value)) value.forEach(collect); else if (value && typeof value === 'object') Object.values(value).forEach(collect); };
+  collect(reference);
+  const corpus = ` ${referenceTexts.map(normalizeText).join(' \n ')} `;
+  const REASON = /لأن|لذلك|ليتحقق|بسبب/;
+  const failures = exercises.filter(exercise => {
+    const quotes = [...String(exercise.explanation).matchAll(/«([^»]+)»/g)].map(match => normalizeText(match[1])).filter(quote => quote.split(' ').length >= 2);
+    const quoted = quotes.some(quote => corpus.includes(quote));
+    return !REASON.test(exercise.explanation) || !quoted;
+  }).map(exercise => exercise.id);
+  assert.deepEqual(failures, [], 'Every explanation must state why the answer is right and quote the reference literally');
+}
 assert.ok(exercises.every(exercise => exercise.choices.length <= 5), 'Exercises must have at most 5 choices');
 assert.ok(exercises.every(exercise => exercise.answer >= 0 && exercise.answer < exercise.choices.length), 'Answer index must point at a choice');
 assert.equal(new Set(exercises.map(exercise => exercise.stimulus)).size, exercises.length, 'No duplicate stimulus');
@@ -90,6 +112,9 @@ assert.doesNotMatch(JSON.stringify(exercises), /"(?:label|prompt|stimulus)":null
 assert.ok(exercises.every(exercise => [exercise.label, exercise.prompt, exercise.stimulus, ...exercise.choices]
   .filter(value => value != null)
   .every(value => !/^(null|undefined)$/i.test(String(value).trim()))), 'User-facing exercise text cannot contain null/undefined sentinels');
+// alpha-4 (D3): الـmanifest يُكتب بعد اكتمال التجاوزات فيطابق الملف النهائي (130 حاليًا).
+assert.equal(manifest.counts.exercises, exercises.length, 'manifest.counts.exercises must match the final exercises.json');
+assert.equal(exercises.length, 130);
 assert.deepEqual(manifest.source_block_counts, {
   part_1_framework: { paragraph: 8, list: 3, key_point: 3, table: 2 },
   part_2_answering: { paragraph: 7, table: 6, key_point: 2, list: 1 },

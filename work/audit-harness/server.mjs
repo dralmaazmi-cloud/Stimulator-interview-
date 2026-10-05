@@ -77,6 +77,8 @@ function buildEvaluation(prompt) {
 
 globalThis.fetch = async (url, options) => {
   const body = JSON.parse(options.body);
+  if (process.env.MOCK_PROVIDER_503) return new Response(JSON.stringify({ error: { code: 503, message: 'The model is overloaded. Please try again later.', status: 'UNAVAILABLE' } }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+  if (process.env.MOCK_SLOW_MS) await new Promise(resolve => setTimeout(resolve, Number(process.env.MOCK_SLOW_MS)));
   if (process.env.MOCK_PROVIDER_429) return new Response(JSON.stringify({ error: { code: 429, message: 'Resource has been exhausted (e.g. check quota). [Gemini quota detail]', status: 'RESOURCE_EXHAUSTED' } }), { status: 429, headers: { 'Content-Type': 'application/json' } });
   if (process.env.MOCK_PROVIDER_400) return new Response(JSON.stringify({ error: { code: 400, message: 'API key not valid. Please pass a valid API key.', status: 'INVALID_ARGUMENT' } }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   const rec = { url: String(url), model: body.model, kind: 'unknown' };
