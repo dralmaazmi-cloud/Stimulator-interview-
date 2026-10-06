@@ -20,6 +20,33 @@ async function evaluate(port, body, headers = {}) {
   log('all evidence quotes literal in answer', q.every(x => ANSWER.includes(x)), `${q.length} quotes`);
   log('no pass/fail wording in report', !JSON.stringify(r.payload).match(/نجاح|رسوب|ناجح|راسب/), 'checked for نجاح/رسوب');
 }
+// 1b. alpha-5: new report fields from the evaluator (R1/R2) and the worked example (step 5)
+{
+  const r = await evaluate(4173, { question_id: 'C1-B3', answer: ANSWER });
+  const rep = r.payload.report || {};
+  log('alpha-5 report carries elements_complete/elements_total, weights phase2-1.1, prompt evaluation-1.2', Number.isFinite(rep.elements_complete) && rep.elements_total === 5 && rep.weights_version === 'phase2-1.1' && r.payload.meta?.prompt_version === 'evaluation-1.2', `complete=${rep.elements_complete}/${rep.elements_total} weights=${rep.weights_version} prompt=${r.payload.meta?.prompt_version}`);
+  log('alpha-5 improve/summary sanitised (no % / «من 100»)', rep.criteria.every(c => typeof c.improve === 'string' && !/%|٪|من 100/.test(c.improve)) && typeof rep.summary === 'string' && !/%|٪|[0-9]|قوية|ضعيفة|متوسطة/.test(rep.summary), `summary="${rep.summary}" improve0="${rep.criteria[0]?.improve}"`);
+  const r2 = await evaluate(4173, { question_id: 'C1-B3', answer: ANSWER + ' NOSUMMARY' });
+  log('alpha-5 fallback summary when evaluator omits it', /^اكتمل \d من \d عناصر\. ابدأ بـ‹.+›\.$/.test(r2.payload.report?.summary || '') && r2.payload.report?.summary_source === 'fallback', `summary="${r2.payload.report?.summary}"`);
+  const ex = await (async () => {
+    const calls0 = (await (await fetch(base(4173) + '/__calls')).json()).length;
+    const res = await fetch(base(4173) + '/api/example', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'scn-example' }, body: JSON.stringify({ question_id: 'C1-B3', answer: ANSWER, missing_elements: ['result'], weak_criteria: ['learning'] }) });
+    const payload = await res.json().catch(() => ({}));
+    const calls = (await (await fetch(base(4173) + '/__calls')).json());
+    return { status: res.status, payload, providerCalls: calls.length - calls0, last: calls.at(-1) };
+  })();
+  const e = ex.payload.example || {};
+  log('alpha-5 /api/example happy path (segments trainee+added, additions ≤ 6, no score)', ex.status === 200 && ex.providerCalls === 1 && e.segments?.some(s => s.source === 'trainee') && e.segments?.some(s => s.source === 'added') && e.additions?.length <= 6 && !('final_score' in e) && ex.payload.meta?.prompt_version === 'example-1.0', `status=${ex.status} calls=${ex.providerCalls} segments=${e.segments?.length} added=${e.segments?.filter(s => s.source === 'added').length} additions=${e.additions?.length}`);
+  log('alpha-5 /api/example strips scores/percentages from the example text', !JSON.stringify(e).match(/[0-9]+\s*%/), 'checked for N%');
+  const exFake = await fetch(base(4173) + '/api/example', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'scn-example-fake' }, body: JSON.stringify({ question_id: 'C1-B3', answer: ANSWER + ' FAKETRAINEE' }) }).then(res => res.json());
+  log('alpha-5 /api/example relabels a "trainee" segment with < 70% overlap as added', exFake.example?.relabelled_segments >= 1 && exFake.example.segments.filter(s => /منهجية جديدة تمامًا/.test(s.text)).every(s => s.source === 'added'), `relabelled=${exFake.example?.relabelled_segments}`);
+  const exNone = await fetch(base(4173) + '/api/example', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'scn-example-none' }, body: JSON.stringify({ question_id: 'C1-B3', answer: ANSWER + ' NOADDED' }) }).then(res => res.json());
+  log('alpha-5 /api/example with nothing added → covered message', exNone.example?.covered === true && exNone.example?.message === 'إجابتك تغطي العناصر المطلوبة. راجع التعليق على كل معيار لرفعها.', `message="${exNone.example?.message}"`);
+  const exGeneral = await fetch(base(4173) + '/api/example', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Client-Id': 'scn-example-x1' }, body: JSON.stringify({ question_id: 'X1', answer: ANSWER }) });
+  log('alpha-5 /api/example rejects general questions (X1) with 400', exGeneral.status === 400, `status=${exGeneral.status}`);
+  const x1 = await evaluate(4173, { question_id: 'X1', answer: 'الذكاء الاصطناعي هو قدرة الأنظمة على التعلم من البيانات واتخاذ قرارات، ومن تطبيقاته في العمل تحليل البيانات وأتمتة المهام المتكررة ودعم القرار.' });
+  log('alpha-5 X1 (general, complete_source_paragraph) evaluates with the general rubric', x1.status === 200 && x1.payload.report?.rubric_mode === 'general' && x1.payload.report?.elements_total === 0, `status=${x1.status} mode=${x1.payload.report?.rubric_mode} score=${x1.payload.report?.final_score}`);
+}
 // 2. Documented REST response shape (steps[]) — what the real API returns
 {
   const r = await evaluate(4174, { question_id: 'C1-B3', answer: ANSWER });

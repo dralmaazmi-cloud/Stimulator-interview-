@@ -257,10 +257,30 @@ async function renderChecklist(host, section) {
   host.append(checklist);
 }
 
-async function renderReadiness(body, data, lesson) {
+// alpha-5 (C1): سؤالا الذكاء الاصطناعي (X1، X2) ببطاقتين تحت بند «أسئلة الذكاء الاصطناعي» بعنوان «إجابة الدليل».
+function renderAiQuestions(data, params = new URLSearchParams()) {
+  const questions = ['X1', 'X2'].map(id => data.questionById.get(id)).filter(Boolean);
+  if (!questions.length) return null;
+  const requested = params.get('question');
+  return el('section', { class: 'ai-questions-section section-block', 'aria-label': 'أسئلة الذكاء الاصطناعي' },
+    el('div', { class: 'section-heading smart-section-heading' },
+      el('div', {}, el('small', { text: 'سؤالان معرفيان من الدليل' }), el('h2', { text: 'أسئلة الذكاء الاصطناعي' }))
+    ),
+    el('div', { class: 'ai-question-grid' }, ...questions.map(question => el('article', { class: 'card ai-guide-card', id: `question-${question.id}` },
+      el('div', { class: 'question-meta' }, tag('سؤال معرفي', 'warning'), tag('إجابة الدليل', 'accent')),
+      el('h3', { text: question.question }),
+      el('h4', { text: 'إجابة الدليل' }),
+      el('p', { class: 'guide-paragraph', text: question.sample_answer }),
+      button('تدرّب على هذا السؤال', { href: `#/simulation?question=${encodeURIComponent(question.id)}&answer=text`, className: 'wide' })
+    )))
+  );
+}
+
+async function renderReadiness(body, data, lesson, params = new URLSearchParams()) {
   body.append(
     lessonHero(lesson, { tone: 'petrol readiness', icon: 'checklist', kicker: 'مراجعة سريعة قبل المحاكاة' }),
     await readinessAccordion(data),
+    renderAiQuestions(data, params),
     el('section', { class: 'ready-callout card no-print' },
       el('span', {}, icon('readiness')),
       el('div', {}, el('h2', { text: 'أنت جاهز للانتقال إلى المحاكاة' }), el('p', { text: 'طبّق ما راجعته في مقابلة تدريبية واحصل على تقرير تطوير مفصل.' })),
@@ -286,7 +306,7 @@ export async function renderLesson(root, data, lessonId, params = new URLSearchP
   if (lesson.id === 'U1') renderUnderstand(body, data, lesson);
   if (lesson.id === 'U2') renderAnswerBuilding(body, data, lesson);
   if (lesson.id === 'U4') renderMission(body, data, lesson, params);
-  if (lesson.id === 'U5') await renderReadiness(body, data, lesson);
+  if (lesson.id === 'U5') await renderReadiness(body, data, lesson, params);
   body.append(printActions(lesson.title), finishLesson(lesson));
   root.append(body);
 }

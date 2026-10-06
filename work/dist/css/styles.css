@@ -1573,7 +1573,7 @@ details.saved-report .evaluation-report { padding: 12px; }
 }
 
 /* ========================================================================== */
-/* v0.6.0-alpha-4 — الواجهة المعتمدة: بترولي، عاجي، قراءة متدرجة وRTL كامل */
+/* v0.6.0-alpha-4/alpha-5 — الواجهة المعتمدة: بترولي، عاجي، قراءة متدرجة وRTL كامل */
 /* ========================================================================== */
 
 :root {
@@ -2143,4 +2143,173 @@ body[data-page="home"] .app-main { width: min(100% - 20px, 560px); min-height: 0
   .app-main { width: 100%; padding: 0; }
   .smart-accordion-item,.competency-detail-item { break-inside: avoid; }
   .smart-accordion-item > .smart-accordion-body,.competency-detail-item > .competency-detail-body { display: block !important; }
+}
+
+/* ============================================================
+   v0.6.0-alpha-5 — تقرير الإجابة الجديد (R3/R4)، خريطة التغطية (D3)،
+   أهداف اللمس (F9)، زر الحفظ (F6)، المثال المكتمل (الخطوة 5)، أسئلة الذكاء الاصطناعي (C1)
+   ============================================================ */
+.print-only { display: none; }
+.muted { color: var(--muted); }
+
+/* F9: رابط العنوان في الشريط العلوي ≥ 44px وخانات الاختيار ≥ 44px */
+.route-brand { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; padding-inline: 10px; border-radius: 12px; }
+.readiness-check-item { grid-template-columns: 44px minmax(0,1fr); gap: 6px; padding-inline: 6px 11px; }
+.readiness-check-item input { appearance: none; -webkit-appearance: none; inline-size: 44px; block-size: 44px; margin: 0; display: grid; place-items: center; cursor: pointer; background: transparent; border: 0; }
+.readiness-check-item input::before { content: ""; inline-size: 20px; block-size: 20px; border: 2px solid var(--teal-700); border-radius: 6px; background: var(--paper-strong); display: grid; place-items: center; font-size: .8rem; line-height: 1; color: #fff; }
+.readiness-check-item input:checked::before { content: "✓"; background: var(--teal-700); }
+.readiness-check-item input:focus-visible::before { outline: 3px solid color-mix(in srgb, var(--teal-700) 40%, transparent); outline-offset: 2px; }
+
+/* F6: أزرار البطاقة المفتوحة */
+.inline-question-actions { display: grid; gap: 8px; margin-block-start: 6px; }
+.inline-model-block + .inline-model-block { margin-block-start: 14px; padding-block-start: 12px; border-block-start: 1px dashed var(--line); }
+.guide-paragraph { margin: 6px 0 0; line-height: 1.9; }
+.sample-answer.sample-guide p { white-space: pre-line; }
+
+/* C1: أسئلة الذكاء الاصطناعي في «الجاهزية النهائية» */
+.ai-question-grid { display: grid; gap: 12px; }
+.ai-guide-card { padding: 18px; display: grid; gap: 8px; }
+.ai-guide-card h3 { margin: 0; font-size: 1.02rem; }
+.ai-guide-card h4 { margin: 4px 0 0; color: var(--teal-700); font-size: .86rem; }
+
+/* D3: رابط التغطية في التقارير */
+.coverage-link-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; text-decoration: none; color: inherit; }
+.coverage-link-card strong, .coverage-link-card small { display: block; }
+.coverage-link-card small { color: var(--muted); }
+
+/* ---------- R3: تقرير الإجابة ---------- */
+.report-question-line { padding: 14px 16px; display: grid; gap: 8px; }
+.report-question-text { margin: 0; font-weight: 700; line-height: 1.8; }
+.score-card { display: grid; gap: 12px; }
+.score-card-top { display: flex; align-items: center; gap: 16px; }
+.score-card .final-score { min-width: 112px; padding: 14px 10px; font-size: 1.9rem; font-weight: 700; line-height: 1; direction: ltr; }
+.score-card.strong .final-score { color: var(--green); }
+.score-card.medium .final-score { color: var(--amber); }
+.score-card.weak .final-score { color: var(--red); }
+.score-card-copy { display: grid; gap: 6px; }
+.score-badge { display: inline-flex; width: fit-content; padding: 4px 12px; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+.score-badge.strong { background: var(--green-soft); color: var(--green); }
+.score-badge.medium { background: var(--amber-soft); color: var(--amber); }
+.score-badge.weak { background: var(--red-soft); color: var(--red); }
+.elements-complete-line { margin: 0; font-weight: 700; font-size: .92rem; }
+.score-track { height: 10px; overflow: hidden; border-radius: 999px; background: var(--line); }
+.score-track span { display: block; height: 100%; border-radius: inherit; background: var(--teal-700); }
+.score-track span.strong, .mini-score-track span.strong { background: var(--green); }
+.score-track span.medium, .mini-score-track span.medium { background: var(--amber); }
+.score-track span.weak, .mini-score-track span.weak { background: var(--red); }
+.score-summary { margin: 0; line-height: 1.85; }
+.trust-line { margin: 0; color: var(--muted); font-size: .8rem; }
+.score-card.untrusted { display: grid; gap: 10px; }
+.score-card.untrusted h2 { margin: 0 0 6px; }
+
+.breakdown-rows { display: grid; gap: 10px; }
+.breakdown-row { padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper-strong); border-inline-start: 5px solid var(--line); }
+.breakdown-row.strong { border-inline-start-color: var(--green); }
+.breakdown-row.medium { border-inline-start-color: var(--amber); }
+.breakdown-row.weak { border-inline-start-color: var(--red); }
+.breakdown-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.breakdown-percent { font-weight: 700; direction: ltr; }
+.breakdown-row.strong .breakdown-percent { color: var(--green); }
+.breakdown-row.medium .breakdown-percent { color: var(--amber); }
+.breakdown-row.weak .breakdown-percent { color: var(--red); }
+.breakdown-weight { color: var(--muted); font-size: .78rem; }
+.breakdown-total { margin: 14px 0 0; font-weight: 700; }
+.breakdown-rule { margin: 4px 0 0; color: var(--muted); font-size: .8rem; }
+
+.action-share-row { display: flex; align-items: center; gap: 14px; margin-block-start: 10px; }
+.action-share-track { position: relative; flex: 1; height: 14px; border-radius: 999px; background: var(--line); overflow: visible; }
+.action-share-fill { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 999px; background: var(--teal-700); }
+.action-share-marker { position: absolute; inset-block: -5px; inline-size: 3px; margin-inline-start: -1px; background: var(--amber); border-radius: 2px; }
+.action-share-marker-label { position: absolute; inset-block-start: 100%; margin-block-start: 6px; transform: translateX(50%); color: var(--amber); font-weight: 700; font-size: .72rem; direction: ltr; }
+.action-share-value { min-width: 56px; font-weight: 700; font-size: 1.1rem; direction: ltr; text-align: center; }
+.action-share-note { display: block; margin-block-start: 22px; color: var(--muted); font-size: .78rem; }
+
+.criterion-card { border-inline-start: 5px solid var(--line); }
+.criterion-card.strong { border-inline-start-color: var(--green); }
+.criterion-card.medium { border-inline-start-color: var(--amber); }
+.criterion-card.weak { border-inline-start-color: var(--red); }
+.criterion-score.strong { background: var(--green-soft); color: var(--green); }
+.criterion-score.medium { background: var(--amber-soft); color: var(--amber); }
+.criterion-score.weak { background: var(--red-soft); color: var(--red); }
+.criterion-lines { display: grid; gap: 8px; margin-block-start: 8px; }
+.criterion-line { display: grid; gap: 4px; }
+.criterion-line b { color: var(--teal-700); font-size: .8rem; }
+.criterion-line span { line-height: 1.8; }
+.improve-line { padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--teal-100) 60%, var(--paper)); }
+
+.behaviour-line { display: grid; gap: 4px; margin-block-end: 8px; }
+.behaviour-line b { font-size: .8rem; }
+.behaviour-line.positive b { color: var(--green); }
+.behaviour-line.negative b { color: var(--red); }
+.next-plan ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 6px; }
+.strengths-section ul { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; }
+.attempt-comparison ul { margin: 8px 0 0; padding-inline-start: 20px; display: grid; gap: 5px; }
+.report-actions { display: grid; gap: 8px; }
+.report-actions .button { width: 100%; }
+
+/* الخطوة 5: المثال المكتمل — المضاف مظلَّل بخلفية وخط معًا */
+.worked-example-host { display: grid; gap: 10px; }
+.worked-example .example-lead { margin: 0 0 10px; color: var(--muted); }
+.example-key { margin: 0 0 10px; font-size: .82rem; }
+.example-text { display: grid; gap: 8px; padding: 14px; border-radius: 14px; background: var(--paper-strong); border: 1px solid var(--line); }
+.example-segment { margin: 0; line-height: 1.95; }
+.example-element { display: inline-block; margin-inline-end: 6px; color: var(--teal-700); font-size: .78rem; }
+mark.example-added { background: var(--amber-soft); color: var(--ink); font-style: italic; font-weight: 700; padding: 1px 4px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+[data-theme="dark"] mark.example-added { background: #4a3a14; color: #fff3d6; }
+.example-additions { margin-block-start: 12px; }
+.example-additions h4 { margin: 0 0 6px; }
+.example-additions ul { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.example-additions li small { display: block; color: var(--muted); }
+
+/* ---------- D3: خريطة التغطية ---------- */
+.coverage-summary { padding: 18px; display: grid; gap: 8px; }
+.coverage-summary .coverage-tried { font-size: 1.2rem; }
+.coverage-summary small { color: var(--muted); }
+.coverage-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 4px; }
+.coverage-legend-item { padding: 4px 10px; border-radius: 999px; font-size: .74rem; font-weight: 700; border: 1px solid var(--line); background: var(--paper); }
+.coverage-legend-item.weak, .coverage-cell.weak { border-color: color-mix(in srgb, var(--red) 55%, var(--line)); background: var(--red-soft); }
+.coverage-legend-item.medium, .coverage-cell.medium { border-color: color-mix(in srgb, var(--amber) 55%, var(--line)); background: var(--amber-soft); }
+.coverage-legend-item.strong, .coverage-cell.strong { border-color: color-mix(in srgb, var(--green) 55%, var(--line)); background: var(--green-soft); }
+.coverage-grid { display: grid; gap: 12px; }
+.coverage-row { padding: 14px; display: grid; gap: 10px; }
+.coverage-row-title { margin: 0; font-size: 1rem; }
+.coverage-cells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.coverage-cell { min-height: 44px; padding: 12px; display: grid; gap: 3px; text-align: start; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); color: inherit; font: inherit; cursor: pointer; }
+.coverage-cell.span { grid-column: 1 / -1; }
+.coverage-cell[disabled] { opacity: .55; cursor: not-allowed; }
+.coverage-cell-column { color: var(--muted); font-size: .74rem; }
+.coverage-status { font-size: .92rem; }
+.coverage-meta { color: var(--muted); font-size: .74rem; }
+@media (max-width: 640px) {
+  .coverage-cells { grid-template-columns: 1fr; }
+  .score-card-top { flex-direction: column; align-items: stretch; }
+  .score-card .final-score { min-width: 0; }
+}
+@media (min-width: 720px) {
+  .report-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- R4: PDF عبر window.print — A4، صفحتان، بلا أشرطة التطبيق ---------- */
+@page { size: A4; margin: 14mm; }
+@media print {
+  .evaluation-report .print-only { display: block !important; }
+  .evaluation-report .no-print, .evaluation-report .report-actions, .evaluation-report .worked-example, .evaluation-report .worked-example-host, .evaluation-report .attempt-comparison { display: none !important; }
+  .evaluation-report { display: block; width: 100%; }
+  .evaluation-report .card, .evaluation-report .report-section, .evaluation-report .score-hero, .evaluation-report .criterion-card, .evaluation-report .breakdown-row { break-inside: avoid; page-break-inside: avoid; box-shadow: none; border-color: #bbb; background: #fff; }
+  .evaluation-report .report-section, .evaluation-report .score-hero { padding: 10px 12px; margin-block-end: 8px; border-radius: 8px; }
+  .evaluation-report .print-header { display: flex !important; justify-content: space-between; padding-block-end: 6px; margin-block-end: 8px; border-block-end: 1px solid #bbb; font-size: 11pt; }
+  .evaluation-report .print-page-one { display: block; }
+  .evaluation-report .print-page-two { display: grid; break-before: page; page-break-before: always; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+  .evaluation-report .print-page-two > .criteria-feedback { grid-column: 1 / -1; }
+  .evaluation-report .print-page-two .criteria-list { grid-template-columns: 1fr 1fr; column-gap: 8px; }
+  .evaluation-report .print-page-two .action-share, .evaluation-report .print-page-two .coverage-section { grid-column: 1 / -1; }
+  .evaluation-report .print-footer { display: block !important; position: fixed; inset-block-end: 0; inset-inline: 0; padding-block: 4px; text-align: center; font-size: 9pt; color: #444; border-block-start: 1px solid #bbb; background: #fff; }
+  .evaluation-report .score-card .final-score { font-size: 22pt; }
+  .evaluation-report .mini-score-track, .evaluation-report .score-track { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .evaluation-report .score-track span, .evaluation-report .mini-score-track span { background: #0d8779 !important; }
+  .evaluation-report .criterion-card, .evaluation-report .breakdown-row { border-inline-start-width: 5px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .evaluation-report p, .evaluation-report li, .evaluation-report small, .evaluation-report q { font-size: 9.5pt; line-height: 1.6; }
+  .evaluation-report h3 { font-size: 11pt; margin: 0 0 6px; }
+  .page-head, .simulation-progress, .toast-region { display: none !important; }
+  body { padding-block-end: 24px; }
 }

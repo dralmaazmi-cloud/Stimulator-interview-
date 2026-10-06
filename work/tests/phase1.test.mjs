@@ -36,6 +36,12 @@ function sourceQuestions() {
   ];
 }
 
+// alpha-5 (C1): X1 وX2 يُنشران بإجابة الدليل (فقرة) بنموذج general.
+const PARAGRAPH_IDS = new Set(['X1', 'X2']);
+function completeParagraph(question) {
+  return PARAGRAPH_IDS.has(question?.id) && typeof question.sample_answer === 'string' && question.sample_answer.trim().length > 0;
+}
+
 function completeModel(question) {
   const model = question?.sample_answer_star_l;
   const action = model?.action ?? model?.action_points;
@@ -45,23 +51,37 @@ function completeModel(question) {
 
 const source = sourceQuestions();
 const sourceById = new Map(source.map(item => [item.id, item]));
-const accepted = source.filter(item => completeModel(item) || expandedIds.has(item.id));
-const excluded = source.filter(item => !completeModel(item) && !expandedIds.has(item.id));
+const accepted = source.filter(item => completeModel(item) || expandedIds.has(item.id) || completeParagraph(item));
+const excluded = source.filter(item => !completeModel(item) && !expandedIds.has(item.id) && !completeParagraph(item));
 const derivedById = new Map(questions.map(item => [item.id, item]));
 
 assert.equal(reference.schema_version, '1.0');
 assert.equal(source.length, 127);
 assert.equal(expandedAnswers.count, 22);
-assert.equal(accepted.length, 68);
-assert.equal(excluded.length, 59);
-assert.equal(questions.length, 68);
-assert.equal(new Set(questions.map(item => item.id)).size, 68);
+// alpha-5 (F1): الملف الموسّع يُوضع كما هو من المالك؛ الـHash ثابت ولا كلمات مشوّهة (لام-ألف مفكوكة) في أي إجابة.
+const expandedBytes = read('dist/data/expanded-model-answers.json');
+assert.equal(crypto.createHash('sha256').update(expandedBytes).digest('hex'),
+  'b81bd2d1a60cc6b47a45c85a15f7503b4e5f8bb28b892372d5ec5be43054160b', 'expanded-model-answers.json must be the owner attachment, unmodified');
+assert.equal(manifest.expanded_answers_sha256, 'b81bd2d1a60cc6b47a45c85a15f7503b4e5f8bb28b892372d5ec5be43054160b');
+const corruptedWords = ['معالفريق', 'الصالحيات', 'زمالئه', 'العامالن', 'لللأسئلة', 'الاختالف', 'االستقاللية', 'املالحظات', 'الزمالء', 'لالختبار', 'باملهام', 'الأولوايت'];
+const expandedText = expandedBytes.toString('utf8');
+corruptedWords.forEach(word => assert.ok(!expandedText.includes(word), `Corrupted word «${word}» must not appear in expanded answers`));
+assert.ok(!fs.existsSync(path.join(project, 'tools/import-expanded-answers.py')), 'import script must be deleted (F1)');
+// alpha-5 (C1): المنشور 70 (46 star_l، 22 seal، 2 general) والمستبعد 57.
+assert.equal(accepted.length, 70);
+assert.equal(excluded.length, 57);
+assert.equal(questions.length, 70);
+assert.equal(new Set(questions.map(item => item.id)).size, 70);
 assert.deepEqual(new Set(questions.map(item => item.id)), new Set(accepted.map(item => item.id)));
 assert.equal(questions.filter(item => item.rubric_mode === 'seal').length, 22);
 assert.equal(questions.filter(item => item.rubric_mode === 'star_l').length, 46);
+assert.equal(questions.filter(item => item.rubric_mode === 'general').length, 2);
+assert.deepEqual(questions.filter(item => item.rubric_mode === 'general').map(item => item.id).sort(), ['X1', 'X2']);
 assert.ok(questions.every(item => item.learning_status === 'primary'));
-assert.ok(questions.every(item => ['complete_source_star_l', 'approved_expanded_seal'].includes(item.model_answer_status)));
-assert.ok(questions.every(item => completeModel(item) || item.sample_answer_seal), 'Every published question must contain a complete model answer');
+assert.ok(questions.every(item => ['complete_source_star_l', 'approved_expanded_seal', 'complete_source_paragraph'].includes(item.model_answer_status)));
+assert.ok(questions.filter(item => item.model_answer_status === 'complete_source_paragraph').every(item => PARAGRAPH_IDS.has(item.id) && item.rubric_mode === 'general'));
+assert.ok(questions.every(item => completeModel(item) || item.sample_answer_seal || completeParagraph(item)), 'Every published question must contain a complete model answer');
+assert.match(text('dist/js/app.js'), /complete_source_paragraph/, 'integrity check must accept the new status (C1)');
 assert.ok(excluded.every(item => !derivedById.has(item.id)), 'No incomplete/general answer may remain in the published bank');
 
 for (const question of questions) {
@@ -69,6 +89,7 @@ for (const question of questions) {
   assert.ok(original, `Missing source question ${question.id}`);
   assert.equal(question.question, original.question, `Question text changed: ${question.id}`);
   assert.deepEqual(question.sample_answer_star_l, original.sample_answer_star_l, `Source model answer changed: ${question.id}`);
+  assert.equal(question.sample_answer, original.sample_answer, `Guide sample_answer changed: ${question.id}`);
   if (expandedIds.has(question.id)) assert.ok(question.sample_answer_seal?.leadership_impact, `Missing expanded SEAL answer: ${question.id}`);
 }
 
@@ -76,7 +97,7 @@ assert.equal(competencies.length, 8);
 assert.equal(missionMap.length, 6);
 assert.equal(questions.filter(item => item.owner_type === 'competency').length, 56);
 assert.equal(questions.filter(item => item.owner_type === 'mission_command').length, 12);
-assert.equal(questions.filter(item => item.owner_type === 'additional').length, 0);
+assert.equal(questions.filter(item => item.owner_type === 'additional').length, 2);
 assert.deepEqual(Object.fromEntries(competencies.map(item => [item.id, item.question_ids.length])),
   { C1: 5, C2: 5, C3: 13, C4: 6, C5: 6, C6: 10, C7: 6, C8: 5 });
 assert.ok(missionMap.every(item => item.question_ids.length === 2));
@@ -87,15 +108,15 @@ assert.deepEqual(lessons.map(item => item.title), [
 assert.equal(exercises.length, 0, 'Preparation must not contain comprehension quizzes');
 assert.equal(variants.length, 0);
 assert.equal(curation.policy, 'complete-model-answers-only');
-assert.equal(curation.primary_count, 68);
+assert.equal(curation.primary_count, 70);
 assert.equal(curation.alternate_count, 0);
 assert.deepEqual(curation.primary_ids, questions.map(item => item.id));
 
 assert.equal(audit.source_question_count, 127);
-assert.equal(audit.published_question_count, 68);
-assert.equal(audit.excluded_question_count, 59);
-assert.equal(audit.published.length, 68);
-assert.equal(audit.excluded.length, 59);
+assert.equal(audit.published_question_count, 70);
+assert.equal(audit.excluded_question_count, 57);
+assert.equal(audit.published.length, 70);
+assert.equal(audit.excluded.length, 57);
 assert.deepEqual(new Set(audit.published.map(item => item.id)), new Set(questions.map(item => item.id)));
 assert.deepEqual(new Set(audit.excluded.map(item => item.id)), new Set(excluded.map(item => item.id)));
 assert.ok(audit.excluded.every(item => item.reason && item.status === 'excluded'));
@@ -105,12 +126,12 @@ assert.deepEqual(manifest.counts, {
   competency_questions: 56,
   mission_command_principles: 6,
   mission_command_questions: 12,
-  additional_questions: 0,
-  total_questions: 68,
+  additional_questions: 2,
+  total_questions: 70,
   source_questions: 127,
-  excluded_questions: 59,
-  unique_question_ids: 68,
-  primary_questions: 68,
+  excluded_questions: 57,
+  unique_question_ids: 70,
+  primary_questions: 70,
   alternate_questions: 0,
   variant_pairs: 0,
   lessons: 5,
@@ -147,13 +168,16 @@ const requiredFiles = [
   'dist/assets/icons/icon-192.png', 'dist/assets/icons/icon-512.png', 'dist/assets/icons/icon-maskable-512.png',
   'dist/assets/fonts/NotoSansArabic-Regular.ttf', 'dist/assets/fonts/NotoSansArabic-Bold.ttf',
   'dist/js/wake-lock.js', 'dist/js/report.js', 'dist/data/derived/question-audit.json',
-  'dist/data/expanded-model-answers.json'
+  'dist/data/expanded-model-answers.json',
+  'dist/js/scoring-rules.js', 'dist/js/retry-plan.js', 'dist/js/rotation.js', 'dist/js/session-plan.js', 'dist/js/coverage.js', 'api/example.js'
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(project, file)), `Missing ${file}`));
 assert.ok(read('dist/assets/images/abu-dhabi-sea-hero.jpg').length > 100_000, 'Hero must be a production-quality local image');
 
 const serviceWorkerText = text('dist/sw.js');
-assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-4/);
+assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-5/);
+assert.doesNotMatch(serviceWorkerText, /alpha-4/, 'only the alpha-5 cache name may remain');
+['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
 const cachedPaths = [...serviceWorkerText.matchAll(/'\.\/(.*?)'/g)].map(match => match[1]);
 cachedPaths.filter(Boolean).forEach(file => assert.ok(fs.existsSync(path.join(project, 'dist', file)), `Service worker caches missing file: ${file}`));
 assert.match(serviceWorkerText, /url\.pathname\.startsWith\('\/api\/'\)/, 'API responses must never be cached');
@@ -193,7 +217,12 @@ assert.doesNotMatch(learnText, /اختبار فهم|اختبر فهمك/);
 const competencyText = text('dist/js/competencies.js');
 assert.match(competencyText, /competency-card-grid/);
 assert.match(competencyText, /smart-question-card/);
-assert.match(competencyText, /إجابة نموذجية إرشادية/);
+assert.match(text('dist/js/data.js'), /إجابة نموذجية إرشادية/);
+// alpha-5 (F2): عناوين صادقة للسؤال الموقفي + «إجابة الدليل كما هي»؛ (F6) زر حفظ السؤال داخل البطاقة.
+assert.match(text('dist/js/data.js'), /إجابة نموذجية موسّعة، مبنية على إجابة الدليل/);
+assert.match(text('dist/js/data.js'), /إجابة الدليل كما هي/);
+assert.match(competencyText, /حفظ السؤال/);
+assert.match(competencyText, /toggleBookmark/);
 assert.match(competencyText, /تدرّب على هذا السؤال/);
 
 const settingsText = text('dist/js/settings.js');

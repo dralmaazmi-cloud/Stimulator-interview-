@@ -131,7 +131,10 @@ assert.match(read('dist/js/recorder.js').toString('utf8'), /MAX_SECONDS = 120/);
 assert.match(read('dist/js/recorder.js').toString('utf8'), /MAX_BYTES = 4 \* 1024 \* 1024/);
 assert.match(read('dist/js/simulation.js').toString('utf8'), /راجع التفريغ وصححه/);
 assert.match(read('dist/js/simulation.js').toString('utf8'), /SELF-INTRO/);
-assert.match(read('dist/js/report.js').toString('utf8'), /قارن بنموذج الدليل/);
+// alpha-5 (F2): زر التقرير «قارن بالإجابة النموذجية»، ونص النافذة الجديد.
+assert.match(read('dist/js/report.js').toString('utf8'), /قارن بالإجابة النموذجية/);
+assert.match(read('dist/js/report.js').toString('utf8'), /للمقارنة بعد التقييم، وليست الإجابة الصحيحة الوحيدة\./);
+assert.doesNotMatch(read('dist/js/report.js').toString('utf8'), /التصنيف النوعي/, 'old header label removed (R3)');
 
 const savedGemini = process.env.GEMINI_API_KEY;
 const savedGoogle = process.env.GOOGLE_API_KEY;

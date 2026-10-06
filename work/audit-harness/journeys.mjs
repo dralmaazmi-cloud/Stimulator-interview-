@@ -39,10 +39,8 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   const qtext = await text(page, '.ai-question-card h2');
   log('J1 question', `${qid} :: ${qtext.slice(0, 80)}`);
   log('J1 progress bar', await page.locator('.simulation-progress').getAttribute('aria-valuenow'));
-  // submit empty
-  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
-  await page.waitForTimeout(300);
-  log('J1 empty submit toast', await text(page, '.toast'));
+  // F8 (alpha-5): empty submit is disabled by design; assert it instead of clicking (the old toast path no longer exists).
+  log('J1 empty submit disabled', String(await page.locator('button:has-text("إرسال الإجابة للتقييم")').isDisabled()));
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   await shot(page, '1-question');
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -50,14 +48,19 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   log('J1 scrollY after report (item 8)', String(await page.evaluate(() => window.scrollY)));
   log('J1 final-score text', await text(page, '.final-score'));
   log('J1 report hero', await text(page, '.score-hero'));
-  log('J1 trust notice', await text(page, '.evaluation-report .notice'));
+  log('J1 trust line', await text(page, '.evaluation-report .trust-line'));
+  log('J1 R3 section order', (await page.locator('.evaluation-report h3').allInnerTexts()).join(' | '));
+  log('J1 R3 no old header labels', String(!/التصنيف النوعي|من 100(?!\s*$)/.test(await text(page, '.score-hero'))));
+  log('J1 R3 breakdown total line', await text(page, '.breakdown-total') + ' :: ' + await text(page, '.breakdown-rule'));
+  log('J1 R3 action share marker', String(await page.locator('.action-share-marker').count()) + ' :: ' + await text(page, '.action-share-note'));
+  log('J1 R2 criterion three lines', (await page.locator('.criterion-card').first().locator('.criterion-line b').allInnerTexts()).join(' | '));
   log('J1 report sections', (await page.locator('.evaluation-report h3').allInnerTexts()).join(' | '));
   log('J1 action buttons', (await page.locator('.report-actions .button').allInnerTexts()).join(' | '));
   const bodyText = await page.locator('body').innerText();
   log('J1 null/undefined in report', String((bodyText.match(/\b(null|undefined|NaN)\b/g) || []).length));
   await shot(page, '1-report');
   // compare with guide
-  await page.locator('button:has-text("قارن بنموذج الدليل")').click();
+  await page.locator('button:has-text("قارن بالإجابة النموذجية")').click();
   await page.waitForTimeout(300);
   log('J1 compare dialog open', String(await page.locator('#app-dialog').evaluate(d => d.open)) + ' :: ' + (await text(page, '#dialog-content')).slice(0, 120));
   await shot(page, '1-compare');
@@ -85,11 +88,13 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   await page.waitForTimeout(500);
   log('J1 saved session view headings', (await page.locator('h1,h2,h3').allInnerTexts()).join(' | '));
   log('J1 saved view shows criteria/quotes?', String(await page.locator('.criteria-list, .evidence-quotes').count()));
+  log('J1 saved view retry link (R5)', String(await page.locator('.retry-question').count()));
   await shot(page, '1-saved-session');
   // print css — closed saved reports must open on beforeprint and show criteria
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   await page.emulateMedia({ media: 'print' });
   log('J1 print: saved report criteria visible (item 7)', String(await page.locator('details.saved-report .criteria-list').evaluateAll(nodes => nodes.filter(node => node.getClientRects().length > 0).length)));
+  log('J1 print: footer text present', String(await page.locator('.print-footer').evaluateAll(nodes => nodes.some(node => getComputedStyle(node).display !== 'none' && /تقييم تدريبي لإجابة واحدة/.test(node.textContent)))));
   await page.screenshot({ path: `${OUT}/j-1-print.png`, fullPage: true });
   const hiddenInPrint = await page.evaluate(() => ({ nav: getComputedStyle(document.querySelector('.bottom-nav')).display, header: getComputedStyle(document.querySelector('.app-header')).display, noPrint: getComputedStyle(document.querySelector('.no-print') || document.body).display }));
   log('J1 print media hides chrome', JSON.stringify(hiddenInPrint));
@@ -378,9 +383,9 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto(BASE + '/#/preparation/U1').catch(e => log('J3 nav offline err', e.message));
   await page.waitForTimeout(1200);
   log('J3 offline learn U1 h1', await text(page, 'h1'));
-  await page.goto(BASE + '/#/bank/C1-B3');
+  await page.goto(BASE + '/#/competencies/C1?question=C1-B3');
   await page.waitForTimeout(800);
-  log('J3 offline bank C1-B3 h2', await text(page, '.question-detail-text'));
+  log('J3 offline competency C1 question C1-B3 open', String(await page.locator('#question-C1-B3[open]').count()) + ' :: ' + (await text(page, '#question-C1-B3 summary strong')).slice(0, 60));
   await page.goto(BASE + '/#/self-intro');
   await page.waitForTimeout(800);
   log('J3 offline self-intro h1', await text(page, 'h1'));
@@ -428,7 +433,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
   await page.waitForTimeout(1500);
-  log('J5 provider-429 message shown to user', await text(page, '.evaluation-status'));
+  log('J5 provider-429 message shown to user (R6)', await text(page, '.evaluation-status'));
+  log('J5 R6 lock ≤ 120s and message by duration', String(/حاول بعد \d+ ثانية|بعد نحو \d+ دقيقة/.test(await text(page, '.evaluation-status'))) + ' :: ' + await text(page, '.retry-countdown'));
   await shot(page, '5-provider-429');
   await gotoHash(page, BASE + '/#/simulation');
   await page.waitForSelector('.simulation-start');
@@ -469,7 +475,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
     await page.locator('button:has-text("ابدأ أسئلة المقابلة")').click();
     await page.waitForSelector('.ai-question-card');
     const ids = [];
-    for (let i = 0; i < 6; i += 1) {
+    for (let i = 0; i < 7; i += 1) {
       ids.push(await text(page, '.ai-question-card .question-id'));
       await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' NOFOLLOWUP');
       await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -481,6 +487,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
     }
     await page.waitForSelector('.session-summary');
     log(`J6 ${mode}/${scope || 'random'} question ids`, ids.join(','));
+    if (mode === 'full' && !scope) log('J6 D1 full composition (B,B,S,S,M,X)', ids.join(',') + ' :: ' + String(ids.length === 6 && /^X[12]$/.test(ids[5]) && /^M/.test(ids[4])));
     log(`J6 ${mode} summary`, (await text(page, '.session-summary-hero')));
     await shot(page, `6-${mode}-${scope || 'random'}-summary`);
   }
@@ -536,15 +543,159 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 // ---------- Journey 8: settings delete all data ----------
 {
   const { browser, page } = await newPage();
-  await page.goto(BASE + '/#/bank/C1-B3');
+  await page.goto(BASE + '/#/competencies/C1?question=C1-B3');
   await page.waitForTimeout(400);
-  await page.locator('button:has-text("حفظ السؤال")').click();
+  await page.locator('#question-C1-B3 .inline-bookmark-button').click();
+  await page.waitForTimeout(200);
+  log('J8 F6 bookmark button toggles', await text(page, '#question-C1-B3 .inline-bookmark-button') + ' :: ' + JSON.stringify(await page.evaluate(() => localStorage.getItem('lic:bookmarked-questions'))));
+  await page.goto(BASE + '/#/tools/saved');
+  await page.waitForTimeout(400);
+  log('J8 saved questions page lists C1-B3', String(await page.locator('.saved-question-card').count()));
   await page.goto(BASE + '/#/settings');
   await page.waitForTimeout(400);
-  await page.locator('button:has-text("حذف كل بياناتي المحلية")').click();
+  await page.locator('button:has-text("حذف جميع بياناتي المحلية")').click();
   await page.waitForTimeout(600);
   const left = await page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('lic:')));
   log('J8 localStorage lic:* keys after delete', JSON.stringify(left));
+  await browser.close();
+}
+// ---------- alpha-5 Journey 9: full interview to summary → coverage map → print one answer report (2 pages) + 390px shots in both themes ----------
+const countPdfPages = buffer => (buffer.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+for (const theme of ['light', 'dark']) {
+  const { browser, page, errors } = await newPage({ colorScheme: theme, viewport: { width: 390, height: 844 } });
+  await page.goto(BASE + '/#/home');
+  await page.waitForSelector('.home-dashboard');
+  await page.evaluate(value => localStorage.setItem('lic:theme', value), theme);
+  await gotoHash(page, BASE + '/#/simulation?mode=full');
+  await page.waitForSelector('.simulation-start');
+  log(`J9[${theme}] full card description (F7/D1)`, (await page.locator('.simulation-mode-card').nth(3).innerText()).replace(/\n/g, ' / '));
+  await page.locator('.simulation-start').click();
+  await page.waitForSelector('textarea.simulation-answer-input');
+  await page.locator('textarea.simulation-answer-input').fill('أنا مدير فريق العمليات. بدأت مسيرتي مشرف عمليات ثم تدرجت إلى إدارة وحدة. من أبرز ما حققته خفض زمن الإنجاز. وأتطلع مستقبلًا إلى توسيع أثر التحسين.');
+  await page.locator('button:has-text("تقييم تقديم الذات")').click();
+  await page.waitForSelector('.evaluation-report', { timeout: 20000 });
+  await page.locator('button:has-text("ابدأ أسئلة المقابلة")').click();
+  await page.waitForSelector('.ai-question-card');
+  const ids = [];
+  let exampleChecked = false;
+  for (let i = 0; i < 7; i += 1) {
+    const qid = await text(page, '.ai-question-card .question-id');
+    ids.push(qid);
+    await page.locator('textarea.simulation-answer-input').fill(ANSWER + (i === 0 ? ' LOWSCORE' : ' NOFOLLOWUP'));
+    await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+    await page.waitForSelector('.evaluation-report', { timeout: 20000 });
+    if (i === 0) {
+      log(`J9[${theme}] R1 low report: elements line + badge`, await text(page, '.elements-complete-line') + ' :: ' + await text(page, '.score-badge'));
+      // step 5: worked example button → panel with highlighted additions
+      const exampleButton = page.locator('.worked-example-button');
+      log(`J9[${theme}] example button visible when incomplete/low`, String(await exampleButton.count()));
+      if (await exampleButton.count()) {
+        await exampleButton.click();
+        await page.waitForSelector('.worked-example', { timeout: 20000 });
+        const added = await page.locator('.worked-example mark.example-added').evaluateAll(nodes => nodes.map(node => { const style = getComputedStyle(node); return { bg: style.backgroundColor, italic: style.fontStyle, weight: style.fontWeight }; }));
+        log(`J9[${theme}] example panel title/lead`, (await page.locator('.worked-example h3').innerText()) + ' :: ' + (await text(page, '.example-lead')).slice(0, 60));
+        log(`J9[${theme}] example added segments highlighted (bg+font)`, JSON.stringify(added.slice(0, 2)) + ` count=${added.length}`);
+        log(`J9[${theme}] example literal warning + key + additions list`, String((await text(page, '.worked-example')).includes('التفاصيل المظللة افتراضية للتوضيح. استبدلها بما حدث معك فعلًا؛ لا تحفظها.')) + ' :: ' + String((await text(page, '.example-key')).includes('المظلَّل')) + ' :: ' + String(await page.locator('.example-additions li').count()));
+        log(`J9[${theme}] example has no score and no copy button`, String(!/%|من 100/.test(await text(page, '.worked-example')) && (await page.locator('.worked-example button').count()) === 0));
+        exampleChecked = true;
+      }
+      await shot(page, `9-${theme}-report`);
+    }
+    const next = page.locator('button:has-text("السؤال التالي")');
+    if (await next.count()) await next.click(); else { await page.locator('button:has-text("إنهاء وعرض الملخص")').click(); break; }
+    await page.waitForSelector('.ai-question-card');
+  }
+  await page.waitForSelector('.session-summary');
+  log(`J9[${theme}] full interview ids (D1)`, ids.join(',') + ' :: valid=' + String(ids.length === 6 && new Set(ids.slice(0, 4).map(id => id.split('-')[0])).size === 4 && /^M/.test(ids[4]) && /^X[12]$/.test(ids[5])));
+  log(`J9[${theme}] F5 summary separates STAR-L and SEAL`, (await page.locator('.session-summary .aggregate-section h2').allInnerTexts()).filter(t => /اكتمال عناصر/.test(t)).join(' | '));
+  await shot(page, `9-${theme}-summary`);
+  // coverage map
+  await page.locator('.session-summary a:has-text("خريطة التغطية")').click();
+  await page.waitForSelector('.coverage-grid');
+  log(`J9[${theme}] coverage header`, await text(page, '.coverage-tried') + ' :: rows=' + String(await page.locator('.coverage-row').count()) + ' cells=' + String(await page.locator('.coverage-cell').count()));
+  log(`J9[${theme}] coverage statuses present`, [...new Set(await page.locator('.coverage-status').allInnerTexts())].join(' | '));
+  log(`J9[${theme}] coverage not linked from home`, String(await page.evaluate(() => !document.querySelector('.home-dashboard a[href="#/coverage"]'))));
+  await shot(page, `9-${theme}-coverage`);
+  await page.locator('.coverage-cell:not([disabled])').first().click();
+  await page.waitForSelector('.ai-question-card', { timeout: 10000 });
+  log(`J9[${theme}] coverage cell opens a question`, await text(page, '.ai-question-card .question-id'));
+  // print one answer report from the saved session: open saved session, expand first answer report, print to PDF
+  await page.goto(BASE + '/#/reports');
+  await page.waitForTimeout(500);
+  log(`J9[${theme}] reports page links coverage (D3)`, String(await page.locator('a[href="#/coverage"]').count()));
+  await page.locator('.session-history-card').first().click();
+  await page.waitForSelector('details.saved-report');
+  // isolate one report for the PDF: open the first report and hide the rest + summary via a print-time class
+  await page.evaluate(() => {
+    document.querySelectorAll('details.saved-report').forEach((details, index) => { details.open = index === 1; if (index !== 1) details.style.display = 'none'; });
+    document.querySelector('.session-summary').style.display = 'none';
+    document.querySelector('.page-head').style.display = 'none';
+  });
+  await page.emulateMedia({ media: 'print' });
+  const pdf = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
+  fs.writeFileSync(`${OUT}/j-9-${theme}-answer-report.pdf`, pdf);
+  log(`J9[${theme}] R4 answer report PDF pages`, String(countPdfPages(pdf)) + ` bytes=${pdf.length}`);
+  const printState = await page.evaluate(() => ({
+    nav: getComputedStyle(document.querySelector('.bottom-nav')).display,
+    header: getComputedStyle(document.querySelector('.app-header')).display,
+    buttons: [...document.querySelectorAll('details.saved-report[open] .report-actions')].map(node => getComputedStyle(node).display),
+    footer: [...document.querySelectorAll('details.saved-report[open] .print-footer')].map(node => getComputedStyle(node).display),
+    pageTwo: [...document.querySelectorAll('details.saved-report[open] .print-page-two')].map(node => getComputedStyle(node).breakBefore)
+  }));
+  log(`J9[${theme}] R4 print hides chrome/buttons, shows footer, page-2 break`, JSON.stringify(printState));
+  await page.emulateMedia({ media: 'screen' });
+  // D2 rotation + R5 attempts stored locally; migration kept v2 data (checked in J10)
+  const stores = await page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const db = r.result; const names = [...db.objectStoreNames]; const tx = db.transaction(['attempts', 'rotation']); const a = tx.objectStore('attempts').getAll(); const b = tx.objectStore('rotation').getAll(); a.onsuccess = () => { b.onsuccess = () => resolve({ version: db.version, names, attempts: a.result.map(x => ({ id: x.id, n: x.attempts.length, hasAnswer: x.attempts.some(y => 'answer' in y) })), rotation: b.result.length }); }; }; }));
+  log(`J9[${theme}] IndexedDB v3 stores + attempts (no answer text) + rotation`, JSON.stringify(stores).slice(0, 300));
+  log(`J9[${theme}] page errors`, JSON.stringify(errors.filter(e => !/Failed to load resource/.test(e))));
+  if (!exampleChecked) log(`J9[${theme}] example`, 'NOT CHECKED (button not shown)');
+  await browser.close();
+}
+
+// ---------- alpha-5 Journey 10: DB migration v2 → v3 keeps data; R5 retry & compare; R6 429 copy on 4176 ----------
+{
+  const { browser, page } = await newPage();
+  await page.goto(BASE + '/#/home');
+  await page.waitForSelector('.home-dashboard');
+  // seed a v2 database with a completed session and a checklist, then reload the app (which opens v3)
+  await page.evaluate(() => new Promise((resolve, reject) => {
+    const del = indexedDB.deleteDatabase('leadership-interview-coach');
+    del.onsuccess = del.onerror = () => {
+      const open = indexedDB.open('leadership-interview-coach', 2);
+      open.onupgradeneeded = () => { ['settings', 'progress', 'stories', 'sessions', 'checklists', 'review', 'pending_recordings'].forEach(s => open.result.createObjectStore(s, { keyPath: 'id' })); };
+      open.onsuccess = () => { const db = open.result; const tx = db.transaction(['sessions', 'checklists'], 'readwrite'); tx.objectStore('sessions').put({ id: 'legacy-1', status: 'completed', mode: 'single', completed_at: '2026-01-01T00:00:00.000Z', question_ids: ['C1-B3'], responses: [{ question: { id: 'C1-B3', question: 'q', type: 'behavioural', rubric_mode: 'star_l', competency_id: 'C1', competency_name: 'c' }, answer: 'a', followups: [], report: { trusted: true, final_score: 50, classification: 'قوية', rubric_mode: 'star_l', weights_version: 'phase2-1.0', elements: { situation: { present: true, quote: 'x' }, task: { present: true, quote: 'x' }, action: { present: true, quote: 'x' }, result: { present: true, quote: 'x' }, learning: { present: true, quote: 'x' } }, criteria: ['context', 'personal_role_or_options', 'action_or_plan', 'result_or_effect', 'learning', 'competency_evidence'].map(key => ({ key, score: 2, evidence: ['x'], justification: 'j' })), strengths: [], missing: [], next_actions: [], flags: [] } }] }); tx.objectStore('checklists').put({ id: 'preparation-6.1', checked: [0, 2] }); tx.oncomplete = () => { db.close(); resolve(); }; tx.onerror = () => reject(tx.error); };
+      open.onerror = () => reject(open.error);
+    };
+  }));
+  await page.reload();
+  await page.waitForSelector('.home-dashboard');
+  await page.goto(BASE + '/#/reports');
+  await page.waitForTimeout(600);
+  const migrated = await page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const db = r.result; const tx = db.transaction(['sessions', 'checklists']); const s = tx.objectStore('sessions').get('legacy-1'); const c = tx.objectStore('checklists').get('preparation-6.1'); s.onsuccess = () => { c.onsuccess = () => resolve({ version: db.version, stores: [...db.objectStoreNames], session: s.result?.status, checklist: c.result?.checked }); }; }; }));
+  log('J10 migration v2→v3 keeps sessions/checklists', JSON.stringify(migrated));
+  await page.locator('.session-history-card').first().click();
+  await page.waitForSelector('details.saved-report');
+  await page.evaluate(() => { document.querySelector('details.saved-report').open = true; });
+  log('J10 old saved report recomputed at display (R1: 5 present, all 2/5 → 0 complete, ضعيفة)', await text(page, 'details.saved-report .elements-complete-line') + ' :: ' + await text(page, 'details.saved-report .score-badge'));
+  // R5: retry & compare from the live report
+  await gotoHash(page, BASE + '/#/simulation?question=C1-B3&answer=text');
+  await page.waitForSelector('.ai-question-card');
+  await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' LOWSCORE');
+  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+  await page.waitForSelector('.evaluation-report', { timeout: 20000 });
+  log('J10 R5 first attempt: no comparison yet', String(await page.locator('.attempt-comparison').count()));
+  await page.locator('.retry-question').click();
+  await page.waitForSelector('.ai-question-card');
+  log('J10 R5 retry reopens the same question', await text(page, '.ai-question-card .question-id'));
+  await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' NOFOLLOWUP');
+  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+  await page.waitForSelector('.evaluation-report', { timeout: 20000 });
+  log('J10 R5 comparison with previous attempt', (await text(page, '.attempt-comparison')).slice(0, 220));
+  const attempts = await page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const tx = r.result.transaction('attempts'); const g = tx.objectStore('attempts').get('C1-B3'); g.onsuccess = () => resolve(g.result); }; }));
+  log('J10 R5 attempts store: count ≤ 5, no answer text', JSON.stringify({ n: attempts?.attempts?.length, keys: Object.keys(attempts?.attempts?.[0] || {}) }));
+  // export includes attempts + rotation
+  const backup = await page.evaluate(async () => { const { exportBackup } = await import('/js/storage.js'); const b = await exportBackup({}); return { stores: Object.keys(b.stores), attempts: (b.stores.attempts || []).length, rotation: (b.stores.rotation || []).length }; });
+  log('J10 export includes attempts/rotation', JSON.stringify(backup));
   await browser.close();
 }
 fs.writeFileSync(`${OUT}/journeys-done.txt`, 'ok');

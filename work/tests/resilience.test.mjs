@@ -140,16 +140,41 @@ const allBodiesSafe = calls => calls.every(call => call.body.store === false && 
   assert.equal(result.payload.code, 'AI_PROVIDER_ERROR');
   assert.doesNotMatch(result.payload.error, /provider detail|UNAVAILABLE/);
 }
-// 5. 429 → نداء واحد، AI_RATE_LIMITED، retry_after من الترويسة كعدد ثوانٍ فقط.
+// 5. 429 (alpha-5 R6): يُجرَّب الاحتياطي مرة واحدة إن كان معرّفًا ومختلفًا؛ إن فشل هو أيضًا بـ429 → 429 مع retry_after.
+{
+  const { result, calls } = await withProvider([
+    jsonResponse(429, { error: { message: 'quota' } }, { 'Retry-After': '30' }),
+    jsonResponse(429, { error: { message: 'quota' } }, { 'Retry-After': '45' })
+  ], async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }, { env: { GEMINI_EVALUATION_FALLBACK_MODEL: 'fallback-eval-model' } });
+  assert.equal(calls.length, 2, '429 on primary → one fallback call, no retry on the same model');
+  assert.equal(calls[1].body.model, 'fallback-eval-model');
+  assert.equal(result.statusCode, 429);
+  assert.equal(result.payload.code, 'AI_RATE_LIMITED');
+  assert.equal(result.payload.retry_after, 45);
+  assert.doesNotMatch(result.payload.error, /quota/);
+}
+// 5b. 429 ثم نجاح الاحتياطي → 200 بنداءين.
+{
+  const { result, calls } = await withProvider([
+    jsonResponse(429, { error: { message: 'quota' } }, { 'Retry-After': '30' }),
+    ok(JSON.stringify(goodReport))
+  ], async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }, { env: { GEMINI_EVALUATION_FALLBACK_MODEL: 'fallback-eval-model' } });
+  assert.equal(calls.length, 2);
+  assert.equal(result.statusCode, 200, JSON.stringify(result.payload));
+  assert.equal(result.payload.report.trusted, true);
+}
+// 5c. 429 بلا احتياطي معرّف → نداء واحد و429.
 {
   const { result, calls } = await withProvider([jsonResponse(429, { error: { message: 'quota' } }, { 'Retry-After': '30' })], async () => {
     const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
-  }, { env: { GEMINI_EVALUATION_FALLBACK_MODEL: 'fallback-eval-model' } });
+  });
   assert.equal(calls.length, 1);
   assert.equal(result.statusCode, 429);
-  assert.equal(result.payload.code, 'AI_RATE_LIMITED');
   assert.equal(result.payload.retry_after, 30);
-  assert.doesNotMatch(result.payload.error, /quota/);
 }
 // 6. فشل شبكة ثم نجاح → نداءان.
 {

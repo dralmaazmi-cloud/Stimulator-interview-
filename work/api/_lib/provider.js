@@ -164,6 +164,23 @@ export async function callWithRetry(bodyForModel, { budget, primaryModel, fallba
     try {
       return { payload: await singleCall(bodyForModel(primaryModel), budget), model: primaryModel, fallbackUsed: false };
     } catch (error) {
+      // alpha-5 (R6): عند 429 لا تُعاد المحاولة على النموذج نفسه، بل يُجرَّب الاحتياطي مرة واحدة إن كان معرّفًا ومختلفًا.
+      if (error?.code === 'AI_RATE_LIMITED') {
+        if (fallbackModel && fallbackModel !== primaryModel && budget.canStart()) {
+          budget.fallbackUsed = true;
+          try {
+            return { payload: await singleCall(bodyForModel(fallbackModel), budget), model: fallbackModel, fallbackUsed: true };
+          } catch (fallbackError) {
+            if (fallbackError?.code === 'AI_RATE_LIMITED') {
+              fallbackError.retryAfter = Math.max(Number(error.retryAfter) || 0, Number(fallbackError.retryAfter) || 0) || undefined;
+              throw fallbackError;
+            }
+            if (!fallbackError?.retryable) throw fallbackError;
+            throw error;
+          }
+        }
+        throw error;
+      }
       if (!error?.retryable) throw error;
       lastError = error;
     }

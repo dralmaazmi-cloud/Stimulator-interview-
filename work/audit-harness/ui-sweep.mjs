@@ -8,7 +8,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const ROUTES = [
   '#/home', '#/preparation', '#/preparation/U1', '#/preparation/U2', '#/preparation/U4', '#/preparation/U5',
   '#/competencies', '#/competencies/C1', '#/competencies/C1?question=C1-S1', '#/preparation/U4?question=M6-S1',
-  '#/simulation', '#/reports', '#/tools', '#/settings', '#/nope'
+  '#/simulation', '#/reports', '#/coverage', '#/tools', '#/tools/saved', '#/settings', '#/nope'
 ];
 const findings = [];
 const note = (route, kind, detail) => {
@@ -20,10 +20,15 @@ async function inspect(page, route) {
   return page.evaluate(currentRoute => {
     const bodyText = document.body.innerText;
     const viewport = document.documentElement.clientWidth;
+    // alpha-5: العناصر المخفية بصريًا لقارئ الشاشة (.sr-only / clip) ليست أهداف لمس ولا نصًا مقصوصًا.
+    const screenReaderOnly = element => element.closest('.sr-only') != null || (() => {
+      const style = getComputedStyle(element);
+      return style.position === 'absolute' && (style.clip === 'rect(0px, 0px, 0px, 0px)' || style.clipPath === 'inset(50%)') && parseFloat(style.width) <= 1;
+    })();
     const visible = element => {
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
-      return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && !element.closest('[hidden]');
+      return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && !element.closest('[hidden]') && !screenReaderOnly(element);
     };
     const wide = [...document.querySelectorAll('body *')].filter(element => {
       if (!visible(element)) return false;

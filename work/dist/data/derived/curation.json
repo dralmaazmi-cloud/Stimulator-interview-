@@ -2,8 +2,8 @@
   "schema_version": "2.0",
   "policy": "complete-model-answers-only",
   "total_source_questions": 127,
-  "excluded_source_questions": 59,
-  "primary_count": 68,
+  "excluded_source_questions": 57,
+  "primary_count": 70,
   "alternate_count": 0,
   "primary_ids": [
     "C1-S1",
@@ -73,7 +73,9 @@
     "M5-S1",
     "M5-B1",
     "M6-S1",
-    "M6-B1"
+    "M6-B1",
+    "X1",
+    "X2"
   ],
   "alternates": []
 }

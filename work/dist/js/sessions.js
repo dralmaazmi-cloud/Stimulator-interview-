@@ -45,7 +45,12 @@ export async function renderSessions(root) {
     .sort((a, b) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || '')));
   root.append(
     pageHead('محفوظ محليًا', 'سجل الجلسات', 'تقاريرك السابقة موجودة على هذا الجهاز فقط.'),
-    notice('لا تُخزن التسجيلات الصوتية. يمكنك طباعة أي تقرير أو حفظه PDF من شاشة التقرير.', '', '▣')
+    notice('لا تُخزن التسجيلات الصوتية. يمكنك طباعة أي تقرير أو حفظه PDF من شاشة التقرير.', '', '▣'),
+    // alpha-5 (D3): رابط خريطة التغطية من «التقارير».
+    el('a', { class: 'card coverage-link-card', href: '#/coverage' },
+      el('div', {}, el('strong', { text: 'خريطة التغطية' }), el('small', { text: 'ما جرّبته من الكفاءات والمبادئ وما لم تجرّبه بعد.' })),
+      el('span', { class: 'row-chevron', 'aria-hidden': 'true', text: '‹' })
+    )
   );
   if (pending.length) {
     root.append(el('section', { class: 'section-block pending-sessions' },
@@ -131,6 +136,10 @@ export async function renderSavedSession(root, id) {
             question: item.question,
             answer: item.answer,
             followups: item.followups || [],
+            currentAttempt: item.attempt?.current || null,
+            previousAttempt: item.attempt?.previous || null,
+            example: item.example || null,
+            retryHref: item.question.id === 'SELF-INTRO' ? null : `#/simulation?question=${encodeURIComponent(item.question.id)}&answer=${session.answer_mode === 'voice' ? 'voice' : 'text'}`,
             onFollowup: null,
             onNext: null,
             onFinish: null

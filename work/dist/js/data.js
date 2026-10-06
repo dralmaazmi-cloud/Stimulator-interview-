@@ -46,20 +46,29 @@ export function sectionsByNumber(part) {
   return new Map((part.sections || []).map(section => [section.number, section]));
 }
 
+// alpha-5 (F2): السؤال الموقفي يعرض الإجابة الموسّعة بعنوانها الصادق ثم «إجابة الدليل كما هي» حرفيًا.
+// (C1): السؤال المعرفي (X1/X2) يعرض «إجابة الدليل» كما هي.
 export function questionSamples(question) {
   const results = [];
   if (question.sample_answer_seal) {
     results.push({
-      title: 'إجابة نموذجية إرشادية',
+      kind: 'expanded',
+      title: 'إجابة نموذجية موسّعة، مبنية على إجابة الدليل',
       subtitle: 'استخدمها لفهم طريقة بناء القرار، ولا تحفظها حرفيًا.',
       parts: question.sample_answer_seal
     });
+    if (typeof question.sample_answer === 'string' && question.sample_answer.trim()) {
+      results.push({ kind: 'guide', title: 'إجابة الدليل كما هي', text: question.sample_answer });
+    }
   } else if (question.sample_answer_star_l) {
     results.push({
+      kind: 'guide',
       title: 'إجابة نموذجية إرشادية',
       subtitle: 'استخدمها لفهم طريقة بناء الإجابة، ولا تحفظها حرفيًا.',
       parts: question.sample_answer_star_l
     });
+  } else if (typeof question.sample_answer === 'string' && question.sample_answer.trim()) {
+    results.push({ kind: 'guide', title: 'إجابة الدليل', text: question.sample_answer });
   }
   return results;
 }

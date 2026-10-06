@@ -12,7 +12,8 @@ const handlers = {
   '/api/health': (await import(path.join(ROOT, 'api/health.js'))).default,
   '/api/evaluate': (await import(path.join(ROOT, 'api/evaluate.js'))).default,
   '/api/transcribe': (await import(path.join(ROOT, 'api/transcribe.js'))).default,
-  '/api/self-intro': (await import(path.join(ROOT, 'api/self-intro.js'))).default
+  '/api/self-intro': (await import(path.join(ROOT, 'api/self-intro.js'))).default,
+  '/api/example': (await import(path.join(ROOT, 'api/example.js'))).default
 };
 
 const calls = [];
@@ -60,8 +61,10 @@ function buildEvaluation(prompt) {
       key,
       score: allZero ? 0 : lowScore ? (i < 2 ? 2 : 0) : 3 + (i % 3),
       evidence: allZero ? [] : lowScore ? (i < 2 ? qt(i) : []) : qt(i),
-      justification: `تبرير تجريبي للمعيار ${key}.`
+      justification: `تبرير تجريبي للمعيار ${key}.`,
+      improve: /NOIMPROVE/.test(answer) ? '' : `اذكر خطوة محددة ترفع ${key} (جملة تجريبية بنسبة 40% تُحذف).`
     })),
+    summary: /NOSUMMARY/.test(answer) ? '' : 'الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي 85% إجابة قوية).',
     expected_points_coverage: points.map((p, i) => ({ point: p, covered: !(lowScore || allZero) && i % 2 === 0, quote: !(lowScore || allZero) && i % 2 === 0 ? elementQuote(i) : null })),
     behaviours_observed: { supporting: [], negative: [] },
     mission_command_indicators: q.id.startsWith('M') ? ['M1'] : [],
@@ -93,6 +96,31 @@ globalThis.fetch = async (url, options) => {
     rec.kind = 'self-intro';
     const src = body.input.split('<<<')[1].split('>>>')[0];
     text = JSON.stringify({ text: src.replace(/\s+/g, ' ').trim() + ' (نسخة محسّنة تجريبيًا)', changes: ['تحسين الربط بين الجمل (تجريبي)'], facts_preserved: !/ADDFACT/.test(src) });
+  } else if (body.response_format?.schema?.properties?.segments) {
+    // alpha-5: «مثال مكتمل على غرار موقفك» — مقاطع من إجابة المتدرب (trainee) + مقاطع مضافة (added).
+    rec.kind = 'example';
+    const prompt = body.input;
+    const answer = prompt.split('<<<')[1].split('>>>')[0];
+    const mode = /"rubric_mode":"seal"/.test(prompt) ? 'seal' : 'star_l';
+    const qid = (prompt.match(/question_id = "([^"]+)"/) || [])[1] || 'C1-B3';
+    const sentences = pick(answer, 5);
+    const elements = mode === 'seal' ? ['situation', 'evaluation', 'action', 'leadership_effect'] : ['situation', 'task', 'action', 'result', 'learning'];
+    const segments = [];
+    elements.forEach((element, i) => {
+      if (sentences[i]) segments.push({ element, text: sentences[i] + '.', source: 'trainee' });
+      if (i === 1 || i === elements.length - 1) segments.push({ element, text: `وافترضتُ هنا أن المهلة كانت ثلاثة أسابيع، فوضعت خطة متابعة أسبوعية مع كل عضو (مقطع مضاف تجريبي للعنصر ${element}).`, source: 'added' });
+    });
+    if (/FAKETRAINEE/.test(answer)) segments.push({ element: elements[2], text: 'قمت بتدريب الفريق على منهجية جديدة تمامًا لم تُذكر في أي مكان من الإجابة.', source: 'trainee' });
+    if (/NOADDED/.test(answer)) { for (let i = segments.length - 1; i >= 0; i -= 1) if (segments[i].source === 'added') segments.splice(i, 1); }
+    text = JSON.stringify({
+      question_id: qid,
+      rubric_mode: mode,
+      segments,
+      additions: /NOADDED/.test(answer) ? [] : [
+        { criterion: 'personal_role_or_options', what: 'تحديد المهلة والدور بوضوح', why: 'عنصر المهمة لم يُذكر صراحة' },
+        { criterion: 'result_or_effect', what: 'مؤشر قابل للقياس للنتيجة (نسبة 90% افتراضية)', why: 'النتيجة بلا مؤشر' }
+      ]
+    });
   } else if (body.response_format?.schema?.properties?.questions) {
     rec.kind = 'followup';
     text = JSON.stringify({ questions: ['ما الذي فعلته أنت تحديدًا؟'], reasons: ['الدور الشخصي غير واضح'] });

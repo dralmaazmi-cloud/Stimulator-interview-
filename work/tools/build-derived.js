@@ -37,8 +37,16 @@ const VARIANT_PAIRS = [
 // guidance, expected points, or competency indicators is not a model answer.
 // The immutable reference remains untouched and the audit records every
 // exclusion explicitly.
+// alpha-5 (C1): سؤالا الذكاء الاصطناعي X1 وX2 يُنشران بإجابتَي الدليل (sample_answer) كما هما،
+// بنموذج general وحالة complete_source_paragraph. لا يُنشر أي سؤال آخر بهذه القاعدة.
+const PARAGRAPH_PUBLISHED_IDS = new Set(['X1', 'X2']);
+function hasCompleteParagraphAnswer(question) {
+  return PARAGRAPH_PUBLISHED_IDS.has(question?.id) && typeof question.sample_answer === 'string' && question.sample_answer.trim().length > 0;
+}
+
 function hasCompleteModelAnswer(question) {
   if (expandedAnswerById.has(question?.id)) return true;
+  if (hasCompleteParagraphAnswer(question)) return true;
   const answer = question?.sample_answer_star_l;
   if (!answer || typeof answer !== 'object') return false;
   return ['situation', 'task', 'result', 'learning'].every(key => typeof answer[key] === 'string' && answer[key].trim())
@@ -108,7 +116,7 @@ function flattenQuestion(question, owner) {
     alternate_of: null,
     expected_points: stableExpectedPoints(question),
     sample_answer_seal: expanded,
-    model_answer_status: expanded ? 'approved_expanded_seal' : 'complete_source_star_l'
+    model_answer_status: expanded ? 'approved_expanded_seal' : hasCompleteParagraphAnswer(question) ? 'complete_source_paragraph' : 'complete_source_star_l'
   };
 }
 
@@ -539,7 +547,9 @@ const questionAudit = {
     status: 'published',
     evidence: expandedAnswerById.has(question.id)
       ? 'إجابة SEAL موسعة ومعتمدة مبنية على الدليل'
-      : 'sample_answer_star_l كامل في المصدر'
+      : hasCompleteParagraphAnswer(question)
+        ? 'sample_answer فقرة كاملة من الدليل (سؤال معرفي)'
+        : 'sample_answer_star_l كامل في المصدر'
   })),
   excluded: allSourceQuestions.filter(question => !hasCompleteModelAnswer(question)).map(question => ({
     id: question.id,
@@ -571,7 +581,7 @@ const manifest = {
   derived_schema_version: '1.0',
   reference_sha256: sourceHash,
   expanded_answers_sha256: crypto.createHash('sha256').update(expandedAnswersBytes).digest('hex'),
-  prompt_version: 'evaluation-1.1+approved-content-audit-1',
+  prompt_version: 'evaluation-1.2+approved-content-audit-1',
   rubric_version: 'phase2-reference-review-4.0',
   config_version: '6.0',
   model_id: null,

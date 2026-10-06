@@ -37,7 +37,9 @@ export function renderSavedQuestions(root, data) {
   questions.forEach(question => {
     const href = question.competency_id
       ? `#/competencies/${question.competency_id}?question=${question.id}`
-      : `#/preparation/U4?question=${question.id}`;
+      : question.owner_type === 'additional'
+        ? `#/preparation/U5?question=${question.id}`
+        : `#/preparation/U4?question=${question.id}`;
     list.append(el('a', { class: 'card saved-question-card', href },
     el('div', { class: 'question-meta' },
       tag(question.competency_name || question.principle_title || 'سؤال عام', 'accent'),

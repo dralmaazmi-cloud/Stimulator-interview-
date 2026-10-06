@@ -45,9 +45,10 @@ export const evaluationSchema = {
           },
           score: { type: 'integer', minimum: 0, maximum: 5 },
           evidence: { type: 'array', maxItems: 4, items: { type: 'string' } },
-          justification: { type: 'string' }
+          justification: { type: 'string' },
+          improve: { type: 'string' }
         },
-        required: ['key', 'score', 'evidence', 'justification']
+        required: ['key', 'score', 'evidence', 'justification', 'improve']
       }
     },
     expected_points_coverage: {
@@ -88,13 +89,54 @@ export const evaluationSchema = {
     missing: { type: 'array', maxItems: 5, items: { type: 'string' } },
     next_actions: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
     follow_up_questions: { type: 'array', maxItems: 2, items: { type: 'string' } },
-    follow_up_reasons: { type: 'array', maxItems: 2, items: { type: 'string' } }
+    follow_up_reasons: { type: 'array', maxItems: 2, items: { type: 'string' } },
+    summary: { type: 'string' }
   },
   required: [
     'question_id', 'rubric_mode', 'elements', 'criteria', 'expected_points_coverage',
     'behaviours_observed', 'mission_command_indicators', 'flags', 'strengths', 'missing',
-    'next_actions', 'follow_up_questions'
+    'next_actions', 'follow_up_questions', 'summary'
   ]
+};
+
+// alpha-5 (الخطوة 5): مخطط «مثال مكتمل على غرار موقفك».
+export const exampleSchema = {
+  type: 'object',
+  properties: {
+    question_id: { type: 'string' },
+    rubric_mode: { type: 'string', enum: ['star_l', 'seal'] },
+    segments: {
+      type: 'array',
+      minItems: 1,
+      maxItems: 12,
+      items: {
+        type: 'object',
+        properties: {
+          element: { type: 'string', enum: ['situation', 'task', 'action', 'result', 'learning', 'evaluation', 'leadership_effect'] },
+          text: { type: 'string' },
+          source: { type: 'string', enum: ['trainee', 'added'] }
+        },
+        required: ['element', 'text', 'source']
+      }
+    },
+    additions: {
+      type: 'array',
+      maxItems: 6,
+      items: {
+        type: 'object',
+        properties: {
+          criterion: {
+            type: 'string',
+            enum: ['context', 'personal_role_or_options', 'action_or_plan', 'result_or_effect', 'learning', 'competency_evidence']
+          },
+          what: { type: 'string' },
+          why: { type: 'string' }
+        },
+        required: ['criterion', 'what', 'why']
+      }
+    }
+  },
+  required: ['question_id', 'rubric_mode', 'segments', 'additions']
 };
 
 export const selfIntroSchema = {

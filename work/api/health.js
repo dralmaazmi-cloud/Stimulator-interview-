@@ -11,7 +11,8 @@ export default async function handler(req, res) {
       text_evaluation: true,
       audio_transcription: true,
       follow_up_questions: true, // تُعاد ضمن /api/evaluate؛ لا توجد نقطة مستقلة للمتابعة
-      hybrid_self_intro: true
+      hybrid_self_intro: true,
+      worked_example: true // alpha-5: /api/example «مثال مكتمل على غرار موقفك»
     },
     limits: { audio_seconds: 120, audio_bytes: 4 * 1024 * 1024 }
   });

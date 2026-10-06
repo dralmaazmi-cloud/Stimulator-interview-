@@ -1,8 +1,14 @@
-import { selectSessionQuestions } from './sim.js';
-import { evaluateWithAi, getAiHealth, transcribeWithAi } from './evaluate-client.js';
+import { evaluateWithAi, getAiHealth, requestWorkedExample, transcribeWithAi } from './evaluate-client.js';
 import { AudioRecorder, recordingSupported } from './recorder.js';
 import { renderEvaluationReport, renderSessionSummary } from './report.js';
-import { get, getAll, getPendingRecording, pendingRecordingId, remove, removePendingRecording, savePendingRecording, set } from './storage.js';
+import {
+  attemptSummary, attemptsFor, get, getAll, getPendingRecording, loadRotation, pendingRecordingId, previousComparableAttempt,
+  recordAttempt, remove, removePendingRecording, savePendingRecording, saveRotationRecords, set
+} from './storage.js';
+import { composeQuestionSet } from './session-plan.js';
+import { applyRecords, shownRecords } from './rotation.js';
+import { retryLockPlan } from './retry-plan.js';
+import { WEIGHTS_VERSION } from './scoring-rules.js';
 import { el, button, clear, formatModel, formatType, icon, notice, pageHead, tag, toast } from './ui.js';
 import { acquireWakeLock, releaseAllWakeLocks, releaseWakeLock, wakeLockUnsupportedNoticeOnce } from './wake-lock.js';
 import { modelElements } from './guidance.js';
@@ -11,7 +17,7 @@ const MODE_CONFIG = Object.freeze({
   single: { title: 'سؤال واحد', description: 'تدريب سريع', count: 1, minutes: '2–4 دقائق', icon: 'communication' },
   realistic: { title: 'مقابلة واقعية', description: 'سؤالان', count: 2, minutes: 'نحو 7 دقائق', icon: 'interview' },
   extended: { title: 'مقابلة موسّعة', description: 'خمسة أسئلة', count: 5, minutes: 'نحو 16 دقيقة', icon: 'book' },
-  full: { title: 'مقابلة كاملة', description: 'نحو 20 دقيقة', count: 6, minutes: 'نحو 20 دقيقة', icon: 'checklist' }
+  full: { title: 'مقابلة كاملة', description: 'تقديم الذات ثم ستة أسئلة: سلوكية وموقفية وقيادة بالمهمة وسؤال معرفي.', count: 6, minutes: 'نحو 20 دقيقة', icon: 'checklist' }
 });
 
 let activeRecorder = null;
@@ -36,20 +42,14 @@ export function cleanupSimulation() {
   releaseAllWakeLocks();
 }
 
-// alpha-4 (B5): عند الازدحام يُقفل زر إعادة الإرسال 15 ثانية فقط مع عدّ استرشادي من 60 ثانية؛
-// عند 429 يُقفل فعليًا مدة Retry-After أو دقيقة. النص والتسجيل يبقيان دون تغيير.
-export function retryLockPlan(error) {
-  if (error?.code === 'AI_RATE_LIMITED') {
-    const seconds = Number.isFinite(error.retryAfter) && error.retryAfter > 0 ? Math.ceil(error.retryAfter) : 60;
-    return { lockSeconds: seconds, adviceSeconds: seconds, advisory: false };
-  }
-  return { lockSeconds: 15, adviceSeconds: 60, advisory: true };
-}
+// alpha-4 (B5): عند الازدحام يُقفل زر إعادة الإرسال 15 ثانية فقط مع عدّ استرشادي من 60 ثانية.
+// alpha-5 (R6): عند 429 القفل = الأصغر بين Retry-After و120 ثانية، والنص يتبع المدة (retry-plan.js).
+export { retryLockPlan };
 
 function applyRetryLock(retryButton, error, host) {
   const plan = retryLockPlan(error);
   const countdown = el('small', { class: 'retry-countdown', 'aria-live': 'polite' });
-  host.replaceChildren(notice(error.message || 'تعذّر إكمال الطلب الآن.', 'danger'), countdown);
+  host.replaceChildren(notice(plan.message || error.message || 'تعذّر إكمال الطلب الآن.', 'danger'), countdown);
   retryButton.hidden = false;
   retryButton.disabled = true;
   let lockRemaining = plan.lockSeconds;
@@ -108,61 +108,31 @@ function sessionId() {
   return globalThis.crypto?.randomUUID?.() || `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function chooseMixedQuestions(pool, count) {
-  const behavioural = selectSessionQuestions(pool.filter(item => item.type === 'behavioural'), 1);
-  const scenario = selectSessionQuestions(pool.filter(item => item.type === 'scenario'), 1);
-  const first = [...behavioural, ...scenario];
-  const blocked = new Set(first.map(item => item.variant_group).filter(Boolean));
-  const remaining = pool.filter(item => !first.some(chosen => chosen.id === item.id) && (!item.variant_group || !blocked.has(item.variant_group)));
-  return [...first, ...selectSessionQuestions(remaining, Math.max(0, count - first.length))].slice(0, count);
+// alpha-5 (D1/D2): تركيب الجلسة في session-plan.js مع سجل التدوير المحلي ومولّد عشوائي قابل للحقن.
+async function buildQuestionSet(data, mode, scope, requestedId) {
+  const rotation = await loadRotation().catch(() => new Map());
+  return composeQuestionSet(data, mode, scope, requestedId, { rotation, random: Math.random });
 }
 
-function buildQuestionSet(data, mode, scope, requestedId) {
-  const requested = requestedId ? data.questionById.get(requestedId) : null;
-  if (requested) return [requested];
-  let pool = data.primaryQuestions;
-  if (scope === 'mission') pool = pool.filter(item => item.owner_type === 'mission_command');
-  else if (scope) pool = pool.filter(item => item.competency_id === scope || item.principle_id === scope);
+// D2: يُحدَّث السجل عند عرض السؤال (السؤال وكفاءته أو مبدؤه)، بلا إجابة ولا درجة.
+async function markQuestionShown(question) {
+  try {
+    const rotation = await loadRotation();
+    const records = shownRecords(question, new Date().toISOString(), rotation);
+    applyRecords(rotation, records);
+    await saveRotationRecords(records);
+  } catch { /* التدوير اختياري؛ لا يعطل الجلسة */ }
+}
 
-  if (mode === 'single') return selectSessionQuestions(pool, 1);
-  if (mode === 'realistic') {
-    if (!scope) {
-      const competency = data.competencies[Math.floor(Math.random() * data.competencies.length)];
-      pool = pool.filter(item => item.competency_id === competency.id);
-    }
-    return chooseMixedQuestions(pool, Math.min(MODE_CONFIG.realistic.count, pool.length));
-  }
-  if (mode === 'full') {
-    if (scope === 'mission') {
-      return ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
-        .map(principle => selectSessionQuestions(pool.filter(item => item.principle_id === principle), 1)[0])
-        .filter(Boolean);
-    }
-    if (scope) return selectSessionQuestions(pool, Math.min(MODE_CONFIG.full.count, pool.length));
-    const competencyIds = [...new Set(pool.map(item => item.competency_id).filter(Boolean))]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, MODE_CONFIG.full.count);
-    return competencyIds
-      .map(id => selectSessionQuestions(pool.filter(item => item.competency_id === id), 1)[0])
-      .filter(Boolean);
-  }
-  if (scope === 'mission') {
-    return ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
-      .map(principle => selectSessionQuestions(pool.filter(item => item.principle_id === principle), 1)[0])
-      .filter(Boolean);
-  }
-  if (!scope) {
-    const competencyIds = [...new Set(pool.map(item => item.competency_id).filter(Boolean))]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 4);
-    const selected = competencyIds.flatMap(id => selectSessionQuestions(pool.filter(item => item.competency_id === id), 1));
-    const blocked = new Set(selected.map(item => item.variant_group).filter(Boolean));
-    const remaining = pool.filter(item => !selected.some(chosen => chosen.id === item.id)
-      && (!item.variant_group || !blocked.has(item.variant_group)));
-    return [...selected, ...selectSessionQuestions(remaining, Math.max(0, MODE_CONFIG.extended.count - selected.length))]
-      .slice(0, MODE_CONFIG.extended.count);
-  }
-  return selectSessionQuestions(pool, Math.min(MODE_CONFIG.extended.count, pool.length));
+// R5: تسجيل محاولة موثوقة (بلا نص إجابة) وإرجاع المحاولة السابقة القابلة للمقارنة.
+async function storeAttempt(session, index, response) {
+  const key = `${session.id}:${index}`;
+  const summary = attemptSummary(response.report, key, response.evaluated_at || new Date().toISOString());
+  if (!summary) return { current: null, previous: null };
+  const before = await attemptsFor(response.question.id).catch(() => []);
+  const previous = previousComparableAttempt(before, key, summary.weights_version || WEIGHTS_VERSION);
+  await recordAttempt(response.question.id, summary).catch(() => {});
+  return { current: summary, previous };
 }
 
 function formatClock(seconds) {
@@ -579,7 +549,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     syncIntroOptions();
 
     const startSession = async () => {
-      const questions = buildQuestionSet(data, selectedMode, selectedScope, params.get('question'));
+      const questions = await buildQuestionSet(data, selectedMode, selectedScope, params.get('question'));
       if (!questions.length) {
         toast('لا توجد أسئلة ضمن هذا الاختيار.');
         return;
@@ -712,6 +682,12 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
   const drawQuestion = (session, questions) => {
     cleanupSimulation();
     const question = questions[session.current_index];
+    // D2: لا يُحدَّث التدوير مرتين للسؤال نفسه في الجلسة نفسها (استئناف أو تبديل طريقة الإجابة).
+    session.shown_question_ids = Array.isArray(session.shown_question_ids) ? session.shown_question_ids : [];
+    if (!session.shown_question_ids.includes(question.id)) {
+      session.shown_question_ids.push(question.id);
+      markQuestionShown(question);
+    }
     // A4: المسودة مرتبطة بمعرّف السؤال؛ لا تُستعاد مسودة سؤال آخر.
     const draftForThisQuestion = session.draft_question_id === question.id ? session.draft_answer : '';
     let answer = session.responses[session.current_index]?.answer || draftForThisQuestion || '';
@@ -815,6 +791,9 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
           meta: response.meta,
           evaluated_at: new Date().toISOString()
         };
+        // R5: سجل المحاولات لكل سؤال (بلا نص إجابة) والمحاولة السابقة للمقارنة.
+        const attempt = await storeAttempt(session, session.current_index, session.responses[session.current_index]);
+        session.responses[session.current_index].attempt = attempt;
         // تُحذف المسودة عند تقييم موثوق فقط؛ وإلا تبقى مرتبطة بهذا السؤال حتى الانتقال الآمن.
         if (response.report?.trusted) {
           delete session.draft_answer;
@@ -885,7 +864,9 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       }
       const followups = [...current.followups, { question: followupQuestion, answer: corrected, reason: followupReason || '' }].slice(0, 2);
       return runner({ question_id: current.question.id, answer: current.answer, followups }, async response => {
-        session.responses[session.current_index] = { ...current, followups, report: response.report, meta: response.meta, evaluated_at: new Date().toISOString() };
+        session.responses[session.current_index] = { ...current, followups, report: response.report, meta: response.meta, evaluated_at: new Date().toISOString(), example: null };
+        const attempt = await storeAttempt(session, session.current_index, session.responses[session.current_index]);
+        session.responses[session.current_index].attempt = attempt;
         await set('sessions', { ...session, updated_at: new Date().toISOString() });
         drawReport(session, questions);
       });
@@ -902,6 +883,24 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     ));
   };
 
+  // R5: «أعد الإجابة وقارن» يفتح السؤال نفسه في جلسة تدريب مباشر جديدة.
+  const retrySameQuestion = (session, question) => {
+    const fresh = {
+      id: sessionId(),
+      mode: 'single',
+      direct_training: true,
+      answer_mode: session.answer_mode === 'voice' ? 'voice' : 'text',
+      followups_enabled: session.followups_enabled,
+      include_self_intro: false,
+      created_at: new Date().toISOString(),
+      status: 'in_progress',
+      current_index: 0,
+      question_ids: [question.id],
+      responses: [],
+      retry_of: question.id
+    };
+    drawQuestion(fresh, [question]);
+  };
   const drawReport = (session, questions) => {
     cleanupSimulation();
     const current = session.responses[session.current_index];
@@ -914,6 +913,18 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         question: current.question,
         answer: current.answer,
         followups: current.followups,
+        currentAttempt: current.attempt?.current || null,
+        previousAttempt: current.attempt?.previous || null,
+        example: current.example || null,
+        onRetry: () => retrySameQuestion(session, current.question),
+        // الخطوة 5: المثال بطلب المتدرب فقط، ويُحفظ محليًا مع الجلسة؛ مثال واحد لكل إجابة.
+        onRequestExample: async payload => {
+          const response = await requestWorkedExample({ ...payload, answer: current.answer });
+          current.example = { ...response.example, meta: response.meta, requested_at: new Date().toISOString() };
+          session.responses[session.current_index] = current;
+          await set('sessions', { ...session, updated_at: new Date().toISOString() });
+          return current.example;
+        },
         onFollowup: session.followups_enabled ? (question, reason) => drawFollowup(session, questions, question, reason) : null,
         onNext: session.current_index < questions.length - 1 ? async () => {
           // A4: الإجابة محفوظة في استجابة السؤال الحالي؛ تُمسح مسودة خانة الإدخال قبل الانتقال.

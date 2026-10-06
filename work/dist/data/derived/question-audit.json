@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "policy": "لا يُنشر إلا السؤال الذي يتضمن إجابة نموذجية مكتملة العناصر ومعتمدة للمراجعة والتدريب.",
   "source_question_count": 127,
-  "published_question_count": 68,
-  "excluded_question_count": 59,
+  "published_question_count": 70,
+  "excluded_question_count": 57,
   "reference_sha256": "51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357",
   "reviewed_sources": [
     "dist/data/reference.json",
@@ -350,6 +350,16 @@
       "id": "M6-B1",
       "status": "published",
       "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "X1",
+      "status": "published",
+      "evidence": "sample_answer فقرة كاملة من الدليل (سؤال معرفي)"
+    },
+    {
+      "id": "X2",
+      "status": "published",
+      "evidence": "sample_answer فقرة كاملة من الدليل (سؤال معرفي)"
     }
   ],
   "excluded": [
@@ -635,16 +645,6 @@
     },
     {
       "id": "C8-B2",
-      "status": "excluded",
-      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
-    },
-    {
-      "id": "X1",
-      "status": "excluded",
-      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
-    },
-    {
-      "id": "X2",
       "status": "excluded",
       "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
     }

@@ -1,0 +1,85 @@
+[J1 health notice] ✓ المحاكاة جاهزة.
+[J1 modes] ● / سؤال واحد /  / تدريب سريع /  / 2–4 دقائق || ○ / مقابلة واقعية /  / سؤالان /  / نحو 7 دقائق || ○ / مقابلة موسّعة /  / خمسة أسئلة /  / نحو 16 دقيقة || ○ / مقابلة كاملة /  / تقديم الذات ثم ستة أسئلة: سلوكية وموقفية وقيادة بالمهمة وسؤال معرفي. /  / نحو 20 دقيقة
+[J1 default mode] سؤال واحد
+[J1 default answer mode] ▤إجابة نصية
+[J1 question header] السؤال 1 من 1
+[J1 question] C4-B6 :: صف موقفاً عكست فيه أنت وفريقك مستوى عالياً من الثقة المتبادلة. ماذا حدث؟ وكيف أث
+[J1 progress bar] 100
+[J1 empty submit disabled] true
+[J1 scrollY after report (item 8)] 0
+[J1 final-score text] 84%
+[J1 report hero] 84% إجابة قوية العناصر المكتملة: 5 من 5 الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J1 trust line] اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J1 R3 section order] أين ذهبت الدرجة | خطة المحاولة القادمة | ما أحسنتَ فيه | إجابتك كما قُيّمت | نصيب الإجراء من إجابتك | التعليق على كل معيار | كيف حُسبت الدرجة
+[J1 R3 no old header labels] true
+[J1 R3 breakdown total line] المجموع: 84 من 100 :: العنصر يُحتسب مكتملًا عند 60% فأكثر
+[J1 R3 action share marker] 1 :: تقديري · قاعدة الدليل: الإجراء هو الجزء الأكبر من الإجابة.
+[J1 R2 criterion three lines] ما ظهر في إجابتك | ما ينقص | كيف ترفعه
+[J1 report sections] أين ذهبت الدرجة | خطة المحاولة القادمة | ما أحسنتَ فيه | إجابتك كما قُيّمت | نصيب الإجراء من إجابتك | التعليق على كل معيار | كيف حُسبت الدرجة
+[J1 action buttons] تصدير PDF | أعد الإجابة وقارن | قارن بالإجابة النموذجية | الإجابة عن سؤال المتابعة | إنهاء وعرض الملخص
+[J1 null/undefined in report] 0
+[J1 compare dialog open] true :: ⓘ للمقارنة بعد التقييم، وليست الإجابة الصحيحة الوحيدة. إجابة نموذجية إرشادية استخدمها لفهم طريقة بناء الإجابة، ولا تحفظه
+[J1 followup card] ؟ ما المؤشر الذي استخدمته لقياس النتيجة؟ (متابعة تجريبية) أجب بإيجاز وركّز على هذا المحور فقط.
+[J1 followup merged in report] true
+[J1 followup button still shown after 1 followup?] 0
+[J1 summary] اكتملت المحاكاة تقرير المقابلة الشامل 1 إجابة محللة · 1 تقييم موثوق أداء قوي 84% المتوسط التدريبي
+[J1 summary buttons] طباعة أو تصدير PDF | محاكاة جديدة | خريطة التغطية | سجل التقارير | العودة للرئيسية
+[J1 sessions list] سؤال واحد نصي 06‏/10‏/2026، 5:10 ص 1 إجابة اضغط لفتح الملخص وتقارير الإجابات كاملة 84%
+[J1 saved session view headings] سؤال واحد | تقرير المقابلة الشامل | متوسط معايير المقابلة | أداؤك حسب الكفاءة أو مبدأ قيادة المهمة | اكتمال عناصر STAR-L | نقاط القوة المتكررة | نقاط الضعف المتكررة | أولوياتك للمحاكاة القادمة | نتيجة كل إجابة | تقارير الإجابات |  |  |  |  |  |  |  | المقارنة بالإجابة النموذجية | إجابة نموذجية إرشادية
+[J1 saved view shows criteria/quotes?] 7
+[J1 saved view retry link (R5)] 1
+[J1 print: saved report criteria visible (item 7)] 1
+[J1 print: footer text present] true
+[J1 print media hides chrome] {"nav":"none","header":"none","noPrint":"none"}
+[J1b flags shown] الدور الشخصي غير واضح
+[J1b comparison with previous] المقارنة مع آخر جلسة موثقة +0 نقطة السابق 84 · الحالي 84
+[J1c after save&exit: home mentions resume?] false
+[J1c sessions page lists in-progress session?] true
+[J1c IndexedDB sessions] [{"status":"completed","n":1},{"status":"in_progress","draft":"مسودة غير مرسلة","n":0},{"status":"completed","n":1}]
+[J1d resume card shown on simulation setup] 1 :: لديك جلسة غير مكتملة السؤال 1 من 1 — سؤال واحد استئناف حذف الجلسة
+[J1d resumed same question?] true (C3-B7)
+[J1d draft restored?] true
+[J1d after finish: sessions by status (item 6)] {"completed":3,"in_progress":0,"drafts":0}
+[J1d home resume card gone after finish] 0
+[J1 page errors] []
+[J2 voice panel] أوافق على إرسال التسجيل مؤقتًا لتحويله إلى نص، ثم حذفه بعد اكتمال العملية. 00:00 جاهز للتسجيل بدء التسجيل
+[J2 textarea hidden before recording] true
+[J2 start without consent → toast] اقرأ إشعار الخصوصية ووافق قبل التسجيل.
+[J2 recording state] جارٍ التسجيل… clock=00:03
+[J2 transcript in editable textarea] هذا تفريغ تجريبي للتسجيل الصوتي، في بداية المشروع كان الفريق متأخرًا وأنا أعدت ت
+[J2 state after transcription] راجع النص وصححه قبل التقييم
+[J2 evaluation auto-started?] false
+[J2 provider transcribe call] {"url":"https://generativelanguage.googleapis.com/v1beta/interactions","model":"gemini-3.8-flash","kind":"transcribe","mime":"audio/webm","audioBytes":51957}
+[J2 report uses corrected text] true
+[J2 page errors] []
+[J2b transcription failure message] ⓘ الخدمة مشغولة حاليًا. حاول بعد 60 ثانية.
+[J2b resend button visible after failure] true
+[J2b textarea empty before resend] true
+[J2b resend succeeded without re-recording] true rerouted=1
+[J2b resend button hidden after success] true
+[J2b page errors] []
+[A1 wake lock requested while recording] {"requests":1,"releases":0,"held":1}
+[A2 interrupted card] ⓘ توقّف التسجيل لأن التطبيق خرج من الواجهة. سُجّل منه 2 ثانية. أرسل ما سُجّل للتفريغ إعادة التسجيل
+[A2 card buttons] أرسل ما سُجّل للتفريغ | إعادة التسجيل
+[A2 nothing sent automatically] true (see A3 send below)
+[A1 wake lock released after stop] {"requests":1,"releases":1,"held":0}
+[A3 pending recording stored in IndexedDB] [{"dur":2,"size":true,"mime":"audio/webm;codecs=opus"}]
+[A3 restored after reload] ⓘ لديك تسجيل محفوظ لهذا السؤال لم يُفرَّغ بعد. مدته 2 ثانية. أرسل ما سُجّل للتفريغ إعادة ا
+[A3 sent the stored recording once] true (calls +1)
+[A3 pending removed after transcription success] []
+[A1 wake lock balance after transcription] {"requests":1,"releases":1,"held":0}
+[A2 sub-second recording: buttons] إعادة التسجيل
+[A3 pending removed after re-record choice] []
+[A page errors] []
+[A3 expired recording purged on start (fresh kept)] ["fresh:Q"]
+[A listeners after 4 enter/leave cycles (visibilitychange net count)] 0
+[A4 draft saved on hide with question id] true
+[A4 draft restored after reload on the same question] true
+[A4 Q1 evaluated untrusted] تقييم غير موثوق
+[A4 Q2 textarea empty after untrusted Q1] true
+[A4 Q1 answer kept in responses, draft cleared] true
+[B5 overloaded message] ⓘ خدمة الذكاء الاصطناعي مزدحمة الآن. إجابتك محفوظة؛ أعد الإرسال بعد دقيقة.
+[B5 countdown advisory] يُفضَّل الانتظار 60 ثانية قبل إعادة الإرسال.
+[B5 resend locked initially] true
+[B5 text unchanged after overload] true
+[B5 wake lock released after failed evaluation] {"requests":1,"releases":1,"held":0}

@@ -71,6 +71,11 @@ export async function transcribeWithAi(blob, durationSeconds, options = {}) {
   });
 }
 
+// alpha-5 (الخطوة 5): طلب «مثال مكتمل على غرار موقفك» بطلب المتدرب فقط.
+export async function requestWorkedExample(payload, options = {}) {
+  return apiRequest('/example', { method: 'POST', body: payload, timeout: LONG_TIMEOUT, onSlow: options.onSlow });
+}
+
 export async function improveSelfIntroduction(payload) {
   return apiRequest('/self-intro', { method: 'POST', body: payload });
 }

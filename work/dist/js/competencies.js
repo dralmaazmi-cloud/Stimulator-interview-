@@ -1,5 +1,6 @@
 import { questionSamples } from './data.js';
 import { buildAnswerGuidance } from './guidance.js';
+import { isBookmarked, toggleBookmark } from './bookmarks.js';
 import {
   button, clear, el, formatModel, formatType, icon, notice, printActions, tag, toast
 } from './ui.js';
@@ -70,7 +71,7 @@ function renderAnswerParts(parts, mode) {
 
 export function renderInlineQuestion(question, data, index, options = {}) {
   const guidance = buildAnswerGuidance(question, data);
-  const sample = questionSamples(question)[0];
+  const samples = questionSamples(question);
   const details = el('details', {
     class: 'smart-question-card',
     id: `question-${question.id}`,
@@ -96,18 +97,33 @@ export function renderInlineQuestion(question, data, index, options = {}) {
       el('article', {}, el('b', { text: item.key }), el('div', {}, el('strong', { text: item.title }), el('small', { text: item.prompt })))
     ))
   );
+  // alpha-5 (F2): العنوان من questionSamples؛ للسؤال الموقفي: الإجابة الموسّعة ثم «إجابة الدليل كما هي» حرفيًا.
   const answer = el('section', { class: 'inline-question-section model-answer-section' },
-    el('div', { class: 'inline-model-heading' },
-      el('div', {}, el('h4', { text: 'إجابة نموذجية إرشادية' }), el('small', { text: 'لفهم البناء وطريقة التفكير، وليست نصًا للحفظ.' }))
-    ),
-    sample ? renderAnswerParts(sample.parts, question.rubric_mode) : notice('الإجابة غير متاحة حاليًا.', 'warning')
+    ...(samples.length ? samples.map(sample => el('div', { class: `inline-model-block sample-${sample.kind || 'guide'}` },
+      el('div', { class: 'inline-model-heading' },
+        el('div', {}, el('h4', { text: sample.title }), sample.subtitle ? el('small', { text: sample.subtitle }) : el('small', { text: 'لفهم البناء وطريقة التفكير، وليست نصًا للحفظ.' }))
+      ),
+      sample.parts ? renderAnswerParts(sample.parts, question.rubric_mode) : el('p', { class: 'guide-paragraph', text: sample.text })
+    )) : [notice('الإجابة غير متاحة حاليًا.', 'warning')])
   );
   const train = button('تدرّب على هذا السؤال', {
     href: `#/simulation?question=${encodeURIComponent(question.id)}&answer=voice`,
     className: 'wide inline-train-button'
   });
   train.addEventListener('click', () => markTrainingStarted(question.id));
-  details.append(summary, el('div', { class: 'smart-question-body' }, required, blueprint, answer, train));
+  // alpha-5 (F6): زر «حفظ السؤال» داخل البطاقة المفتوحة (مدخل صفحة «الأسئلة المحفوظة»).
+  const bookmark = button(isBookmarked(question.id) ? 'إزالة من المحفوظات' : 'حفظ السؤال', {
+    variant: 'secondary',
+    className: 'wide inline-bookmark-button',
+    'aria-pressed': isBookmarked(question.id) ? 'true' : 'false'
+  });
+  bookmark.addEventListener('click', () => {
+    const saved = toggleBookmark(question.id);
+    bookmark.textContent = saved ? 'إزالة من المحفوظات' : 'حفظ السؤال';
+    bookmark.setAttribute('aria-pressed', saved ? 'true' : 'false');
+    toast(saved ? 'حُفظ السؤال في «الأسئلة المحفوظة».' : 'أُزيل السؤال من المحفوظات.');
+  });
+  details.append(summary, el('div', { class: 'smart-question-body' }, required, blueprint, answer, el('div', { class: 'inline-question-actions' }, train, bookmark)));
   return details;
 }
 

@@ -1,7 +1,8 @@
 export const CONFIG = Object.freeze({
-  appVersion: '0.6.0-alpha-4',
+  appVersion: '0.6.0-alpha-5',
   referenceSha256: '51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357',
-  promptVersion: 'evaluation-1.1',
+  promptVersion: 'evaluation-1.2',
+  examplePromptVersion: 'example-1.0',
   rubricVersion: 'reference-rubric-1.0',
   configVersion: '6.0',
   review: {
@@ -18,7 +19,8 @@ export const CONFIG = Object.freeze({
       health: '/api/health',
       evaluate: '/api/evaluate',
       transcribe: '/api/transcribe',
-      selfIntro: '/api/self-intro'
+      selfIntro: '/api/self-intro',
+      example: '/api/example'
     }
   }
 });

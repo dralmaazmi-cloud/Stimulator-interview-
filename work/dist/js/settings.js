@@ -14,7 +14,8 @@ export function renderSettings(root, data) {
     el('section', { class: 'more-shortcuts', 'aria-label': 'اختصارات' },
       shortcut('search', 'البحث', 'ابحث في المحتوى', '#/search'),
       shortcut('bookmark', 'المحفوظات', 'أسئلتك المحفوظة', '#/tools/saved'),
-      shortcut('competencies', 'الكفاءات', 'الشرح والأسئلة والتدريب', '#/competencies')
+      shortcut('competencies', 'الكفاءات', 'الشرح والأسئلة والتدريب', '#/competencies'),
+      shortcut('target', 'خريطة التغطية', 'ما جرّبته وما لم تجرّبه بعد', '#/coverage')
     )
   );
 
@@ -140,7 +141,7 @@ function backupPanel() {
     file.value = '';
   });
   return el('div', { class: 'settings-panel' },
-    el('p', { text: 'تتضمن النسخة تقدم التحضير، والأسئلة المحفوظة، والجلسات، والتقارير وقوائم الجاهزية. التسجيلات الصوتية لا تدخل في التصدير.' }),
+    el('p', { text: 'تتضمن النسخة تقدم التحضير، والأسئلة المحفوظة، والجلسات، والتقارير وقوائم الجاهزية، وسجل المحاولات وتدوير الأسئلة. التسجيلات الصوتية ونصوص الإجابات في سجل المحاولات لا تدخل في التصدير.' }),
     el('div', { class: 'document-actions' }, exportButton, importButton, file)
   );
 }
