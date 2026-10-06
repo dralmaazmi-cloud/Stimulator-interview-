@@ -9,9 +9,9 @@ import {
 } from '../api/_lib/provider.js';
 
 const USER_TEXT = 'في بداية المشروع كان الفريق متأخرًا. كانت مهمتي إعادة توزيع العمل. أنا عقدت اجتماعًا ووزعت الأدوار بنفسي. اكتمل المشروع في الموعد. تعلمت أن المتابعة المبكرة تمنع التأخير.';
-const context = getQuestionContext('C1-B1');
+const context = getQuestionContext('C1-B3');
 const goodReport = {
-  question_id: 'C1-B1', rubric_mode: 'star_l',
+  question_id: 'C1-B3', rubric_mode: 'star_l',
   elements: {
     situation: { present: true, quote: 'في بداية المشروع كان الفريق متأخرًا' },
     task: { present: true, quote: 'كانت مهمتي إعادة توزيع العمل' },
@@ -21,7 +21,7 @@ const goodReport = {
   },
   criteria: ['context', 'personal_role_or_options', 'action_or_plan', 'result_or_effect', 'learning', 'competency_evidence']
     .map(key => ({ key, score: 4, evidence: ['في بداية المشروع كان الفريق متأخرًا'], justification: 'x' })),
-  expected_points_coverage: context.question.expected_points.points.map(item => ({ point: item.text, covered: false, quote: null })),
+  expected_points_coverage: [],
   behaviours_observed: { supporting: [], negative: [] },
   mission_command_indicators: [], flags: [], strengths: ['s'], missing: ['m'], next_actions: ['n'], follow_up_questions: []
 };
@@ -38,7 +38,7 @@ function mockResponse() {
   return { statusCode: 200, headers: {}, payload: undefined, setHeader(key, value) { this.headers[key.toLowerCase()] = value; }, end(value) { this.payload = value ? JSON.parse(value) : undefined; } };
 }
 function evaluateRequest(ip) {
-  return { method: 'POST', headers: { 'x-client-id': 'resilience', 'x-forwarded-for': ip }, socket: { remoteAddress: '127.0.0.1' }, body: { question_id: 'C1-B1', answer: USER_TEXT } };
+  return { method: 'POST', headers: { 'x-client-id': 'resilience', 'x-forwarded-for': ip }, socket: { remoteAddress: '127.0.0.1' }, body: { question_id: 'C1-B3', answer: USER_TEXT } };
 }
 let ipCounter = 0;
 const nextIp = () => `10.1.0.${(ipCounter += 1) % 250}`;
@@ -117,8 +117,8 @@ const allBodiesSafe = calls => calls.every(call => call.body.store === false && 
   assert.equal(usage.final_provider_status, 504);
   assert.equal(usage.error_code, 'AI_OVERLOADED');
   // B13: لا نص مستخدم ولا استجابة خام في السجلات.
-  assert.ok(logs.every(line => !line.includes(USER_TEXT) && !line.includes('provider detail that must never leak') === false || !line.includes(USER_TEXT)));
   assert.ok(logs.every(line => !line.includes(USER_TEXT.slice(0, 20))), 'user text must not appear in logs');
+  assert.ok(logs.every(line => !line.includes('provider detail that must never leak')), 'raw provider errors must not appear in logs');
 }
 // 3. 503 ثلاث مرات ثم احتياطي ناجح → نجاح بأربعة نداءات، النداء الرابع بالنموذج الاحتياطي.
 {

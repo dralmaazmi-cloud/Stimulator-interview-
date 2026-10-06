@@ -42,7 +42,7 @@ async function apiRequest(path, options = {}) {
     return payload;
   } catch (error) {
     if (error?.name === 'AbortError') throw new Error('استغرق الطلب وقتًا أطول من المتوقع. حاول مرة أخرى.');
-    if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.');
+    if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالخدمة. تحقق من الإنترنت ثم أعد المحاولة.');
     throw error;
   } finally {
     clearTimeout(timeout);

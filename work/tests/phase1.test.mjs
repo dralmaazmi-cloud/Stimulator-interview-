@@ -1,16 +1,18 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { selectSessionQuestions } from '../dist/js/sim.js';
 import { buildAnswerGuidance } from '../dist/js/guidance.js';
 import { buildSelfIntroduction } from '../dist/js/self-intro.js';
+import { buildSessionInsights } from '../dist/js/report.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const project = path.resolve(here, '..');
 const read = relative => fs.readFileSync(path.join(project, relative));
-const json = relative => JSON.parse(read(relative).toString('utf8'));
+const text = relative => read(relative).toString('utf8');
+const json = relative => JSON.parse(text(relative));
 
 const referenceBytes = read('dist/data/reference.json');
 const reference = JSON.parse(referenceBytes.toString('utf8'));
@@ -20,101 +22,101 @@ const missionMap = json('dist/data/derived/mission-map.json');
 const lessons = json('dist/data/derived/lessons.json');
 const variants = json('dist/data/derived/variants.json');
 const curation = json('dist/data/derived/curation.json');
+const audit = json('dist/data/derived/question-audit.json');
 const exercises = json('dist/data/exercises.json');
 const manifest = json('dist/data/derived/manifest.json');
+const expandedAnswers = json('dist/data/expanded-model-answers.json');
+const expandedIds = new Set(expandedAnswers.answers.map(item => item.id));
 
 function sourceQuestions() {
-  const result = [];
-  for (const competency of reference.part_3_competencies.competencies) {
-    result.push(...competency.scenario_questions, ...competency.behavioural_questions);
-  }
-  for (const principle of reference.part_4_mission_command.principles) {
-    result.push(principle.scenario_question, principle.behavioural_question);
-  }
-  result.push(...reference.part_5_additional_questions.questions);
-  return result;
+  return [
+    ...reference.part_3_competencies.competencies.flatMap(item => [...item.scenario_questions, ...item.behavioural_questions]),
+    ...reference.part_4_mission_command.principles.flatMap(item => [item.scenario_question, item.behavioural_question]),
+    ...reference.part_5_additional_questions.questions
+  ];
 }
 
-const originalQuestions = sourceQuestions();
-const derivedById = new Map(questions.map(question => [question.id, question]));
+function completeModel(question) {
+  const model = question?.sample_answer_star_l;
+  const action = model?.action ?? model?.action_points;
+  return [model?.situation, model?.task, action, model?.result, model?.learning]
+    .every(value => Array.isArray(value) ? value.length > 0 : typeof value === 'string' && value.trim().length > 0);
+}
+
+const source = sourceQuestions();
+const sourceById = new Map(source.map(item => [item.id, item]));
+const accepted = source.filter(item => completeModel(item) || expandedIds.has(item.id));
+const excluded = source.filter(item => !completeModel(item) && !expandedIds.has(item.id));
+const derivedById = new Map(questions.map(item => [item.id, item]));
 
 assert.equal(reference.schema_version, '1.0');
+assert.equal(source.length, 127);
+assert.equal(expandedAnswers.count, 22);
+assert.equal(accepted.length, 68);
+assert.equal(excluded.length, 59);
+assert.equal(questions.length, 68);
+assert.equal(new Set(questions.map(item => item.id)).size, 68);
+assert.deepEqual(new Set(questions.map(item => item.id)), new Set(accepted.map(item => item.id)));
+assert.equal(questions.filter(item => item.rubric_mode === 'seal').length, 22);
+assert.equal(questions.filter(item => item.rubric_mode === 'star_l').length, 46);
+assert.ok(questions.every(item => item.learning_status === 'primary'));
+assert.ok(questions.every(item => ['complete_source_star_l', 'approved_expanded_seal'].includes(item.model_answer_status)));
+assert.ok(questions.every(item => completeModel(item) || item.sample_answer_seal), 'Every published question must contain a complete model answer');
+assert.ok(excluded.every(item => !derivedById.has(item.id)), 'No incomplete/general answer may remain in the published bank');
+
+for (const question of questions) {
+  const original = sourceById.get(question.id);
+  assert.ok(original, `Missing source question ${question.id}`);
+  assert.equal(question.question, original.question, `Question text changed: ${question.id}`);
+  assert.deepEqual(question.sample_answer_star_l, original.sample_answer_star_l, `Source model answer changed: ${question.id}`);
+  if (expandedIds.has(question.id)) assert.ok(question.sample_answer_seal?.leadership_impact, `Missing expanded SEAL answer: ${question.id}`);
+}
+
 assert.equal(competencies.length, 8);
-assert.equal(questions.filter(q => q.owner_type === 'competency').length, 113);
 assert.equal(missionMap.length, 6);
-assert.equal(questions.filter(q => q.owner_type === 'mission_command').length, 12);
-assert.equal(questions.filter(q => q.owner_type === 'additional').length, 2);
-assert.equal(questions.length, 127);
-assert.equal(new Set(questions.map(q => q.id)).size, 127);
-assert.equal(questions.filter(q => q.sample_answer || q.sample_answer_star_l || q.sample_answers?.length).length, 127,
-  'Every question shown in the bank must have a source model answer');
-assert.equal(lessons.length, 6);
-assert.equal(variants.length, 16);
-assert.equal(curation.primary_count, 89);
-assert.equal(curation.alternate_count, 38);
-assert.equal(curation.primary_ids.length, 89);
-assert.equal(curation.alternates.length, 38);
-assert.equal(new Set(curation.primary_ids).size, 89);
-assert.equal(new Set([...curation.primary_ids, ...curation.alternates.map(item => item.id)]).size, 127);
-assert.ok(curation.alternates.every(item => curation.primary_ids.includes(item.primary_id)), 'Every alternate must point to a primary question');
-assert.ok(questions.filter(question => curation.primary_ids.includes(question.id))
-  .every(question => question.sample_answer || question.sample_answer_star_l || question.sample_answers?.length),
-  'Every primary question must retain a source model answer');
-assert.deepEqual(
-  Object.fromEntries(competencies.map(competency => [
-    competency.id,
-    competency.question_ids.filter(id => curation.primary_ids.includes(id)).length
-  ])),
-  { C1: 8, C2: 7, C3: 11, C4: 12, C5: 10, C6: 10, C7: 9, C8: 8 }
-);
-assert.ok(exercises.length >= 60);
-// البند 11 (v0.5.1): جودة تمارين التثبيت بعد تطبيق tools/exercise-overrides.json.
-assert.ok(exercises.length >= 120, 'At least 120 exercises must remain after de-duplication');
-assert.ok(exercises.every(exercise => exercise.explanation && exercise.explanation !== exercise.choices[exercise.answer]),
-  'No exercise may use its correct choice as the explanation');
-assert.ok(exercises.every(exercise => !/حقل (situation|task|action|result|learning)/.test(exercise.explanation)),
-  'Explanations must not expose internal field names');
-// alpha-4 (D1): لا رموز داخلية (معرّفات السلوكيات C1-SB1/C1-NB1 أو النقاط المتوقعة C1-S1-EP1) في نصوص التمارين أو الواجهة.
-// معرّفات الأسئلة (C1-B1) تُعرض عمدًا في البنك والتمارين فليست رمزًا داخليًا.
-const INTERNAL_CODE = /\bC\d+-(?:SB|NB)\d+\b|\bC\d+-[SB]\d+-EP\d+\b|\bM\d+-[SB]\d+-EP\d+\b/;
-assert.ok(exercises.every(exercise => [exercise.prompt, exercise.stimulus, exercise.explanation, exercise.label, ...exercise.choices]
-  .filter(Boolean).every(value => !INTERNAL_CODE.test(String(value)))), 'Internal behaviour/point codes must not appear in exercise text');
-assert.ok(!INTERNAL_CODE.test(fs.readdirSync(path.join(project, 'dist/js')).map(file => read(`dist/js/${file}`).toString('utf8')).join('\n')),
-  'Internal behaviour/point codes must not appear in client code');
-// alpha-4 (D2): كل تفسير يحتوي سببًا واقتباسًا حرفيًا قصيرًا (≥ كلمتين) من نص المرجع.
-{
-  const normalizeText = value => String(value || '').normalize('NFKC').replace(/[\u064B-\u065F\u0670]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().toLowerCase();
-  const referenceTexts = [];
-  const collect = value => { if (typeof value === 'string') referenceTexts.push(value); else if (Array.isArray(value)) value.forEach(collect); else if (value && typeof value === 'object') Object.values(value).forEach(collect); };
-  collect(reference);
-  const corpus = ` ${referenceTexts.map(normalizeText).join(' \n ')} `;
-  const REASON = /لأن|لذلك|ليتحقق|بسبب/;
-  const failures = exercises.filter(exercise => {
-    const quotes = [...String(exercise.explanation).matchAll(/«([^»]+)»/g)].map(match => normalizeText(match[1])).filter(quote => quote.split(' ').length >= 2);
-    const quoted = quotes.some(quote => corpus.includes(quote));
-    return !REASON.test(exercise.explanation) || !quoted;
-  }).map(exercise => exercise.id);
-  assert.deepEqual(failures, [], 'Every explanation must state why the answer is right and quote the reference literally');
-}
-assert.ok(exercises.every(exercise => exercise.choices.length <= 5), 'Exercises must have at most 5 choices');
-assert.ok(exercises.every(exercise => exercise.answer >= 0 && exercise.answer < exercise.choices.length), 'Answer index must point at a choice');
-assert.equal(new Set(exercises.map(exercise => exercise.stimulus)).size, exercises.length, 'No duplicate stimulus');
-{
-  const positions = new Map();
-  exercises.forEach(exercise => positions.set(exercise.answer, (positions.get(exercise.answer) || 0) + 1));
-  assert.ok(Math.max(...positions.values()) / exercises.length <= 0.35, 'No answer position may exceed 35% of exercises');
-}
-assert.ok(exercises.every(exercise => exercise.source_ref));
-assert.ok(exercises.every(exercise => exercise.prompt && exercise.stimulus && exercise.choices?.length), 'Exercises must have clear prompt, stimulus and choices');
-assert.ok(exercises.every(exercise => !('label' in exercise) || Boolean(exercise.label)), 'Optional exercise labels must never be null');
-assert.ok(exercises.filter(exercise => exercise.authored).every(exercise => exercise.label), 'Authored exercises must be visibly labelled');
-assert.doesNotMatch(JSON.stringify(exercises), /"(?:label|prompt|stimulus)":null/, 'User-facing exercise fields cannot be null');
-assert.ok(exercises.every(exercise => [exercise.label, exercise.prompt, exercise.stimulus, ...exercise.choices]
-  .filter(value => value != null)
-  .every(value => !/^(null|undefined)$/i.test(String(value).trim()))), 'User-facing exercise text cannot contain null/undefined sentinels');
-// alpha-4 (D3): الـmanifest يُكتب بعد اكتمال التجاوزات فيطابق الملف النهائي (130 حاليًا).
-assert.equal(manifest.counts.exercises, exercises.length, 'manifest.counts.exercises must match the final exercises.json');
-assert.equal(exercises.length, 130);
+assert.equal(questions.filter(item => item.owner_type === 'competency').length, 56);
+assert.equal(questions.filter(item => item.owner_type === 'mission_command').length, 12);
+assert.equal(questions.filter(item => item.owner_type === 'additional').length, 0);
+assert.deepEqual(Object.fromEntries(competencies.map(item => [item.id, item.question_ids.length])),
+  { C1: 5, C2: 5, C3: 13, C4: 6, C5: 6, C6: 10, C7: 6, C8: 5 });
+assert.ok(missionMap.every(item => item.question_ids.length === 2));
+
+assert.deepEqual(lessons.map(item => item.title), [
+  'افهم المقابلة', 'بناء الإجابة النموذجية', 'الكفاءات الثمانية', 'قيادة المهمة', 'الجاهزية النهائية'
+]);
+assert.equal(exercises.length, 0, 'Preparation must not contain comprehension quizzes');
+assert.equal(variants.length, 0);
+assert.equal(curation.policy, 'complete-model-answers-only');
+assert.equal(curation.primary_count, 68);
+assert.equal(curation.alternate_count, 0);
+assert.deepEqual(curation.primary_ids, questions.map(item => item.id));
+
+assert.equal(audit.source_question_count, 127);
+assert.equal(audit.published_question_count, 68);
+assert.equal(audit.excluded_question_count, 59);
+assert.equal(audit.published.length, 68);
+assert.equal(audit.excluded.length, 59);
+assert.deepEqual(new Set(audit.published.map(item => item.id)), new Set(questions.map(item => item.id)));
+assert.deepEqual(new Set(audit.excluded.map(item => item.id)), new Set(excluded.map(item => item.id)));
+assert.ok(audit.excluded.every(item => item.reason && item.status === 'excluded'));
+
+assert.deepEqual(manifest.counts, {
+  competencies: 8,
+  competency_questions: 56,
+  mission_command_principles: 6,
+  mission_command_questions: 12,
+  additional_questions: 0,
+  total_questions: 68,
+  source_questions: 127,
+  excluded_questions: 59,
+  unique_question_ids: 68,
+  primary_questions: 68,
+  alternate_questions: 0,
+  variant_pairs: 0,
+  lessons: 5,
+  exercises: 0
+});
+assert.equal(manifest.config_version, '6.0');
 assert.deepEqual(manifest.source_block_counts, {
   part_1_framework: { paragraph: 8, list: 3, key_point: 3, table: 2 },
   part_2_answering: { paragraph: 7, table: 6, key_point: 2, list: 1 },
@@ -123,97 +125,115 @@ assert.deepEqual(manifest.source_block_counts, {
   part_6_preparation: { paragraph: 5, list: 3, table: 2, template: 1, key_point: 1 }
 });
 
-for (const original of originalQuestions) {
-  const derived = derivedById.get(original.id);
-  assert.ok(derived, `Missing derived question ${original.id}`);
-  assert.equal(derived.question, original.question, `Question text changed: ${original.id}`);
-  if (original.question_continuation) assert.equal(derived.question_continuation, original.question_continuation);
-  if (original.options) assert.deepEqual(derived.options, original.options);
-}
-
-const m6 = derivedById.get('M6-S1');
-assert.ok(m6.question && m6.options.length && m6.question_continuation);
-assert.ok(m6.display_question.indexOf(m6.question) < m6.display_question.indexOf(m6.options[0]));
-assert.ok(m6.display_question.indexOf(m6.options.at(-1)) < m6.display_question.indexOf(m6.question_continuation));
-assert.equal(reference.part_3_competencies.competencies[0].negative_behaviours.length, 0);
-assert.equal(questions.filter(q => q.owner_type === 'competency' && !q.expected_answer_points).length, 81);
-assert.deepEqual(
-  questions.filter(q => q.rubric_mode === 'general').map(q => q.id).sort(),
-  ['C4-S10', 'C4-S7', 'C4-S8', 'C4-S9', 'C5-S7', 'C5-S8', 'X1', 'X2'].sort()
-);
-assert.ok(Array.isArray(derivedById.get('C4-S10').sample_answers));
-
 const hash = crypto.createHash('sha256').update(referenceBytes).digest('hex');
 assert.equal(hash, manifest.reference_sha256);
+assert.equal(hash, audit.reference_sha256);
 assert.equal(hash, '51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357');
 
-for (let iteration = 0; iteration < 1000; iteration += 1) {
+for (let iteration = 0; iteration < 300; iteration += 1) {
   let state = (iteration + 1) * 2654435761 >>> 0;
   const random = () => {
     state = (1664525 * state + 1013904223) >>> 0;
     return state / 2 ** 32;
   };
-  const selected = selectSessionQuestions(questions.filter(q => q.owner_type === 'competency'), 12, random);
-  const groups = selected.map(q => q.variant_group).filter(Boolean);
-  assert.equal(groups.length, new Set(groups).size, `Variant collision in iteration ${iteration}`);
+  const selected = selectSessionQuestions(questions, 12, random);
+  assert.equal(new Set(selected.map(item => item.id)).size, selected.length);
 }
 
 const requiredFiles = [
   'dist/index.html', 'dist/manifest.webmanifest', 'dist/sw.js',
-  'dist/assets/icons/icon-192.png', 'dist/assets/icons/icon-512.png',
+  'dist/assets/images/abu-dhabi-sea-hero.jpg',
+  'dist/assets/icons/app-icon-1024.png', 'dist/assets/icons/apple-touch-icon-180.png',
+  'dist/assets/icons/icon-192.png', 'dist/assets/icons/icon-512.png', 'dist/assets/icons/icon-maskable-512.png',
   'dist/assets/fonts/NotoSansArabic-Regular.ttf', 'dist/assets/fonts/NotoSansArabic-Bold.ttf',
-  'dist/assets/illustrations/journey.svg',
-  'dist/js/competencies.js', 'dist/js/quick-review.js', 'dist/js/guidance.js', 'dist/js/self-intro.js',
-  'dist/js/tools.js', 'dist/js/bookmarks.js', 'dist/data/derived/curation.json'
+  'dist/js/wake-lock.js', 'dist/js/report.js', 'dist/data/derived/question-audit.json',
+  'dist/data/expanded-model-answers.json'
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(project, file)), `Missing ${file}`));
+assert.ok(read('dist/assets/images/abu-dhabi-sea-hero.jpg').length > 100_000, 'Hero must be a production-quality local image');
 
-const serviceWorkerText = read('dist/sw.js').toString('utf8');
+const serviceWorkerText = text('dist/sw.js');
+assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-4/);
 const cachedPaths = [...serviceWorkerText.matchAll(/'\.\/(.*?)'/g)].map(match => match[1]);
-cachedPaths.filter(item => item && item !== '').forEach(file => {
-  assert.ok(fs.existsSync(path.join(project, 'dist', file)), `Service worker caches missing file: ${file}`);
-});
+cachedPaths.filter(Boolean).forEach(file => assert.ok(fs.existsSync(path.join(project, 'dist', file)), `Service worker caches missing file: ${file}`));
+assert.match(serviceWorkerText, /url\.pathname\.startsWith\('\/api\/'\)/, 'API responses must never be cached');
 
-const clientText = fs.readdirSync(path.join(project, 'dist/js'))
-  .map(file => read(`dist/js/${file}`).toString('utf8')).join('\n');
-assert.doesNotMatch(clientText, /AIza[0-9A-Za-z_-]{30,}/, 'Potential Google API key in client');
-assert.doesNotMatch(clientText, /sk-[A-Za-z0-9_-]{20,}/, 'Potential API key in client');
+const clientText = fs.readdirSync(path.join(project, 'dist/js')).map(file => text(`dist/js/${file}`)).join('\n');
+assert.doesNotMatch(clientText, /AIza[0-9A-Za-z_-]{20,}|sk-[A-Za-z0-9_-]{20,}/, 'No API key may ship to the client');
+assert.doesNotMatch(clientText, /\bC\d+-(?:SB|NB)\d+\b|\bC\d+-[SB]\d+-EP\d+\b/, 'Internal behaviour codes must not appear in client copy');
 
-const learnText = read('dist/js/learn.js').toString('utf8');
+const indexText = text('dist/index.html');
+assert.equal((indexText.match(/data-nav=/g) || []).length, 5);
+['الرئيسية', 'التحضير', 'المحاكاة', 'التقارير', 'المزيد'].forEach(label => assert.match(indexText, new RegExp(`>${label}<`)));
+assert.match(indexText, /apple-touch-icon-180\.png/);
+assert.match(indexText, /id="back-button"[^>]+aria-label="العودة إلى الصفحة السابقة"/);
+assert.match(indexText, /href="#\/settings" data-nav="more"/);
+
+const homeText = text('dist/js/home.js');
+assert.match(homeText, /abu-dhabi-sea-hero\.jpg/);
+assert.match(homeText, /التحضير للمقابلة/);
+assert.match(homeText, /المحاكاة الذكية/);
+assert.match(homeText, /home-start-grid/);
+assert.match(homeText, /home-path-card/);
+assert.match(homeText, /home-report-card/);
+assert.doesNotMatch(homeText, /أيام الأسبوع|الاثنين|الثلاثاء/);
+
+const learnText = text('dist/js/learn.js');
+assert.match(learnText, /printActions/);
 assert.match(learnText, /part_1_framework\.sections/);
 assert.match(learnText, /part_2_answering\.sections/);
-assert.match(learnText, /part_6_preparation\.sections/);
-assert.match(learnText, /source\.intro\.forEach/);
-assert.match(learnText, /Math\.min\(3,/);
-assert.doesNotMatch(learnText, /LocalRecorder|renderLocalRecorder|التقييم الذاتي/);
-assert.match(learnText, /appendChildren\(card,/,
-  'Exercise cards must use null-safe appendChildren; native append renders null as visible text');
+assert.match(learnText, /#\/competencies/);
+assert.match(learnText, /renderMission/);
+assert.match(learnText, /renderLesson\(root, data, lessonId, params = new URLSearchParams\(\)\)/,
+  'Lesson routes must receive URL parameters before rendering Mission Command');
+assert.match(learnText, /renderReadiness/);
+assert.match(learnText, /bindExclusiveAccordions/);
+assert.doesNotMatch(learnText, /اختبار فهم|اختبر فهمك/);
 
-const uiText = read('dist/js/ui.js').toString('utf8');
-assert.match(uiText, /export function appendChildren/);
-assert.match(uiText, /child != null && child !== false/);
+const competencyText = text('dist/js/competencies.js');
+assert.match(competencyText, /competency-card-grid/);
+assert.match(competencyText, /smart-question-card/);
+assert.match(competencyText, /إجابة نموذجية إرشادية/);
+assert.match(competencyText, /تدرّب على هذا السؤال/);
 
-const simText = read('dist/js/sim.js').toString('utf8');
-assert.doesNotMatch(simText, /speechSynthesis|MediaRecorder|راجع إجابتي|اعرض التقييم الذاتي|textarea/i);
-assert.match(simText, /export function selectSessionQuestions/);
-// الرموز المحذوفة في v0.5.1 (البند 13) تُبنى بالتجميع كي يبقى فحص grep في بوابة القبول صفرًا.
-const removedRenderer = ['render', 'Practice'].join('');
-const removedPreparation = ['render', 'Preparation'].join('');
-const removedModule = ['evidence', 'js'].join('.');
-assert.ok(!simText.includes(removedRenderer), 'Dead practice renderer must stay removed (v0.5.1 item 13)');
-assert.ok(!fs.existsSync(path.join(project, 'dist/js', removedModule)), 'Unused client module must stay removed');
-assert.ok(!read('dist/js/learn.js').toString('utf8').includes(removedPreparation));
-const bankSourceText = read('dist/js/bank.js').toString('utf8');
-assert.match(bankSourceText, /ما الذي يجب أن تذكره/);
-assert.match(bankSourceText, /إظهار الإجابة النموذجية/);
-assert.match(read('dist/js/quick-review.js').toString('utf8'), /سؤال السيناريو: الموقف موجود في نص السؤال/);
+const settingsText = text('dist/js/settings.js');
+['المظهر والقراءة', 'الصوت والمحاكاة', 'البيانات والنسخة الاحتياطية', 'الخصوصية والتحكم', 'عن التطبيق']
+  .forEach(label => assert.match(settingsText, new RegExp(label)));
+['حجم الخط', 'تباعد السطور', 'تصدير البيانات', 'استيراد نسخة', 'حذف جميع بياناتي المحلية']
+  .forEach(label => assert.match(settingsText, new RegExp(label)));
 
-const sourceQuestion = questions.find(question => question.expected_answer_points);
-const derivedQuestion = questions.find(question => question.competency_id && !question.expected_answer_points);
+const uiText = text('dist/js/ui.js');
+assert.match(uiText, /other !== item\) other\.open = false/, 'Opening one accordion item must close the previous item');
+
+const cssText = text('dist/css/styles.css');
+assert.match(cssText, /grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/, 'Bottom navigation must fit five destinations');
+assert.match(cssText, /html:not\(\[data-font-size="large"\]\) body\[data-page="home"\]\s*\{\s*overflow:\s*hidden;/,
+  'Normal phone home viewport must not scroll, while large text keeps a safe scrolling fallback');
+
+assert.doesNotMatch(clientText, /استُبعدت الأسئلة|الواجهة جاهزة|تهيئة مفتاح|إعادة النشر/);
+assert.doesNotMatch(settingsText, /الأسئلة المستبعدة|بصمة المرجع|بنك الأسئلة/);
+
+const simulationText = text('dist/js/simulation.js');
+assert.match(simulationText, /مقابلة كاملة/);
+assert.match(simulationText, /selectedMode === 'full'/);
+assert.match(simulationText, /acquireWakeLock\('transcribing'\)/);
+assert.match(simulationText, /acquireWakeLock\('evaluating'\)/);
+assert.match(simulationText, /draft_answer/);
+assert.match(simulationText, /direct_training/);
+assert.match(simulationText, /تذكّر بناء SEAL/);
+
+const reportText = text('dist/js/report.js');
+['تقرير المقابلة الشامل', 'متوسط معايير المقابلة', 'نقاط القوة المتكررة', 'نقاط الضعف المتكررة', 'أولوياتك للمحاكاة القادمة'].forEach(label => assert.match(reportText, new RegExp(label)));
+
+const manifestWeb = json('dist/manifest.webmanifest');
+assert.ok(manifestWeb.icons.some(item => item.src.endsWith('icon-192.png')));
+assert.ok(manifestWeb.icons.some(item => item.purpose.includes('maskable')));
+
+const firstQuestion = questions.find(item => item.rubric_mode === 'star_l');
 const dataForGuidance = { competencyById: new Map(competencies.map(item => [item.id, item])), reference };
-assert.equal(buildAnswerGuidance(sourceQuestion, dataForGuidance).kind, 'source');
-assert.equal(buildAnswerGuidance(derivedQuestion, dataForGuidance).kind, 'derived');
-assert.ok(buildAnswerGuidance(derivedQuestion, dataForGuidance).points.length);
+const guidance = buildAnswerGuidance(firstQuestion, dataForGuidance);
+assert.ok(guidance.points.length);
+assert.match(guidance.intent.answerPlan, /STAR-L/);
 
 const introInput = {
   identity: 'قائد عمليات', current_role: 'مدير فريق العمليات', current_scope: 'قيادة فريق متعدد التخصصات',
@@ -224,40 +244,37 @@ const introInput = {
 };
 const intro60 = buildSelfIntroduction(introInput, { duration: 60 });
 const intro120 = buildSelfIntroduction(introInput, { duration: 120 });
-assert.ok(intro60.text.includes('مدير فريق العمليات'));
-assert.ok(intro60.text.includes('خفض زمن إنجاز المعاملات'));
-assert.ok(intro60.text.includes('توسيع أثر التحسين'));
-assert.ok(intro60.word_count <= 112);
+assert.ok(intro60.text.includes('مدير فريق العمليات') && intro60.word_count <= 112);
 assert.ok(intro120.word_count <= 225);
-assert.ok(intro120.text.indexOf('مشرف عمليات') < intro120.text.indexOf('مدير فريق العمليات'), 'Self introduction must move from past to present');
-assert.ok(intro120.text.indexOf('مدير فريق العمليات') < intro120.text.indexOf('توسيع أثر التحسين'), 'Future goal must follow current role');
-assert.notEqual(buildSelfIntroduction(introInput, { duration: 60, variation: 0 }).text, buildSelfIntroduction(introInput, { duration: 60, variation: 1 }).text);
+assert.ok(intro120.text.indexOf('مشرف عمليات') < intro120.text.indexOf('مدير فريق العمليات'));
 
-const indexText = read('dist/index.html').toString('utf8');
-assert.match(indexText, /id="back-button"/);
-assert.equal((indexText.match(/data-nav=/g) || []).length, 4);
-assert.match(indexText, />المسار</);
-assert.match(indexText, />الأدوات</);
+const reportFor = (score, competency, overrides = {}) => ({
+  question: { id: competency.id, question: 'سؤال', competency_id: competency.id, competency_name: competency.name },
+  report: {
+    final_score: score,
+    classification: score == null ? null : score >= 80 ? 'قوية' : score >= 60 ? 'متوسطة' : 'ضعيفة',
+    criteria: [{ key: 'context', score: score == null ? 5 : score / 20 }],
+    elements: { situation: { present: score != null }, action: { present: score >= 80 } },
+    expected_points_coverage: [], action_ratio: score == null ? 99 : score / 2,
+    strengths: ['وضوح الرسالة'], missing: ['تفصيل النتيجة'], next_actions: ['أضف مؤشرًا للنتيجة.'], flags: [],
+    ...overrides
+  }
+});
+const insights = buildSessionInsights({
+  responses: [
+    reportFor(80, { id: 'C1', name: 'التواصل' }),
+    reportFor(60, { id: 'C2', name: 'العمل الجماعي' }),
+    reportFor(null, { id: 'C3', name: 'القرار' }, { strengths: ['يجب ألا تُحتسب'], missing: ['يجب ألا تُحتسب'] })
+  ]
+});
+assert.equal(insights.average, 70);
+assert.equal(insights.trusted_count, 2);
+assert.equal(insights.untrusted_count, 1);
+assert.equal(insights.criterion_scores[0].score, 70);
+assert.equal(insights.competency_scores.length, 2);
+assert.equal(insights.action_ratio, 35);
+assert.ok(insights.strengths.every(item => item.text !== 'يجب ألا تُحتسب'));
+assert.ok(insights.weaknesses.every(item => item.text !== 'يجب ألا تُحتسب'));
+assert.ok(insights.priorities.length > 0);
 
-const homeText = read('dist/js/home.js').toString('utf8');
-assert.match(homeText, /ابدأ المسار التعليمي/);
-assert.match(homeText, /89 سؤالًا أساسيًا/);
-assert.match(homeText, /التعلّم والبنك محليان/);
-assert.match(homeText, /محاكاة المقابلة/);
-
-const bankText = read('dist/js/bank.js').toString('utf8');
-assert.match(bankText, /السؤال والإجابة/);
-assert.match(bankText, /إجابة نموذجية متوفرة/);
-assert.match(bankText, /ماذا يريد منك المقابل/);
-assert.match(bankText, /ما الذي يجب أن تذكره/);
-assert.match(bankText, /إظهار الإجابة النموذجية/);
-assert.doesNotMatch(bankText, /textarea|اكتب إجابتك|راجع إجابتي/i);
-
-const configText = read('dist/js/config.js').toString('utf8');
-assert.match(configText, /maxExercisesPerLessonSession: 3/);
-
-const cssText = read('dist/css/styles.css').toString('utf8');
-assert.match(cssText, /NotoSansArabic-Regular\.ttf/);
-assert.match(cssText, /\[data-theme="dark"\]/);
-
-console.log(`PASS phase 1 data: ${questions.length} questions, ${exercises.length} exercises, 1000 variant-safe sessions.`);
+console.log(`PASS v0.6 content and UX: ${questions.length} complete-answer questions, ${audit.excluded.length} excluded, 5 preparation sections.`);

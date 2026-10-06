@@ -58,7 +58,14 @@
           "text": "التركيز يجب أن يكون على وضوح الرسالة + التأثير الإيجابي + معالجة سوء الفهم."
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "الفريق لم يستوعب توجيها مهما مع أنني شرحته أكثر من مرة، والنتيجة تأخر في تنفيذ المهمة. تكرار الشرح نفسه لم ينفع، فالمشكلة في طريقة إيصال الرسالة لا في عدد مرات قولها.",
+      "evaluation": "قبل أن أشرح مرة أخرى سأبحث عن سبب عدم الفهم: هل كان شرحي نظريا أكثر من اللازم؟ هل قدمت معلومات كثيرة دفعة واحدة؟ هل يوجد عائق يمنعهم من السؤال؟ سأسأل الفريق عن الجزء غير الواضح وأستمع لهم بانتباه.",
+      "action": "سأعيد صياغة التوجيه بلغة أبسط وأكثر تحديدا، وأقسمه إلى خطوات قصيرة. سأغير الأسلوب: مثال عملي، ونموذج بصري يوضح تسلسل الخطوات. ثم أطلب من كل فرد أن يعيد شرح الجزء الذي سينفذه، فأتأكد من الفهم وأصحح أي التباس في حينه. وأختم بتحديد واضح: من يفعل ماذا، ومتى ينتهي.",
+      "leadership_impact": "يتحرك الفريق برسالة واحدة مفهومة، وتنفذ المهمة في وقتها وبجودة أفضل. وأكون قد عالجت سوء الفهم بهدوء واحترام، فتبقى الثقة بيني وبين الفريق."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C1-S2",
@@ -119,207 +126,14 @@
           "text": "إعادة إشراك العضو بشكل إيجابي في تنفيذ القرار."
         }
       ]
-    }
-  },
-  {
-    "id": "C1-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "لاحظت أثناء تنفيذ مهمة تشغيلية أن أحد الموظفين يكرر فهماً غير دقيق لإجراء أساسي، رغم أنك شرحته خلال الاجتماع التمهيدي. هذا الخطأ قد يؤثر على جودة العمل وسلامة الفريق. كيف تتعامل مع الموقف؟",
-    "label": "فريق عمل لا يستوعب إجراء مهم",
-    "sample_answer": "أبدأ بتحليل سبب تكرار الخطأ: هل المشكلة في وضوح الشرح، أو الضغط العملي، أو عدم إدراك الموظف لأهمية الإجراء؟ ثم أعيد صياغة التوجيه بطريقة عملية باستخدام مثال مباشر من سياق العمل بدل الشرح النظري. بعدها أطلب من الموظف إعادة توضيح الإجراء بأسلوبه لضمان الفهم، وأتابع تطبيقه خلال العمل. هدفي هو ضمان الجودة دون خلق توتر، والاستفادة من الخطأ كفرصة تطوير.",
-    "pdf_page": 11,
-    "display_question": "لاحظت أثناء تنفيذ مهمة تشغيلية أن أحد الموظفين يكرر فهماً غير دقيق لإجراء أساسي، رغم أنك شرحته خلال الاجتماع التمهيدي. هذا الخطأ قد يؤثر على جودة العمل وسلامة الفريق. كيف تتعامل مع الموقف؟",
-    "owner_type": "competency",
-    "competency_id": "C1",
-    "competency_name": "التواصل الفعّال والتأثير الإيجابي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C1-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C1-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "أثناء تنفيذ مهمة عاجلة داخل المؤسسة، أصدر أحد أعضاء الفريق توجيهًا متسرعًا أدى إلى ارتباك سريع بين بقية الفريق. كيف تتواصل فورًا لإعادة الانضباط واستعادة التنسيق؟",
-    "label": "ارتباك في فريق خلال مهمة سريعة",
-    "sample_answer": "في المهام السريعة، وضوح الرسالة وسرعة التوجيه أمران حاسمان. لذلك أبدأ بتوضيح التعليمات بشكل مختصر وحاسم لإعادة ترتيب الأولويات، ثم أطلب من الفريق تأكيد التوجيه بصوت واضح لضمان التطابق في الفهم. بعد انتهاء المهمة، أعقد اجتماعًا قصيرًا أشرح فيه سبب الارتباك وكيف يمكن منعه مستقبلاً عبر استخدام مصطلحات مشتركة وآلية تواصل موحدة.",
-    "pdf_page": 12,
-    "display_question": "أثناء تنفيذ مهمة عاجلة داخل المؤسسة، أصدر أحد أعضاء الفريق توجيهًا متسرعًا أدى إلى ارتباك سريع بين بقية الفريق. كيف تتواصل فورًا لإعادة الانضباط واستعادة التنسيق؟",
-    "owner_type": "competency",
-    "competency_id": "C1",
-    "competency_name": "التواصل الفعّال والتأثير الإيجابي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C1-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء تقديم نظام عمل أو إجراء جديد، اعترض أحد الموظفين ذوي الخبرة أمام الفريق، مما قد يؤثر على تقبّل التغيير. كيف تتعامل مع الموقف؟",
-    "label": "اعتراض من أحد الموظفين خلال طرح نظام جديد",
-    "sample_answer": "أستمع للاعتراض بالكامل دون مقاطعة لفهم طبيعته، سواء كان اعتراضًا منهجيًا أو ناتجًا عن تجربة سابقة. إذا كان له أساس واقعي، أعترف بجزء منه، ثم أوضح الهدف الأكبر من التغيير وقيمته للمؤسسة. بعدها أعيد تركيز النقاش على النتائج المتوقعة، وأقترح تجربة الإجراء الجديد ضمن نطاق محدود كتجربة أولية. غالبًا يتحول المعترض إلى داعم عندما يشعر بأنه شريك في القرار.",
-    "pdf_page": 12,
-    "display_question": "أثناء تقديم نظام عمل أو إجراء جديد، اعترض أحد الموظفين ذوي الخبرة أمام الفريق، مما قد يؤثر على تقبّل التغيير. كيف تتعامل مع الموقف؟",
-    "owner_type": "competency",
-    "competency_id": "C1",
-    "competency_name": "التواصل الفعّال والتأثير الإيجابي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C1-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C1-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "خلال اجتماع مشترك بين عدة إدارات في المؤسسة، ظهرت تفسيرات مختلفة لنفس المعلومة مما أدى إلى تضارب التوصيات. كيف تتواصل لضبط الرسالة وتوحيد الفهم؟",
-    "label": "اجتماعات مشتركة بين جهات مختلفة",
-    "sample_answer": "أبدأ بتحديد نقطة الاختلاف بصياغة محايدة، ثم أعرض المعلومة الأصلية كما وردت من مصدرها، وأقسمها إلى عناصر واضحة. بعدها أطلب من ممثلي كل إدارة توضيح فهمهم الحالي لضمان كشف أي افتراضات. ثم أقود عملية دمج للآراء للوصول إلى صياغة موحدة. الهدف هو توحيد الرسالة وحماية جودة القرار المؤسسي.",
-    "pdf_page": 12,
-    "display_question": "خلال اجتماع مشترك بين عدة إدارات في المؤسسة، ظهرت تفسيرات مختلفة لنفس المعلومة مما أدى إلى تضارب التوصيات. كيف تتواصل لضبط الرسالة وتوحيد الفهم؟",
-    "owner_type": "competency",
-    "competency_id": "C1",
-    "competency_name": "التواصل الفعّال والتأثير الإيجابي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C1-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً كنت بحاجة فيه إلى توصيل رسالة مهمة لفريقك وتأكدت من أنهم فهموها بالكامل. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": "يُتوقع من المرشح أن يقدم",
-      "points": [
-        "Situation: سياق المهمة",
-        "Task: دوره في التواصل",
-        "Action: كيف شرح الرسالة؟ كيف تأكد من الفهم؟",
-        "Result: ما الذي تغير؟",
-        "Learning: ماذا تعلم؟"
-      ]
     },
-    "sample_answer": "في مشروع ضيق الوقت، لاحظت أن الفريق غير متأكد من توزيع المهام، فخصصت اجتماعاً قصيراً لشرح الخطة باستخدام خريطة تدفق. طلبت من كل فرد تلخيص دوره. النتيجة كانت تنفيذ دقيق دون تأخير. تعلمت أهمية استخدام الأساليب البصرية.",
-    "pdf_page": 12,
-    "display_question": "صف موقفاً كنت بحاجة فيه إلى توصيل رسالة مهمة لفريقك وتأكدت من أنهم فهموها بالكامل. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C1",
-    "competency_name": "التواصل الفعّال والتأثير الإيجابي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يُتوقع من المرشح أن يقدم",
-      "points": [
-        {
-          "id": "C1-B1-EP1",
-          "text": "Situation: سياق المهمة"
-        },
-        {
-          "id": "C1-B1-EP2",
-          "text": "Task: دوره في التواصل"
-        },
-        {
-          "id": "C1-B1-EP3",
-          "text": "Action: كيف شرح الرسالة؟ كيف تأكد من الفهم؟"
-        },
-        {
-          "id": "C1-B1-EP4",
-          "text": "Result: ما الذي تغير؟"
-        },
-        {
-          "id": "C1-B1-EP5",
-          "text": "Learning: ماذا تعلم؟"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C1-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف واجهت فيه خلافاً أو سوء فهم داخل الفريق وكان عليك استخدام مهارات التواصل لحل المشكلة. ماذا فعلت؟",
-    "label": "سلوكي – أعمق وأكثر تعقيداً",
-    "expected_answer_points": {
-      "lead": "على المرشح أن يوضح",
-      "points": [
-        "تحليل سبب الخلاف",
-        "التواصل الفردي أو الجماعي",
-        "تهدئة التوتر",
-        "إعادة بناء الثقة",
-        "النتيجة النهائية"
-      ]
+    "sample_answer_seal": {
+      "situation": "عضو مؤثر يعترض بقوة أمام الجميع في اجتماع مهم. اعتراضه قد يضعف معنويات الآخرين ويعطل قرارا ضروريا، وكلمته مسموعة عند زمالئه.",
+      "evaluation": "علي أن أحافظ على أمرين معا: احترام العضو، وتمرير القرار. إن قاطعته أو أسكته زاد التوتر وخسرته هو ومن يتأثرون به، وإن تراجعت تعطل القرار. لذلك الأنسب أن أسمعه أولا ثم أعيد النقاش إلى الهدف.",
+      "action": "سأتركه يكمل كلامه دون مقاطعة حتى يهدأ التوتر. ثم أعترف بالجزء الوجيه من مخاوفه بطريقة مهنية، وأوضح بلغة هادئة وواثقة أن القرار مبني على معطيات أوسع. بعدها أعيد ربط القرار بالهدف العام وأبين الأثر المطلوب منه. وأخيرا أطلب منه أن يقود جزءا من التنفيذ لأنه الأقرب للميدان.",
+      "leadership_impact": "ينتهي الاجتماع بتوافق، ويمر القرار مع حفظ الاحترام للجميع. يتحول العضو المعترض من مصدر تعطيل إلى شريك في التنفيذ، ويرى بقية الفريق أن الخلاف يدار بالحوار والهدوء."
     },
-    "sample_answer": "حدث خلاف بين عضوين بسبب سوء توزيع المهام. تحدثت معهما بشكل منفصل أولاً لفهم الأسباب، ثم جمعت الطرفين لإعادة توضيح الهدف ودور كل شخص. استخدمت لغة محايدة وركزت على نقاط الاتفاق. النتيجة كانت عودة الانسجام وتحسن الأداء. تعلمت أهمية الحياد والإنصات قبل الحل.",
-    "pdf_page": 13,
-    "display_question": "أخبرني عن موقف واجهت فيه خلافاً أو سوء فهم داخل الفريق وكان عليك استخدام مهارات التواصل لحل المشكلة. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C1",
-    "competency_name": "التواصل الفعّال والتأثير الإيجابي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "على المرشح أن يوضح",
-      "points": [
-        {
-          "id": "C1-B2-EP1",
-          "text": "تحليل سبب الخلاف"
-        },
-        {
-          "id": "C1-B2-EP2",
-          "text": "التواصل الفردي أو الجماعي"
-        },
-        {
-          "id": "C1-B2-EP3",
-          "text": "تهدئة التوتر"
-        },
-        {
-          "id": "C1-B2-EP4",
-          "text": "إعادة بناء الثقة"
-        },
-        {
-          "id": "C1-B2-EP5",
-          "text": "النتيجة النهائية"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C1-B3",
@@ -347,7 +161,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C1-B4",
@@ -373,9 +189,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C1-B2",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C1-B5",
@@ -403,7 +221,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C2-S1",
@@ -464,7 +284,14 @@
           "text": "التأكد من تجنب الأزمة"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "ألاحظ مشكلة في سير العمل لم تتحول إلى أزمة بعد، لكنها ستكبر خلال أيام إن تركت؛ مثل تأخر توريد مادة أساسية للمشروع. لم يطلب مني أحد التدخل، والوقت ما زال في صالحي.",
+      "evaluation": "سأحلل المشكلة بسرعة: ما سببها، وما الذي سيتوقف إن استمرت، وكم بقي من الوقت قبل أن تؤثر في العمل. أجمع معلومات تكفي للتحرك، ولا أنتظر صورة كاملة. وانتظار التعليمات هنا يعني أن أتعامل معًالمشكلة بعد أن تصير أزمة.",
+      "action": "سأحدد خطوة عملية واضحة وأبدأ بها فورا. في مثال التوريد: أرصد أسباب التأخير، وأتواصل مع مورد بديل، وأفعل خطة احتياطية. أشرك الأطراف الضرورية فقط، كل بما يخصه. ثم أتابع حتى أتأكد أن الخطر زال فعلا، وأتحمل مسؤولية الخطوة التي اتخذتها.",
+      "leadership_impact": "يستمر العمل دون توقف، وتحل المشكلة وهي صغيرة. ويرى الفريق أن اكتشاف المشكلات قبل تفاقمها والتحرك دون انتظار تعليمات جزء من عملنا."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C2-S2",
@@ -525,212 +352,14 @@
           "text": "توثيق الحدث واستخلاص الدروس"
         }
       ]
-    }
-  },
-  {
-    "id": "C2-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "أثناء إشرافك على مهمة تشغيلية في المؤسسة، لاحظت من خلال متابعة الأنظمة التقنية أن أحد الأجهزة يُظهر تراجعًا متكرّرًا في الأداء، وقد يؤثر ذلك على سير العمل خلال الأيام القادمة. ما الخطوة الاستباقية التي ستتخذها قبل أن تتطور المشكلة؟",
-    "label": "مبادرة في بيئة تشغيلية",
-    "sample_answer": "أبدأ بتقييم أداء النظام فورًا لتحديد ما إذا كان الخلل ناتجًا عن مشكلة تقنية أو عامل تشغيلي. بعدها أجمع بيانات سريعة من فريق الدعم الفني ومن سجل الصيانة لتقدير احتمالية تطور العطل. ثم أفعّل إجراء احتياطي باستخدام نظام بديل لضمان استمرار العمل دون انقطاع، وأرفع بلاغًا فنيًا عاجلاً مع وضع أولوية للصيانة. الهدف هو منع توقف العملية وحماية جاهزية الفريق دون انتظار توجيه رسمي.",
-    "pdf_page": 16,
-    "display_question": "أثناء إشرافك على مهمة تشغيلية في المؤسسة، لاحظت من خلال متابعة الأنظمة التقنية أن أحد الأجهزة يُظهر تراجعًا متكرّرًا في الأداء، وقد يؤثر ذلك على سير العمل خلال الأيام القادمة. ما الخطوة الاستباقية التي ستتخذها قبل أن تتطور المشكلة؟",
-    "owner_type": "competency",
-    "competency_id": "C2",
-    "competency_name": "المبادرة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C2-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C2-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "أثناء تنفيذ برنامج تدريبي داخل المؤسسة، اكتشفت أن أحد التقييمات لا يتناسب مع مستوى المتدربين، وأن الاستمرار بالصيغة الحالية سيؤثر على عدالة التقييم. والوقت لا يسمح بالرجوع للإدارة. ماذا تفعل؟",
-    "label": "مبادرة أثناء تنفيذ برنامج تدريبي",
-    "sample_answer": "أقوم بتحليل سريع للفجوة بين مستوى التقييم ومستوى المتدربين، ثم أحدد الأسئلة أو البنود التي قد تؤثر على العدالة. بعدها أطبّق إجراءً مؤقتًا عبر تعديل مستوى الصعوبة أو استبدال جزء من التقييم بفقرات تتوافق مع المهارات التي تم تدريبها فعليًا. أبلغ فريق التدريب فورًا لضمان التوحيد، وأوثّق التعديل وأرفعه لاحقًا للإدارة. الهدف هو حماية جودة التقييم واستمرارية البرنامج دون تعطيل.",
-    "pdf_page": 17,
-    "display_question": "أثناء تنفيذ برنامج تدريبي داخل المؤسسة، اكتشفت أن أحد التقييمات لا يتناسب مع مستوى المتدربين، وأن الاستمرار بالصيغة الحالية سيؤثر على عدالة التقييم. والوقت لا يسمح بالرجوع للإدارة. ماذا تفعل؟",
-    "owner_type": "competency",
-    "competency_id": "C2",
-    "competency_name": "المبادرة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C2-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء مراجعة خطة مشتركة بين عدة إدارات، لاحظت فجوة بين المعلومات الواردة من جهة مختصة وبين الجدول الزمني المعتمد، وقد تؤثر هذه الفجوة على دقة التوصيات. ما الإجراء المبادر الذي تتخذه؟",
-    "label": "مبادرة في غرفة تخطيط مشتركة",
-    "sample_answer": "أبدأ برصد الفجوة وتوثيقها بوضوح، ثم أتواصل مباشرة مع الجهة المختصة للحصول على تحديث سريع. بالتوازي، أعدّ خيارًا بديلاً يعتمد على أسوأ الاحتمالات لضمان استمرار التخطيط دون تعطيل. أقدّم المعلومة الجديدة أو الفرضية البديلة فور توفرها لضمان اتخاذ قرار دقيق ومتناسق بين الإدارات.",
-    "pdf_page": 17,
-    "display_question": "أثناء مراجعة خطة مشتركة بين عدة إدارات، لاحظت فجوة بين المعلومات الواردة من جهة مختصة وبين الجدول الزمني المعتمد، وقد تؤثر هذه الفجوة على دقة التوصيات. ما الإجراء المبادر الذي تتخذه؟",
-    "owner_type": "competency",
-    "competency_id": "C2",
-    "competency_name": "المبادرة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C2-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "أثناء تنفيذ مشروع متعدد الأطراف، لاحظت أن إحدى نقاط التنسيق غير واضحة وقد تسبّب تضاربًا بين الفرق المشاركة. ما الذي تفعله؟",
-    "label": "مبادرة في مشروع مشترك",
-    "sample_answer": "أعيد صياغة نقطة التنسيق بطريقة مختصرة وواضحة، ثم أتواصل مع جميع الأطراف للتأكد من توحيد الفهم. إذا ظهرت فجوة، أقترح إنشاء قناة تواصل فورية أو نقطة اتصال مركزية لتسهيل التنسيق. الهدف هو منع التضارب وضمان انسيابية العمل دون انتظار تحديث رسمي.",
-    "pdf_page": 17,
-    "display_question": "أثناء تنفيذ مشروع متعدد الأطراف، لاحظت أن إحدى نقاط التنسيق غير واضحة وقد تسبّب تضاربًا بين الفرق المشاركة. ما الذي تفعله؟",
-    "owner_type": "competency",
-    "competency_id": "C2",
-    "competency_name": "المبادرة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C2-S5",
-    "expected_points": null
-  },
-  {
-    "id": "C2-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً بادرت فيه بحل مشكلة أو تحسين إجراء دون أن يُطلب منك ذلك. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": null,
-      "points": [
-        "Situation: تحديد سياق المشكلة",
-        "Task: دور المرشح",
-        "Action: خطوات المبادرة",
-        "Result: أثر المبادرة",
-        "Learning: الدروس المكتسبة"
-      ]
     },
-    "sample_answer": "لاحظت بطئاً في تدفق المعلومات بين الفريق، فأعددت نموذج متابعة موحداً قبل أن يُطلب مني ذلك. النتيجة كانت تقليل الأخطاء بنسبة واضحة. تعلمت أهمية المبادرة في معالجة التفاصيل الصغيرة.",
-    "pdf_page": 17,
-    "display_question": "صف موقفاً بادرت فيه بحل مشكلة أو تحسين إجراء دون أن يُطلب منك ذلك. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C2",
-    "competency_name": "المبادرة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": null,
-      "points": [
-        {
-          "id": "C2-B1-EP1",
-          "text": "Situation: تحديد سياق المشكلة"
-        },
-        {
-          "id": "C2-B1-EP2",
-          "text": "Task: دور المرشح"
-        },
-        {
-          "id": "C2-B1-EP3",
-          "text": "Action: خطوات المبادرة"
-        },
-        {
-          "id": "C2-B1-EP4",
-          "text": "Result: أثر المبادرة"
-        },
-        {
-          "id": "C2-B1-EP5",
-          "text": "Learning: الدروس المكتسبة"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C2-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف واجهت فيه مشكلة طارئة تتطلب تدخلاً سريعاً، وكان عليك اتخاذ خطوة حاسمة دون الرجوع للإدارة. ماذا فعلت؟",
-    "label": "سلوكي – أعمق وأكثر تحدياً",
-    "expected_answer_points": {
-      "lead": "يتوقع أن تتضمن الإجابة",
-      "points": [
-        "تحليل سريع للموقف",
-        "اتخاذ قرار فوري",
-        "إدارة المخاطر",
-        "تنسيق الجهود",
-        "النتيجة الفعلية",
-        "التعلم والتحسين"
-      ]
+    "sample_answer_seal": {
+      "situation": "خلل مفاجئ في إجراء أساسي وسط مهمة كبيرة، كأن يتعطل النظام الأساسي في المرحلة النهائية. الوقت لا يسمح بالرجوع إلى الإدارة، والقرار في هذه اللحظة عندي.",
+      "evaluation": "سأقدر بسرعة حجم الخلل: ما الذي يتأثر به، وما الخطر إن استمر العمل كما هو، وما الخطر إن توقف. ثم أبحث عن أول خطوة آمنة وفعالة. لا أحتاج حلا نهائيا الآن، بل بديلا مؤقتا يبقي العمل مستمرا بأقل مخاطرة.",
+      "action": "سأفعل البديل المؤقت فورا، مثل الإجراء اليدوي الاحتياطي. ثم أبلغ الجهات المعنية، ومنها الفريق الفني والإدارة، بما حدث وبالإجراء الذي اتخذته، ليعالج الخلل نفسه لاحقا. أراقب التنفيذ بنفسي حتى يستقر الوضع وتكتمل المهمة. وبعدها أوثق ما جرى وأستخلص الدروس.",
+      "leadership_impact": "تكتمل المهمة دون خسائر مع أن الخلل وقع في وقت حرج. أتحمل مسؤولية قراري ونتائجه، ويخرج الفريق بدرس موثق يستفاد منه إن تكرر الخلل."
     },
-    "sample_answer": "خلال تنفيذ مهمة حساسة، توقف أحد الموردين فجأة. اتخذت قراراً بالتعامل مع مورد بديل من القائمة المعتمدة، وبدأنا التنفيذ مباشرة. تم تسليم المهمة في وقتها، وتعلمت أهمية التحرك السريع في المواقف الحرجة.",
-    "pdf_page": 18,
-    "display_question": "أخبرني عن موقف واجهت فيه مشكلة طارئة تتطلب تدخلاً سريعاً، وكان عليك اتخاذ خطوة حاسمة دون الرجوع للإدارة. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C2",
-    "competency_name": "المبادرة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يتوقع أن تتضمن الإجابة",
-      "points": [
-        {
-          "id": "C2-B2-EP1",
-          "text": "تحليل سريع للموقف"
-        },
-        {
-          "id": "C2-B2-EP2",
-          "text": "اتخاذ قرار فوري"
-        },
-        {
-          "id": "C2-B2-EP3",
-          "text": "إدارة المخاطر"
-        },
-        {
-          "id": "C2-B2-EP4",
-          "text": "تنسيق الجهود"
-        },
-        {
-          "id": "C2-B2-EP5",
-          "text": "النتيجة الفعلية"
-        },
-        {
-          "id": "C2-B2-EP6",
-          "text": "التعلم والتحسين"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C2-B3",
@@ -756,9 +385,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C2-B1",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C2-B4",
@@ -784,9 +415,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C2-B2",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C2-B5",
@@ -814,7 +447,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-S1",
@@ -875,7 +510,14 @@
           "text": "تحمل المسؤولية والمتابعة"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "قرار مهم في مهمة عاجلة، والمعلومات ناقصة، والوقت محدد. لا أستطيع انتظار اكتمال المعلومات، وعلي أن أقرر بما هو متاح.",
+      "evaluation": "سأراجع بسرعة ما أعرفه فعلا. ثم أفصل الناقص إلى قسمين: ما هو ضروري للقرار فأحاول الحصول عليه في الوقت المتاح، وما يمكن تقديره تقديرا معقولا. بعدها أحدد أولويات القرار، أي ما الذي يجب أن يتحقق أولا، وأقارن البدائل على هذا الأساس.",
+      "action": "سأختار أفضل بديل تدعمه المعطيات المتوفرة، وعند تقارب البدائل أميل إلى الأكثر أمانا. أبلغ الفريق بالقرار بوضوح: ما المطلوب، ومن ينفذ، ومتى. ثم أتابع التنفيذ، وأكون مستعدا لتصحيح المسار إن ظهرت معلومة جديدة.",
+      "leadership_impact": "تنتهي المهمة دون تأخير، ويعمل الفريق بتوجيه واضح لا بتردد. وأتحمل مسؤولية القرار ونتائجه شخصيا، سواء أصاب أم احتاج إلى تصحيح."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C3-S2",
@@ -936,212 +578,14 @@
           "text": "تحمل مسؤولية النتائج ومتابعتها"
         }
       ]
-    }
-  },
-  {
-    "id": "C3-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "أثناء تنفيذ مهمة تشغيلية عاجلة في المؤسسة، لاحظت أن المعلومات المتوفرة حول الحالة الميدانية أو المعطيات التشغيلية غير مكتملة. الوقت محدود، ويجب اتخاذ قرار فوري بشأن الاستمرار أو تعديل الخطة. كيف تتعامل مع الموقف؟",
-    "label": "اتخاذ قرار بوجود معلومات ناقصة في بيئة تشغيلية",
-    "sample_answer": "أبدأ بتقييم سريع للبيانات المتوفرة وتحديد المعلومات الجوهرية التي يعتمد عليها القرار. بعدها أحدد ما يمكن تقديره بشكل منطقي اعتمادًا على الخبرة والبيانات السابقة. ثم أقارن السيناريوهات المحتملة، وأختار البديل الذي يحقق الهدف مع أقل قدر من المخاطر، مثل تعديل المسار أو إعادة ترتيب الأولويات. أتواصل مع الفريق بوضوح حول القرار وأتحمل مسؤوليته كاملة، وأتابع التنفيذ لتعديل القرار عند ظهور مستجدات.",
-    "pdf_page": 21,
-    "display_question": "أثناء تنفيذ مهمة تشغيلية عاجلة في المؤسسة، لاحظت أن المعلومات المتوفرة حول الحالة الميدانية أو المعطيات التشغيلية غير مكتملة. الوقت محدود، ويجب اتخاذ قرار فوري بشأن الاستمرار أو تعديل الخطة. كيف تتعامل مع الموقف؟",
-    "owner_type": "competency",
-    "competency_id": "C3",
-    "competency_name": "اتخاذ القرار وتحمل المسؤولية",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C3-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "خلال إدارة مشروع تدريبي أو خطة تشغيلية، ظهر تعارض بين خيارين: (1) خيار سريع يحقق الوقت لكنه يحمل مخاطرة واضحة، (2) خيار آمن لكنه قد يؤخر الإنجاز. كيف تتخذ القرار؟ وكيف تتحمل مسؤوليته؟",
-    "label": "قرار بين السرعة والجودة أثناء إدارة مشروع أو خطة تشغيلية",
-    "sample_answer": "أجري تحليلاً دقيقًا للمخاطر على المدى القصير والطويل، ثم أربط القرار بالهدف النهائي للمشروع وليس فقط بعامل الوقت. إذا كانت المخاطرة تؤثر على جودة المخرجات أو جاهزية الفريق، أبحث عن خيار ثالث يوازن بين الوقت والجودة مثل التنفيذ المرحلي أو إعادة توزيع المهام. بعدها أشرح القرار بوضوح للفريق والإدارة، موضحًا الأسباب والأسس. أتابع النتيجة مباشرة، وأتحمل مسؤولية القرار وإجراء مراجعة لاحقة لاستخلاص الدروس.",
-    "pdf_page": 22,
-    "display_question": "خلال إدارة مشروع تدريبي أو خطة تشغيلية، ظهر تعارض بين خيارين: (1) خيار سريع يحقق الوقت لكنه يحمل مخاطرة واضحة، (2) خيار آمن لكنه قد يؤخر الإنجاز. كيف تتخذ القرار؟ وكيف تتحمل مسؤوليته؟",
-    "owner_type": "competency",
-    "competency_id": "C3",
-    "competency_name": "اتخاذ القرار وتحمل المسؤولية",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C3-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء مهمة حساسة مع ضيق الوقت، تعطل أحد الأنظمة الأساسية بشكل مفاجئ. التوقف قد يعرّض العمل للخطر، والاستمرار دون إجراء مدروس قد يزيد المخاطر. ما قرارك؟",
-    "label": "اتخاذ قرار سريع أثناء خلل تقني في عمل حساس",
-    "sample_answer": "أقيّم نوع الخلل وتأثيره الفعلي على سلامة التنفيذ. إذا كان الخلل ثانوياً، أفعّل النظام الاحتياطي وأعيد توزيع المهام لتعويض النقص. وإن كان الخلل جوهريًا، أتخذ قرار تعديل خطة التنفيذ بشكل مؤقت لرفع هامش الأمان. في كل الحالات أتخذ القرار بسرعة، ثم أبلغ الإدارة بعد السيطرة على الوضع وأتحمل المسؤولية كاملة لضمان استمرارية العمل.",
-    "pdf_page": 22,
-    "display_question": "أثناء مهمة حساسة مع ضيق الوقت، تعطل أحد الأنظمة الأساسية بشكل مفاجئ. التوقف قد يعرّض العمل للخطر، والاستمرار دون إجراء مدروس قد يزيد المخاطر. ما قرارك؟",
-    "owner_type": "competency",
-    "competency_id": "C3",
-    "competency_name": "اتخاذ القرار وتحمل المسؤولية",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C3-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "أثناء إعداد خطة مشتركة، اكتشفت أن إحدى الإدارات تعتمد على تقدير غير دقيق سيؤثر على مصفوفة المخاطر. الوقت لا يسمح بعقد اجتماع موسع. كيف تتخذ القرار؟",
-    "label": "قرار تخطيطي أثناء اجتماع مشترك بين إدارات متعددة",
-    "sample_answer": "أبدأ بتقييم أثر التقدير الخاطئ على الخطة العامة. إن كان التأثير كبيرًا، أعد تقديراً بديلاً مستندًا إلى المعلومات المتاحة والخبرة السابقة، وأعدل مصفوفة المخاطر بشكل مؤقت لضمان استمرار العمل. أوثق التعديل وأبلغ الجهة المعنية، مع توضيح الحاجة إلى تحديث لاحق. الهدف هو حماية جودة القرار دون تعطيل وتيرة التخطيط، مع تحمل مسؤولية الحل المؤقت.",
-    "pdf_page": 22,
-    "display_question": "أثناء إعداد خطة مشتركة، اكتشفت أن إحدى الإدارات تعتمد على تقدير غير دقيق سيؤثر على مصفوفة المخاطر. الوقت لا يسمح بعقد اجتماع موسع. كيف تتخذ القرار؟",
-    "owner_type": "competency",
-    "competency_id": "C3",
-    "competency_name": "اتخاذ القرار وتحمل المسؤولية",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C3-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً اتخذت فيه قراراً صعباً واضطررت لتحمل مسؤوليته بالكامل. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": null,
-      "points": [
-        "Situation: سياق القرار",
-        "Task: المسؤولية الشخصية",
-        "Action: كيف تم اتخاذ القرار؟",
-        "Result: ماذا حدث بعدها؟",
-        "Learning: الدروس المستفادة"
-      ]
     },
-    "sample_answer": "كان عليّ اتخاذ قرار بتغيير خطة العمل قبل يوم من التنفيذ. درست المعطيات وقررت التعديل رغم اعتراض البعض. النتيجة كانت إنقاذ المهمة من تأخير كبير. تعلمت أهمية الثبات عند اتخاذ قرار مبني على تحليل.",
-    "pdf_page": 22,
-    "display_question": "صف موقفاً اتخذت فيه قراراً صعباً واضطررت لتحمل مسؤوليته بالكامل. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C3",
-    "competency_name": "اتخاذ القرار وتحمل المسؤولية",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": null,
-      "points": [
-        {
-          "id": "C3-B1-EP1",
-          "text": "Situation: سياق القرار"
-        },
-        {
-          "id": "C3-B1-EP2",
-          "text": "Task: المسؤولية الشخصية"
-        },
-        {
-          "id": "C3-B1-EP3",
-          "text": "Action: كيف تم اتخاذ القرار؟"
-        },
-        {
-          "id": "C3-B1-EP4",
-          "text": "Result: ماذا حدث بعدها؟"
-        },
-        {
-          "id": "C3-B1-EP5",
-          "text": "Learning: الدروس المستفادة"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C3-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف تحملت فيه مسؤولية خطأ أو نتيجة غير متوقعة لقرار اتخذته، وكيف تعاملت مع الوضع.",
-    "label": "سلوكي – أعمق وأكثر تحدياً",
-    "expected_answer_points": {
-      "lead": "يتوقع أن يوضح المرشح",
-      "points": [
-        "الاعتراف بالخطأ",
-        "تحليل السبب",
-        "معالجة العواقب",
-        "التواصل مع الأطراف المتأثرة",
-        "تصحيح المسار",
-        "التعلم والتحسين"
-      ]
+    "sample_answer_seal": {
+      "situation": "مشروع حساس في منتصف التنفيذ، وأمامي خياران: آمن يؤخر الإنجاز، وسريع يحمل مخاطرة. القرار قراري، وسأسأل عنه أمام الفريق والإدارة.",
+      "evaluation": "سأحلل كل خيار بدقة: ما مخاطره، وما نتائجه، وما أثره على الهدف النهائي للمشروع لا على موعد التسليم وحده. ثم أسأل: هل أنا محصور فعلا في هذين الخيارين، أم يوجد بديل يوازن بين السرعة والأمان؟ وإن احتجت رأي طرف ضروري أشركته بسرعة.",
+      "action": "سأختار البديل الأكثر توازنا، وقد يكون خيارا ثالثا: تنفيذ جزئي يقلل التأخير دون أن يعرض الجودة للخطر. أشرح القرار للفريق والإدارة بشفافية: ما الذي اخترته، ولماذا، وما المخاطرة التي قبلتها. ثم أتابع التنفيذ حتى نهايته.",
+      "leadership_impact": "يكتمل المشروع بقرار واضح يفهمه الفريق والإدارة. وأنا من يتحمل نتيجته، وأصححه فورا إن ظهر فيه خطأ."
     },
-    "sample_answer": "اتخذت قراراً بتخصيص جزء من الموارد لمهمة معينة، واتضح لاحقاً أنني قللت من تقدير متطلباتها. اعترفت بالخطأ، وأعدت توزيع الموارد، وتواصلت مع الفريق لتوضيح الأسباب. تم تصحيح المسار وتعلمت ضرورة وضع هامش احتياطي أكبر.",
-    "pdf_page": 23,
-    "display_question": "أخبرني عن موقف تحملت فيه مسؤولية خطأ أو نتيجة غير متوقعة لقرار اتخذته، وكيف تعاملت مع الوضع.",
-    "owner_type": "competency",
-    "competency_id": "C3",
-    "competency_name": "اتخاذ القرار وتحمل المسؤولية",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يتوقع أن يوضح المرشح",
-      "points": [
-        {
-          "id": "C3-B2-EP1",
-          "text": "الاعتراف بالخطأ"
-        },
-        {
-          "id": "C3-B2-EP2",
-          "text": "تحليل السبب"
-        },
-        {
-          "id": "C3-B2-EP3",
-          "text": "معالجة العواقب"
-        },
-        {
-          "id": "C3-B2-EP4",
-          "text": "التواصل مع الأطراف المتأثرة"
-        },
-        {
-          "id": "C3-B2-EP5",
-          "text": "تصحيح المسار"
-        },
-        {
-          "id": "C3-B2-EP6",
-          "text": "التعلم والتحسين"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C3-B3",
@@ -1167,9 +611,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-B1",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B4",
@@ -1195,9 +641,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-B2",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B5",
@@ -1225,7 +673,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B6",
@@ -1250,9 +700,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-B1",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B7",
@@ -1279,7 +731,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B8",
@@ -1306,7 +760,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B9",
@@ -1331,9 +787,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-B5",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B10",
@@ -1360,7 +818,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B11",
@@ -1385,9 +845,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-B7",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B12",
@@ -1414,7 +876,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C3-B13",
@@ -1439,9 +903,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C3-B5",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C4-S1",
@@ -1497,7 +963,14 @@
           "text": "ظهور القائد كقدوة في الالتزام والهدوء"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "الفريق تحت ضغط مرتفع، وألاحظ أن الدافع والمعنويات في انخفاض. المطلوب مني إجراء فوري قبل أن ينعكس ذلك على الأداء.",
+      "evaluation": "سأحدد بسرعة مصدر الانخفاض: هل هو حجم العمل، أم غموض الهدف، أم شعور بأن الجهد غير مقدر؟ فالتدخل المناسب يتبع السبب. وأدرك أن الفريق ينظر إلي أولا، فهدوئي والتزامي جزء من الحل.",
+      "action": "سأعقد لقاء قصيرا مباشرا معالفريق، أشرح فيه الوضع بصراحة وأوضح الهدف وأين نحن من المرحلة. أعبر عن تقديري لجهود الجميع وأؤكد دعمي لهم. ثم أقسم المهمة إلى أجزاء صغيرة يمكن إنجازها سريعا، ليرى الفريق تقدما ملموسا، وأقدر كل جزء ينجز. وأبقى حاضرا معهم، ملتزما وهادئا.",
+      "leadership_impact": "ترتفع المعنويات ويتحسن الأداء، لأن الفريق عرف الهدف وشعر بالتقدير ورأى نتيجة عمله. وينتقل هدوء القائد إلى الفريق، فيواصل العمل تحت الضغط بثقة."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C4-S2",
@@ -1558,368 +1031,14 @@
           "text": "إبراز القدوة والثبات تحت الضغط"
         }
       ]
-    }
-  },
-  {
-    "id": "C4-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "فريقك يمر بمرحلة ضغط مرتفع أثناء تنفيذ مهمة أو مشروع تدريبي، ولاحظت انخفاض الدافع والمعنويات. ما الإجراء الفوري الذي ستتخذه لرفع الروح وتحفيز الفريق؟",
-    "label": "رفع المعنويات تحت الضغط – تشغيل أو تدريب",
-    "sample_answer": "أول خطوة أقوم بها هي تحديد سبب انخفاض المعنويات: هل هو ضغط الوقت؟ نقص المعلومات؟ الشعور بعدم التقدير؟ بعد ذلك أعقد لقاءً قصيراً وهادئاً أقدم فيه توضيحًا للمرحلة الحالية وأبرز أهمية دور كل فرد. أؤكد تقديري لجهودهم، وأعيد تقسيم المهام إلى أهداف قصيرة قابلة للتحقيق لإعادة الشعور بالتقدم السريع. أحرص على الوجود معهم خلال التنفيذ لإظهار أنني جزء من الجهد وليس مراقبًا. هذا الأسلوب عادة يعيد الطاقة الإيجابية ويثبت الفريق نفسيًا بشكل سريع.",
-    "pdf_page": 30,
-    "display_question": "فريقك يمر بمرحلة ضغط مرتفع أثناء تنفيذ مهمة أو مشروع تدريبي، ولاحظت انخفاض الدافع والمعنويات. ما الإجراء الفوري الذي ستتخذه لرفع الروح وتحفيز الفريق؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C4-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C4-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "خلال تنفيذ مشروع حساس أو عمل مشترك، تعرض الفريق لخطأ أو تأخير كبير أدى إلى إحباط وشعور بالفشل. كيف تقود الفريق لاستعادة الثقة والمحافظة على التماسك؟",
-    "label": "استعادة الثقة بعد انتكاسة أو تأخير في مشروع",
-    "sample_answer": "أبدأ بالاعتراف بالموقف دون تضخيم، وأستخدم نبرة هادئة توضح أن التحديات جزء طبيعي من المشاريع المعقدة. أعيد صياغة الحدث كفرصة لتحسين العملية وليس كفشل شخصي. بعدها أضع خطة تصحيح بالتعاون مع الفريق وأوزع المهام وفق نقاط القوة. أظهر القدوة عبر الاستمرار بالعمل بثبات وطمأنينة، وأحتفي بأي تقدم مهما كان بسيطاً. هذا النهج يعيد الثقة تدريجياً ويجعل الفريق أقوى من ذي قبل.",
-    "pdf_page": 31,
-    "display_question": "خلال تنفيذ مشروع حساس أو عمل مشترك، تعرض الفريق لخطأ أو تأخير كبير أدى إلى إحباط وشعور بالفشل. كيف تقود الفريق لاستعادة الثقة والمحافظة على التماسك؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C4-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C4-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء إدارة مشروع يضم عدة جهات، لاحظت أن الفريق المشترك بدأ يفقد الحماس بسبب اختلاف وجهات النظر وضغط الوقت. كيف تقوده كقائد ملهم؟",
-    "label": "تحفيز فريق من عدة جهات \" لجان مشتركة / مشاريع متعددة \"",
-    "sample_answer": "أبدأ بجمع الفريق في نقاش قصير لتذكيرهم بالهدف المشترك، ثم أوضح دور كل جهة وأثره في الصورة الكلية للمشروع. أستخدم لغة إيجابية تركز على التكامل بدل الاختلاف. أبدأ بالنقاط المتفق عليها لخلق زخم نفسي إيجابي، ثم أطرح خطوات واضحة لتقريب وجهات النظر. أظهر سلوكًا قياديًا هادئًا ومتزنًا يعكس الثقة تحت الضغط. عندما يرى الفريق ذلك، يعود الحماس تدريجيًا ويعمل الجميع باتجاه واحد.",
-    "pdf_page": 31,
-    "display_question": "أثناء إدارة مشروع يضم عدة جهات، لاحظت أن الفريق المشترك بدأ يفقد الحماس بسبب اختلاف وجهات النظر وضغط الوقت. كيف تقوده كقائد ملهم؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C4-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "أحد أعضاء فريق التدريب فقد حماسه بسبب عبء العمل أو عدم وضوح التوجيه، وبدأ تأثيره ينعكس على فريقه. ما دورك كقائد ملهم؟",
-    "label": "إلهام فريق تدريب أو تطوير",
-    "sample_answer": "أبدأ بالتواصل الفردي لفهم مصدر فقدان الحماس، مع إظهار اهتمام وتقدير حقيقي. ثم أوضح له الصورة الأكبر للمشروع التدريبي وكيف يؤثر دوره مباشرة على تطوير العاملين. أقدم دعماً عمليًا مثل إعادة توزيع الحمل أو إشراكه في تطوير مادة جديدة ليشعر بقيمته. أتابع التطور وأشكره أمام الفريق، لأن التقدير العلني يعزز المعنويات ويرفع مستوى الالتزام الجماعي.",
-    "pdf_page": 31,
-    "display_question": "أحد أعضاء فريق التدريب فقد حماسه بسبب عبء العمل أو عدم وضوح التوجيه، وبدأ تأثيره ينعكس على فريقه. ما دورك كقائد ملهم؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C4-S7",
-    "number": 7,
-    "type": "scenario",
-    "question": "بعد خبرتك الحالية، لماذا ترى نفسك جاهزاً لتولي دور قيادي؟ وما الأسس أو التجارب التي تدعم ذلك؟",
-    "sample_answer": "أرى نفسي جاهزاً للقيادة لأن مسيرتي المهنية منحتني خبرة عملية في إدارة الفرق، واتخاذ القرارات تحت الضغط، والتعامل مع التحديات بشكل بنّاء. خلال السنوات الماضية قمت بقيادة مهام متعددة، وشاركت في تطوير عمليات وتحسين إجراءات أثبتت قدرتي على التأثير الإيجابي والتوجيه. أمتلك اليوم مزيجاً من الخبرة، والوعي، والاتزان، إضافة إلى القدرة على بناء الثقة وتحفيز الآخرين، وهي عناصر تجعلني مستعداً لتحمل مسؤولية القيادة.",
-    "pdf_page": 31,
-    "display_question": "بعد خبرتك الحالية، لماذا ترى نفسك جاهزاً لتولي دور قيادي؟ وما الأسس أو التجارب التي تدعم ذلك؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C4-S8",
-    "number": 8,
-    "type": "scenario",
-    "question": "كيف تعمل على تعزيز الثقة بينك وبين فريقك؟ وما الإجراءات العملية التي تتبعها لضمان علاقة مهنية قائمة على الاحترام المتبادل والموثوقية؟",
-    "sample_answer": "أعزز الثقة في فريقي عبر ثلاثة محاور رئيسية: الوضوح، العدالة، والدعم. أبدأ بالتواصل الصريح حول التوقعات والأدوار، وأحرص على التعامل العادل والمتوازن مع الجميع. أقدم الدعم الكامل عند مواجهة التحديات وأظهر تقديراً حقيقياً للإنجازات. كما أحرص على الالتزام بوعودي لأن الثقة تُبنى من خلال الأفعال، لا الكلمات فقط. هذا النهج جعل الفريق يشعر بالأمان النفسي، مما انعكس إيجاباً على الأداء والانتماء.",
-    "pdf_page": 32,
-    "display_question": "كيف تعمل على تعزيز الثقة بينك وبين فريقك؟ وما الإجراءات العملية التي تتبعها لضمان علاقة مهنية قائمة على الاحترام المتبادل والموثوقية؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C4-S9",
-    "number": 9,
-    "type": "scenario",
-    "question": "برأيك، ما الصفة القيادية الأهم التي يجب أن يمتلكها القائد؟ ولماذا تعتبرها جوهرية؟",
-    "sample_answer": "أرى أن أهم صفة في القائد هي القدرة على الإلهام. فالقائد الذي يلهم فريقه يستطيع رفع مستوى الأداء حتى في أصعب الظروف، لأن الفريق لا يتحرك بدافع الأوامر فقط، بل بدافع القناعة والالتزام الداخلي. الإلهام يجمع بين القدوة، والوضوح، والتواصل الإيجابي، وهو ما يجعل الفريق متماسكاً وقادرًا على تجاوز التحديات وتحقيق نتائج تتجاوز المتوقع.",
-    "sample_answer_note": "يمكن اختيار أي صفة قد تراها مناسبة",
-    "pdf_page": 32,
-    "display_question": "برأيك، ما الصفة القيادية الأهم التي يجب أن يمتلكها القائد؟ ولماذا تعتبرها جوهرية؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C4-S10",
-    "number": 10,
-    "type": "scenario",
-    "question": "من هو القائد الملهم لك؟ ولماذا يعدّ نموذجاً قيادياً مؤثراً؟",
-    "sample_answers": [
-      {
-        "leader": "الشيخ زايد بن سلطان آل نهيان (رحمه الله)",
-        "role": "مؤسس دولة الإمارات",
-        "answer": "القائد الملهم بالنسبة لي هو الشيخ زايد بن سلطان آل نهيان (رحمه الله)، لأنه يجسد القيادة الإنسانية المتوازنة القائمة على الحكمة، والصبر، والتواضع، وبناء الإنسان قبل البنيان. قدرته على توحيد مجتمع متعدد الخلفيات وصياغة دولة حديثة خلال عقود قليلة تمثل نموذجاً ملهماً في القيادة التي تجمع بين الرؤية والإنسانية. ما أستلهمه من نهجه هو احترامه للناس، وإيمانه بالعمل المشترك، وبناء الثقة، وهي قيم تشكل أساس القيادة الفعالة."
-      },
-      {
-        "leader": "الشيخ محمد بن زايد آل نهيان",
-        "role": "رئيس دولة الإمارات والقائد الأعلى للقوات المسلحة",
-        "answer": "القائد الملهم بالنسبة لي هو صاحب السمو الشيخ محمد بن زايد آل نهيان، رئيس دولة الإمارات والقائد الأعلى للقوات المسلحة، لأنه يقدم نموذجاً متكاملاً للقيادة القائمة على الرؤية الاستراتيجية وبناء الإنسان. ما يلهمني في سموه هو حكمته في اتخاذ القرار، وقدرته على إدارة التحولات الوطنية الكبرى، وتركيزه المستمر على التعليم والابتكار وتمكين الشباب. قيادته تجمع بين الحزم والإنسانية، وبين التخطيط بعيد المدى والاهتمام بالتفاصيل، وهي عناصر أعتبرها أساس القيادة الملهمة."
-      },
-      {
-        "leader": "الشيخ محمد بن راشد آل مكتوم",
-        "role": "نائب رئيس دولة الإمارات ورئيس مجلس الوزراء",
-        "answer": "القائد الملهم بالنسبة لي هو الشيخ محمد بن راشد آل مكتوم، نائب رئيس الدولة ورئيس مجلس الوزراء، لأنه يمثل نموذجاً قيادياً فريداً يرتكز على الابتكار، والسرعة، وبناء حكومات المستقبل. ما يلهمني في سموه هو رؤيته الواضحة لـ “الحكومة الأسرع والأذكى”، وجرأته في تحويل الأفكار إلى مشاريع واقعية ضخمة غيرت مفهوم الخدمات الحكومية عالميًا. أسلوبه القائم على التفويض، وتمكين الفرق، وتحدي المستحيل يعكس مدرسة قيادية عملية أستفيد منها في تطوير نفسي وفريقي."
-      },
-      {
-        "leader": "الجنرال دوايت د. أيزنهاور",
-        "role": "القائد الأعلى لقوات الحلفاء في أوروبا",
-        "answer": "القائد الملهم بالنسبة لي هو الجنرال دوايت د. أيزنهاور، القائد الأعلى لقوات الحلفاء في أوروبا خلال الحرب العالمية الثانية. ما يلهمني فيه هو قدرته الاستثنائية على قيادة تحالف دولي معقد، وتنسيق عمليات برية وبحرية وجوية ضمن إطار واحد. تميّز بالهدوء تحت الضغط، وبناء الثقة بين القادة، وصياغة قرارات متوازنة في ظروف شديدة التعقيد. قيادته قائمة على التنظيم والانضباط والاتصال الواضح، وهي مبادئ قيادية أجدها جوهرية."
-      },
-      {
-        "leader": "الأميرال السير بيرترام رامزي",
-        "role": "قائد العمليات البحرية المشتركة للحلفاء",
-        "answer": "القائد الذي يلهمني هو الأميرال السير بيرترام رامزي، قائد العمليات البحرية للحلفاء والمسؤول عن الإجلاء في دنكيرك والتخطيط البحري لعملية نورماندي. ما يعجبني في قيادته هو دقته العالية في التخطيط، وقدرته على دمج قوات بحرية متعددة في خطة واحدة متناغمة. أسلوبه يعتمد على التحليل، وإدارة الموارد، وتصميم مسارات تنفيذ معقدة بمهارة كبيرة. أراه نموذجاً للقائد الذي يقود من خلال التنظيم الواضح والتنفيذ المتقن."
-      },
-      {
-        "leader": "المشير برنارد مونتغومري",
-        "role": "قائد مجموعة الجيوش البريطانية – الكندية",
-        "answer": "القائد الملهم بالنسبة لي هو المشير برنارد مونتغومري، قائد مجموعة الجيوش البريطانية–الكندية في الحرب العالمية الثانية. ما يلهمني فيه هو دقته في التخطيط، وحرصه على بناء القوة قبل بدء أي عملية، إضافة إلى قدرته على رفع معنويات قواته. كان تركيزه واضحًا على السيطرة والانضباط وتحقيق التفوق قبل الهجوم. قيادته المتوازنة بين التصميم والتحضير تجعل منه نموذجاً عملياً للقائد المنهجي."
-      },
-      {
-        "leader": "الجنرال عمر برادلي",
-        "role": "قائد الجيوش الأمريكية في الجبهة الغربية",
-        "answer": "القائد الذي يلهمني هو الجنرال عمر برادلي، قائد الجيوش الأمريكية في القطاع الغربي خلال الحرب العالمية الثانية. يعرف بأنه “القائد الهادئ”، وقد تميز بأسلوب عقلاني وعملي في إدارة قوات ضخمة ومعارك معقدة. ما يعجبني فيه هو حرصه على حماية الأفراد، واتخاذ قرارات محسوبة، والقدرة على التقدم بثبات دون تهور. يمثل نموذجاً للقائد العملي الذي يبني الثقة عبر الكفاءة والاتزان."
-      },
-      {
-        "leader": "المارشال الجوي آرثر تِدّر",
-        "role": "نائب القائد الأعلى لقوات الحلفاء ومسؤول الاستراتيجية الجوية",
-        "answer": "القائد الملهم بالنسبة لي هو المارشال الجوي السير آرثر تِدّر، نائب القائد الأعلى لقوات الحلفاء والمسؤول عن الاستراتيجية الجوية في أوروبا. ما يلهمني فيه هو قدرته على توحيد القيادات الجوية المختلفة وصياغة استراتيجية مشتركة فعالة. كان قائداً ذا رؤية تنظيمية دقيقة، استطاع أن ينسّق بين القصف الاستراتيجي والدعم التكتيكي بمهارة. قيادته تمثل التفكير المنهجي والوضوح في تحديد الأولويات."
-      },
-      {
-        "leader": "الجنرال كارل سباتز",
-        "role": "قائد القوات الجوية الاستراتيجية الأمريكية في أوروبا",
-        "answer": "القائد الذي يلهمني هو الجنرال كارل سباتز، قائد القوات الجوية الاستراتيجية الأمريكية في مسرح العمليات الأوروبي. كان يتميز برؤية عميقة حول توظيف القوة الجوية لإضعاف الخصم، واعتمد على التحليل الدقيق لتحديد مراكز الثقل. قيادته القائمة على البيانات والنتائج، وقدرته على استخدام التفوق الجوي لدعم العمليات البرية، جعلته نموذجاً للقائد الاستراتيجي الذي يجمع بين التحليل والرؤية."
-      },
-      {
-        "leader": "المارشال الجوي آرثر هاريس",
-        "role": "قائد قيادة القاذفات البريطانية (Bomber Command)",
-        "answer": "القائد الملهم بالنسبة لي هو المارشال الجوي آرثر هاريس، قائد قيادة القاذفات البريطانية. رغم الجدل حول بعض قراراته، إلا أنه كان قائداً صاحب رؤية واضحة حول دور القوة الجوية الاستراتيجية. ما يلهمني فيه هو تصميمه، وقدرته على إدارة عمليات طويلة المدى، واتخاذ قرارات حاسمة في أصعب الظروف. يمثل نموذجاً للقائد الذي يوازن بين الإمكانات المتاحة والأهداف الاستراتيجية."
-      },
-      {
-        "leader": "الفريق أول والتر بيدل سميث",
-        "role": "رئيس أركان أيزنهاور",
-        "answer": "القائد الذي يلهمني هو الفريق أول والتر بيدل سميث، رئيس أركان القائد الأعلى لقوات الحلفاء. كان هو “العقل التنظيمي” داخل القيادة العليا، والمسؤول عن الانسجام بين القادة الميدانيين وضمان انسيابية اتخاذ القرار. ما يلهمني فيه هو قدرته على إدارة الضغط، وحل الخلافات، وتنظيم العمل في بيئة معقدة. يمثل نموذجاً للقائد الإداري الذي يصنع النجاح من خلف الكواليس عبر الاتصال الفعّال والتنظيم الدقيق."
-      },
-      {
-        "leader": "الجنرال نورمان شوارزكوف",
-        "role": "قائد القيادة المركزية الأمريكية – قائد حرب تحرير الكويت",
-        "answer": "القائد الملهم بالنسبة لي هو الجنرال نورمان شوارزكوف، قائد القيادة المركزية الأمريكية خلال حرب تحرير الكويت. ما يجعل قيادته ملهمة هو قدرته على إدارة تحالف دولي كبير تحت ضغط عملياتي شديد، وتصميم خطط استراتيجية عميقة وفعّالة. كان حاسماً، منضبطاً، وواضحاً في رؤيته، وقاد عمليات واسعة معقدة بمهارة عالية. يلهمني فيه الجمع بين الصرامة والانضباط وبين القدرة على رفع الروح المعنوية والتواصل الواضح مع القوات."
-      },
-      {
-        "leader": "الجنرال كولن باول (Colin Powell)",
-        "role": "رئيس هيئة الأركان المشتركة– وزير خارجية",
-        "answer": "أرى أن الجنرال كولن باول يمثل نموذجاً قيادياً ملهماً لأنه جمع بين العمل العسكري والدبلوماسية، وقدم “عقيدة باول” التي تعتمد على وضوح الهدف، وحشد الجهود، وتقليل المخاطر قبل أي عمل كبير. كان قائداً عملياً، واقعياً، ومنظماً في إدارة الفرق، واشتهر بقدرته على التواصل الواضح وخلق بيئة عمل قائمة على الثقة والالتزام. ما يلهمني فيه هو التوازن بين الحزم والهدوء، وبين الرؤية والتنفيذ."
-      },
-      {
-        "leader": "الجنرال جيمس ماتيس (James Mattis) وزير الدفاع الأمريكي",
-        "role": "قائد مشاة البحرية",
-        "answer": "القائد الملهم بالنسبة لي هو الجنرال جيمس ماتيس، لأنه يجسد القيادة القائمة على الفكر، والانضباط، والتعلم المستمر. ماتيس معروف بأنه “القائد القارئ” ويمثل نموذجاً للقائد الذي يبني قراراته على المعرفة والتحليل العميق. يتميز بقدرته على إدارة المواقف المعقدة، ورفع الجاهزية، وبناء ثقافة احترافية قوية داخل الفرق التي يقودها. ما يلهمني فيه هو الجمع بين القوة الذهنية والحضور الميداني، وهو ما يجعل منه نموذجاً قيادياً متكاملاً."
-      }
-    ],
-    "pdf_page": 32,
-    "display_question": "من هو القائد الملهم لك؟ ولماذا يعدّ نموذجاً قيادياً مؤثراً؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C4-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً استطعت فيه رفع معنويات فريقك خلال فترة صعبة. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": "يُتوقع أن يتضمن المرشح",
-      "points": [
-        "Situation: التحدي",
-        "Task: دوره كقائد",
-        "Action: كيف ألهم الفريق؟",
-        "Result: الأثر على الأداء",
-        "Learning: الدرس المستفاد"
-      ]
     },
-    "sample_answer": "خلال فترة ضغوط عالية، لاحظت التوتر. قدمت خطاباً قصيراً يؤكد قيمة كل فرد، ثم وزعت المهام بشكل يجعل الإنجاز سريعاً. النتيجة: تحسن محسوس في روح الفريق. تعلمت أهمية التواصل الإيجابي.",
-    "pdf_page": 35,
-    "display_question": "صف موقفاً استطعت فيه رفع معنويات فريقك خلال فترة صعبة. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يُتوقع أن يتضمن المرشح",
-      "points": [
-        {
-          "id": "C4-B1-EP1",
-          "text": "Situation: التحدي"
-        },
-        {
-          "id": "C4-B1-EP2",
-          "text": "Task: دوره كقائد"
-        },
-        {
-          "id": "C4-B1-EP3",
-          "text": "Action: كيف ألهم الفريق؟"
-        },
-        {
-          "id": "C4-B1-EP4",
-          "text": "Result: الأثر على الأداء"
-        },
-        {
-          "id": "C4-B1-EP5",
-          "text": "Learning: الدرس المستفاد"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C4-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف واجه فيه فريقك تحدياً كبيراً أو فشلاً، واستطعت رغم ذلك أن تحافظ على تماسك الفريق وتعيد الثقة بينهم. كيف فعلت ذلك؟",
-    "label": "سلوكي – أعمق وأكثر تأثيراً",
-    "expected_answer_points": {
-      "lead": "يجب أن يظهر",
-      "points": [
-        "تحليل الموقف والانفعالات",
-        "التواصل الهادئ والواضح",
-        "التصرف كقدوة",
-        "إشراك الفريق في الحل",
-        "إعادة بناء الثقة تدريجياً",
-        "النتيجة والتعلم"
-      ]
+    "sample_answer_seal": {
+      "situation": "الفريق واجه تحديا كبيرا في مشروع حساس، كخطأ سبب تأخيرا كبيرا، ويسيطر عليه الإحباط والشعور بالفشل. الخطر الآن أن يفقد الفريق ثقته ووحدته، لا التحدي وحده.",
+      "evaluation": "إن تجاهلت ما حدث فقدت مصداقيتي، وإن هولته زدت الإحباط. الأنسب أن أعترف بالموقف كما هو، ثم أنقل الفريق من الانشغال بما حدث إلى ما سنفعله الآن. وثباتي في هذه اللحظة هو أول ما سيلاحظه الفريق.",
+      "action": "سأجمعالفريق فورا. أعترف بالموقف دون تهويل، وأطمئنهم بنبرة هادئة وواثقة أن ما حدث جزء من التعلم وفرصة للتحسين. أذكرهم بالرؤية والهدف. ثمنضع معا خطة تصحيحية بخطوات متدرجة تعيدنا إلى المسار، وأوزع الأدوار بوضوح ليعرف كل فرد ما عليه.",
+      "leadership_impact": "تعود الثقة، ويبقى الفريق متحدا نحو الهدف، ويكتمل المشروع بجودة عالية. ويتعلم الفريق من ثبات قائده أن التحدي يواجه بخطة لا بالإحباط."
     },
-    "sample_answer": "تعرض الفريق لانتقاد حاد من جهة خارجية. استمعت لمشاعرهم، وذكّرتهم بإنجازاتهم، ووضعت معهم خطة تصحيح. شاركتهم كل خطوة وكنت موجوداً معهم. النتيجة: عادت الثقة، وتحسن الأداء. تعلمت أهمية الحضور القيادي المستمر.",
-    "pdf_page": 35,
-    "display_question": "أخبرني عن موقف واجه فيه فريقك تحدياً كبيراً أو فشلاً، واستطعت رغم ذلك أن تحافظ على تماسك الفريق وتعيد الثقة بينهم. كيف فعلت ذلك؟",
-    "owner_type": "competency",
-    "competency_id": "C4",
-    "competency_name": "القيادة الملهمة",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يجب أن يظهر",
-      "points": [
-        {
-          "id": "C4-B2-EP1",
-          "text": "تحليل الموقف والانفعالات"
-        },
-        {
-          "id": "C4-B2-EP2",
-          "text": "التواصل الهادئ والواضح"
-        },
-        {
-          "id": "C4-B2-EP3",
-          "text": "التصرف كقدوة"
-        },
-        {
-          "id": "C4-B2-EP4",
-          "text": "إشراك الفريق في الحل"
-        },
-        {
-          "id": "C4-B2-EP5",
-          "text": "إعادة بناء الثقة تدريجياً"
-        },
-        {
-          "id": "C4-B2-EP6",
-          "text": "النتيجة والتعلم"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C4-B3",
@@ -1945,9 +1064,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C4-B1",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C4-B4",
@@ -1973,9 +1094,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C4-B2",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C4-B5",
@@ -2003,7 +1126,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C4-B6",
@@ -2030,7 +1155,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C5-S1",
@@ -2059,7 +1186,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C5-S1",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -2086,7 +1213,14 @@
           "text": "ربط كل فرد بدوره في الصورة الكلية"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "مهمة طويلة المدى بعدة مراحل، وفريق متنوع. في مهمة كهذه قد ينشغل كل فرد بجزئه ويغيب عنه الهدف الواحد الذي نعمل له جميعا.",
+      "evaluation": "سأبدأ بنفسي: أقرأ السياق العام وأتأكد أنني أفهم الهدف النهائي بدقة، فلا أستطيع توضيح صورة لا أملكها. ثم أحدد ما يحتاج الفريق أن يعرفه ليعمل في اتجاه واحد: الهدف، والأولويات، وموقع كل دور من الصورة الكلية.",
+      "action": "قبل بدء العمل سأقدم للفريق عرضا مبسطا للصورة الكبيرة: الهدف النهائي، والمراحل الأساسية، وما الأولوية في كل مرحلة. أقسم كل مرحلة إلى خطوات تنفيذ واضحة. ثم أربط دور كل فرد بنتيجة محددة في هذه الصورة، حتى يعرف كيف يخدم عمله اليومي الهدف الكبير.",
+      "leadership_impact": "يعمل الفريق نحو هدف واحد، ويعرف كل فرد ارتباط عمله به. فتأتي الأعمال اليومية منسجمة معالاتجاه العام، ويبقى التركيز على النتيجة بعيدة المدى لا على المكسب اللحظي."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C5-S2",
@@ -2116,7 +1250,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C5-S2",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -2147,256 +1281,14 @@
           "text": "الحفاظ على استمرارية العمل"
         }
       ]
-    }
-  },
-  {
-    "id": "C5-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "لديك مشروع طويل المدى يتضمن عدة مراحل ويشارك فيه فريق متنوع التخصصات. كيف تحدد الاتجاه العام وتوضح الصورة الكلية لضمان عملهم نحو هدف واحد؟",
-    "label": "توجيه فريق متنوع نحو هدف بعيد المدى",
-    "sample_answer": "أبدأ بقراءة السياق العام للمشروع وتحديد الهدف النهائي بدقة، ثم أحوّل هذه الرؤية إلى صورة مبسطة يسهل على جميع أعضاء الفريق استيعابها رغم اختلاف تخصصاتهم. أقوم بتحديد أولويات واضحة لكل مرحلة، وأقسم المشروع إلى محطات رئيسية مربوطة بمؤشرات أداء قابلة للقياس. بعد ذلك أربط دور كل تخصص بتأثيره المباشر على النتيجة النهائية لإيجاد شعور بأن الجميع جزء من الصورة الكبيرة. أستخدم اجتماعات دورية قصيرة لربط الأعمال اليومية بالهدف الاستراتيجي. هذا الأسلوب يقلل الارتباك ويخلق انتماءً للاتجاه العام.",
-    "pdf_page": 39,
-    "display_question": "لديك مشروع طويل المدى يتضمن عدة مراحل ويشارك فيه فريق متنوع التخصصات. كيف تحدد الاتجاه العام وتوضح الصورة الكلية لضمان عملهم نحو هدف واحد؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C5-S1",
-    "variant_group": "C5-S1",
-    "learning_status": "alternate",
-    "alternate_of": "C5-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C5-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "أثناء تنفيذ مشروع تدريبي أو تطويري، ظهرت معلومة جديدة قد تغيّر اتجاه المشروع، بينما يعمل الفريق على الخطة الحالية. كيف تعيد تقييم الوضع وتوجّه الفريق دون فقدان التركيز؟",
-    "label": "ظهور معلومة جديدة تُغيّر الاتجاه الاستراتيجي",
-    "sample_answer": "أقوم بتحليل تأثير المعلومة الجديدة على الهدف النهائي وليس فقط على تفاصيل التنفيذ. إذا كان التأثير جوهريًا، أحدد عناصر الخطة التي يجب تعديلها فورًا، وأحتفظ بما يمكن الاستمرار فيه دون تعارض. بعدها أتواصل مع الفريق بوضوح وأشرح المنطق وراء التغيير وأربطه بالرؤية الأكبر. أعدّل الأولويات بطريقة تقلل الارتباك، وأضع مرحلة انتقالية قصيرة تضمن استمرار العمل. هذا النهج جربته في عدة مشاريع تطويرية وكان دائماً يحافظ على الزخم مع تعزيز الاتجاه العام.",
-    "pdf_page": 40,
-    "display_question": "أثناء تنفيذ مشروع تدريبي أو تطويري، ظهرت معلومة جديدة قد تغيّر اتجاه المشروع، بينما يعمل الفريق على الخطة الحالية. كيف تعيد تقييم الوضع وتوجّه الفريق دون فقدان التركيز؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C5-S2",
-    "variant_group": "C5-S2",
-    "learning_status": "alternate",
-    "alternate_of": "C5-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C5-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء إدارة مشروع طويل الأمد، لاحظت أن موارد المشروع أو الظروف المحيطة قد تؤثر على المرحلة النهائية. كيف تفكر استراتيجياً لضمان اكتمال المشروع؟",
-    "label": "تخطيط استراتيجي أثناء تغيّر المعطيات",
-    "sample_answer": "أعيد تقييم الخطة وفق المعطيات الجديدة، وأضع سيناريوهات متعددة تغطي أسوأ الاحتمالات. أحدد نقاط اتخاذ القرار المرتبطة بالموارد والوقت والجودة، ثم أعدّل التسلسل أو توزيع الجهود بما يضمن الوصول إلى المرحلة الحاسمة بأعلى جاهزية. أبلغ الفريق بالاتجاه الجديد وأربطه بالهدف الأكبر. التفكير بعيد المدى يسمح باتخاذ قرارات مبكرة تمنع تأثير التغيرات على النتائج النهائية.",
-    "pdf_page": 40,
-    "display_question": "أثناء إدارة مشروع طويل الأمد، لاحظت أن موارد المشروع أو الظروف المحيطة قد تؤثر على المرحلة النهائية. كيف تفكر استراتيجياً لضمان اكتمال المشروع؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C5-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "تعمل مع جهات متعددة تختلف في أولوياتها وتفسيراتها للموقف، مما قد يعطّل الوصول إلى رؤية مشتركة. كيف تتعامل مع هذه الفروقات لتوجيه الفريق نحو رؤية استراتيجية موحدة؟",
-    "label": "إدارة اختلاف وجهات النظر في بيئة عمل مشتركة",
-    "sample_answer": "أبدأ بتحديد النقاط المشتركة بين الجهات المختلفة وربطها بالهدف الأكبر للمشروع. ثم أعرض صورة شاملة توضح العلاقات بين العناصر المؤثرة، مع شرح أثر كل قرار على بقية الأطراف. أستخدم تحليلاً مدعومًا بالبيانات لدمج وجهات النظر وتقريبها، ثم أقود النقاش نحو خيارات تعزز الاتجاه الاستراتيجي. هذا الأسلوب يساعد على بناء فهم مشترك وتوجيه الجميع نحو رؤية موحدة.",
-    "pdf_page": 40,
-    "display_question": "تعمل مع جهات متعددة تختلف في أولوياتها وتفسيراتها للموقف، مما قد يعطّل الوصول إلى رؤية مشتركة. كيف تتعامل مع هذه الفروقات لتوجيه الفريق نحو رؤية استراتيجية موحدة؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C5-S7",
-    "number": 7,
-    "type": "scenario",
-    "question": "من وجهة نظرك، ما أهم المتغيرات والفجوات الحالية في دولة الإمارات ضمن نطاق عملك؟ وكيف يمكن التعامل معها بشكل استراتيجي؟",
-    "label": "تحليل بيئة الإمارات",
-    "sample_answer": "تشهد دولة الإمارات مجموعة من المتغيرات تشمل التحول الرقمي المتسارع، وتعاظم دور البيانات والذكاء الاصطناعي، وارتفاع متطلبات كفاءة الخدمات، إضافة إلى الحاجة المستمرة لبناء كوادر قادرة على المنافسة المستقبلية. أما الفجوات فتتركز عادة في سرعة التكيف، ومواءمة المهارات مع احتياجات السوق، وتكامل الأنظمة بين الجهات. التعامل الاستراتيجي معها يتطلب الاستثمار في القدرات البشرية، وتبني حلول تقنية مشتركة، وبناء شراكات مؤسسية تعزز المرونة والجاهزية.",
-    "pdf_page": 41,
-    "display_question": "من وجهة نظرك، ما أهم المتغيرات والفجوات الحالية في دولة الإمارات ضمن نطاق عملك؟ وكيف يمكن التعامل معها بشكل استراتيجي؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C5-S8",
-    "number": 8,
-    "type": "scenario",
-    "question": "ما أبرز المتغيرات الحديثة التي تؤثر على بيئة العمل/الأمن/الاقتصاد/التقنية؟ وكيف تراها تنعكس على دور القائد؟",
-    "label": "المتغيرات الحديثة المؤثرة على القادة",
-    "sample_answer": "تشمل المتغيرات الحديثة التحول الرقمي الشامل، واعتماد الذكاء الاصطناعي، وزيادة الاعتماد على البيانات، وتسارع التغيرات الاقتصادية، وتوسع العمل المشترك بين الجهات. هذه المتغيرات تفرض على القائد أن يكون أكثر مرونة، وأن يمتلك قدرة على اتخاذ قرارات مبنية على البيانات، وأن يقود فرقًا متعددة التخصصات، وأن يطور بيئة تواكب التكنولوجيا. كما تتطلب منه رؤية مستقبلية تمنع الركود وتدفع نحو الابتكار والاستعداد المستمر.",
-    "pdf_page": 41,
-    "display_question": "ما أبرز المتغيرات الحديثة التي تؤثر على بيئة العمل/الأمن/الاقتصاد/التقنية؟ وكيف تراها تنعكس على دور القائد؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C5-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً قمت فيه بتحليل وضع معقد ووضعت خطة واضحة للأولويات. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": "المرشح يجب أن يقدم",
-      "points": [
-        "Situation: الوضع المعقد",
-        "Task: المطلوب منه",
-        "Action: كيف حلل؟ كيف وضع الأولويات؟",
-        "Result: الأثر الفعلي",
-        "Learning: ما الذي تعلمه عن التفكير طويل الأجل"
-      ]
     },
-    "sample_answer": "واجه فريقي مهاماً كثيرة خلال فترة قصيرة. قمت بتحليل كل مهمة وحددت ما هو ضروري وما يمكن تأجيله. النتيجة كانت تحسين الإنتاجية وتقليل الضغط. تعلمت أهمية ترتيب الأولويات بوضوح.",
-    "pdf_page": 41,
-    "display_question": "صف موقفاً قمت فيه بتحليل وضع معقد ووضعت خطة واضحة للأولويات. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C5-B1",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "المرشح يجب أن يقدم",
-      "points": [
-        {
-          "id": "C5-B1-EP1",
-          "text": "Situation: الوضع المعقد"
-        },
-        {
-          "id": "C5-B1-EP2",
-          "text": "Task: المطلوب منه"
-        },
-        {
-          "id": "C5-B1-EP3",
-          "text": "Action: كيف حلل؟ كيف وضع الأولويات؟"
-        },
-        {
-          "id": "C5-B1-EP4",
-          "text": "Result: الأثر الفعلي"
-        },
-        {
-          "id": "C5-B1-EP5",
-          "text": "Learning: ما الذي تعلمه عن التفكير طويل الأجل"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C5-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف كان عليك فيه اتخاذ قرار استراتيجي أدى إلى تغيير مسار العمل أو إعادة توجيه الفريق. كيف فكرت؟ وما النتيجة؟",
-    "label": "سلوكي – أعمق وأكثر تحدياً",
-    "expected_answer_points": {
-      "lead": "يجب أن يظهر المرشح",
-      "points": [
-        "تقييم الاتجاه السابق",
-        "تحليل البدائل",
-        "اتخاذ قرار يدعم الهدف العام",
-        "شرح القرار للفريق",
-        "التأثير على الأداء",
-        "درس استراتيجي مستفاد"
-      ]
+    "sample_answer_seal": {
+      "situation": "ظهرت معلومة جديدة قد تغير اتجاه المشروع كله، والفريق منهمك في تنفيذ الخطة الحالية. علي أن أتعامل معالمعلومة بجدية دون أن أوقف العمل أو أشتت الفريق.",
+      "evaluation": "سأحلل أثر المعلومة على الهدف النهائي أولا: هل تغير الهدف نفسه أم الطريق إليه؟ ثم أفرز الخطة إلى قسمين: ما يجب تعديله فورا، وما يبقى صالحا ويجب الحفاظ عليه. فليس كل تغير في المعطيات يستدعي تغيير الخطة كلها.",
+      "action": "سأعدل ما يلزم فقط، وقد تكفي خطوتان من الخطة. ثم أتواصل معالفريق بوضوح: ما الذي تغير، وما الذي لم يتغير، ولماذا. أبرر التعديل بمنطقه وأربطه بالهدف والاستراتيجية. أعيد ترتيب الأولويات دون إرباك، ويستمر العمل في الأجزاء التي لم تتأثر.",
+      "leadership_impact": "يتجه المشروع الوجهة الصحيحة دون تعطيل، ويحافظ الفريق على تركيزه لأنه فهم سبب التغيير. ويرى الفريق أن قراراتنا تخدم الهدف النهائي، والخطة وسيلة إليه."
     },
-    "sample_answer": "في مشروع كبير لاحظت أن الخطة الحالية تؤدى إلى إضاعة وقت طويل. اقترحت التوجه إلى نموذج تنفيذ أسرع بعد تحليل المخاطر. شرحت التغيير للفريق، وتم تطبيق الخطة الجديدة وحققنا نتائج أفضل. تعلمت أهمية مراجعة المسار عند ظهور مؤشرات جديدة.",
-    "pdf_page": 42,
-    "display_question": "أخبرني عن موقف كان عليك فيه اتخاذ قرار استراتيجي أدى إلى تغيير مسار العمل أو إعادة توجيه الفريق. كيف فكرت؟ وما النتيجة؟",
-    "owner_type": "competency",
-    "competency_id": "C5",
-    "competency_name": "التفكير الاستراتيجي",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C5-B2",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يجب أن يظهر المرشح",
-      "points": [
-        {
-          "id": "C5-B2-EP1",
-          "text": "تقييم الاتجاه السابق"
-        },
-        {
-          "id": "C5-B2-EP2",
-          "text": "تحليل البدائل"
-        },
-        {
-          "id": "C5-B2-EP3",
-          "text": "اتخاذ قرار يدعم الهدف العام"
-        },
-        {
-          "id": "C5-B2-EP4",
-          "text": "شرح القرار للفريق"
-        },
-        {
-          "id": "C5-B2-EP5",
-          "text": "التأثير على الأداء"
-        },
-        {
-          "id": "C5-B2-EP6",
-          "text": "درس استراتيجي مستفاد"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C5-B3",
@@ -2420,11 +1312,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C5-B1",
-    "variant_group": "C5-B1",
-    "learning_status": "alternate",
-    "alternate_of": "C5-B1",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C5-B4",
@@ -2448,11 +1342,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C5-B2",
-    "variant_group": "C5-B2",
-    "learning_status": "alternate",
-    "alternate_of": "C5-B2",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C5-B5",
@@ -2480,7 +1376,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C5-B6",
@@ -2513,7 +1411,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-S1",
@@ -2542,7 +1442,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C6-S1",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -2569,7 +1469,14 @@
           "text": "المتابعة وقياس التحسن"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "أحد أفراد الفريق يؤدي دوره، لكن مهارة معينة تنقصه وتمنعه من أداء أعلى، مثل إعداد التقارير. تطويره جزء من مسؤوليتي كقائد.",
+      "evaluation": "سأحدد المهارة المطلوبة بدقة، فوصف عام مثل «أداؤه ضعيف» لا يصلح أساسا لخطة. ثم أحتاج أن أفهم الصعوبة منه هو: ما الذي يتعثر فيه بالضبط، ولماذا. لأن نوع الدعم المناسب يتبع سبب الفجوة.",
+      "action": "سأجلس معه وأناقشه، ونحدد معا نقاط الضعف. نضع خطة تطوير بسيطة على مراحل. أوفر له الدعم المناسب: تدريب قصير، مع وقت أخصصه لتوجيهه شخصيا. وأتابعه أسبوعيا بتغذية راجعة واضحة، وأقيس تحسنه في المهارة نفسها مرحلة بعد مرحلة.",
+      "leadership_impact": "يتحسن أداء الفرد بوضوح، ويصبح مهيأ لتحمل مسؤوليات إضافية. ويرى الفريق أن فجوة المهارة تعالج بالتوجيه والمتابعة، وهذا يبني بيئة تعلم مستمرة."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C6-S2",
@@ -2599,7 +1506,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C6-S2",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -2630,233 +1537,14 @@
           "text": "متابعة التحسن والتعديل عند الحاجة"
         }
       ]
-    }
-  },
-  {
-    "id": "C6-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "لاحظت أن أحد أفراد الفريق يحتاج إلى تطوير مهارة أساسية ليتمكن من أداء دوره بكفاءة أعلى. كيف تتعامل مع الموقف؟",
-    "label": "تطوير مهارة فردية داخل فريق عمل أو تدريب",
-    "sample_answer": "أبدأ بتحديد المهارة المطلوب تطويرها بدقة من خلال ملاحظة الأداء وسماع وجهة نظر الموظف حول التحديات التي يواجهها. أعقد معه جلسة قصيرة لتحديد الفجوة بين المستوى الحالي والمستوى المطلوب. بعدها أضع خطة تطوير بسيطة ومرحلية تتضمن تدريبًا عمليًا أو توجيهًا مباشرًا، وأوفر له موارد أو شخصًا ذا خبرة لدعمه. أتابع تقدمه بشكل دوري وأقدم تغذية راجعة تساعده على التحسن. هذا الأسلوب استخدمته سابقًا مع أحد الموظفين الجدد وارتفعت جاهزيته خلال فترة قصيرة.",
-    "pdf_page": 46,
-    "display_question": "لاحظت أن أحد أفراد الفريق يحتاج إلى تطوير مهارة أساسية ليتمكن من أداء دوره بكفاءة أعلى. كيف تتعامل مع الموقف؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C6-S1",
-    "variant_group": "C6-S1",
-    "learning_status": "alternate",
-    "alternate_of": "C6-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C6-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "فريقك مقبل على مرحلة تتطلب مهارات جديدة لم يتعامل معها مسبقًا، والوقت محدود. كيف ترفع جاهزيتهم بسرعة وكفاءة؟",
-    "label": "رفع جاهزية فريق كامل في وقت محدود",
-    "sample_answer": "أبدأ بتحليل متطلبات المرحلة الجديدة وتحديد المهارات الأساسية اللازمة. أجري تقييماً سريعًا لمستوى الفريق لتحديد الفجوات. بعدها أصمم برنامج تطوير مكثف يجمع بين التدريب العملي والتوجيه المباشر، مع الاستفادة من الخبرات الداخلية لتسريع العملية. أوزع المهام وفق استعداد كل عضو، بحيث يبدأ الأكثر جاهزية بتطبيق المهام المتقدمة ويدعم الآخرين. أتابع التقدم يوميًا وأجري التعديلات اللازمة لضمان جاهزيتهم قبل الموعد المحدد.",
-    "pdf_page": 47,
-    "display_question": "فريقك مقبل على مرحلة تتطلب مهارات جديدة لم يتعامل معها مسبقًا، والوقت محدود. كيف ترفع جاهزيتهم بسرعة وكفاءة؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C6-S2",
-    "variant_group": "C6-S2",
-    "learning_status": "alternate",
-    "alternate_of": "C6-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C6-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء تنفيذ مهام تشغيلية أو مشروعات مستمرة، لاحظت أن بعض الموظفين يفتقرون لمهارات أساسية تؤثر على جودة العمل. كيف تطور مهاراتهم دون التأثير على وتيرة الإنجاز؟",
-    "label": "تطوير قدرات فريق أثناء ضغط العمل",
-    "sample_answer": "أدمج التدريب العملي القصير في سياق العمل اليومي عبر توجيه مباشر خلال المهام الفعلية. أحدد لكل فرد نقطة تطوير معينة يتم التركيز عليها في كل دورة عمل. بعد انتهاء المهمة أخصص وقتًا قصيرًا لمراجعة ما تم تعلمه. هذا الأسلوب يرفع المهارات تدريجيًا دون تعطيل سير العمل.",
-    "pdf_page": 47,
-    "display_question": "أثناء تنفيذ مهام تشغيلية أو مشروعات مستمرة، لاحظت أن بعض الموظفين يفتقرون لمهارات أساسية تؤثر على جودة العمل. كيف تطور مهاراتهم دون التأثير على وتيرة الإنجاز؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C6-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "لديك مجموعة من المدربين أو الموظفين الذين تختلف مستويات خبراتهم، وهناك حاجة لتطوير جاهزيتهم لرفع جودة التدريب أو الخدمات. كيف تتعامل مع الموقف؟",
-    "label": "تطوير فريق تدريبي كامل داخل مؤسسة تعليمية أو تدريبية",
-    "sample_answer": "أبدأ بمسح شامل لمهارات كل مدرب عبر التقييم العملي ومراجعة أسلوبه في الشرح والتعامل. بعدها أضع خطة تطوير جماعية تشمل وحدات تدريبية قصيرة في مهارات العرض، إدارة النقاش، التقييم، وأساليب التدريب الحديثة. ثم أعد خطة تطوير فردية لكل مدرب وفق نقاط قوته وضعفه. أتابع تقدمهم من خلال حضور جلساتهم التدريبية وتقديم تغذية راجعة مباشرة. وفي النهاية أوجه كل منهم لمسار تخصصي متقدم يناسب قدراته وطموحه.",
-    "pdf_page": 47,
-    "display_question": "لديك مجموعة من المدربين أو الموظفين الذين تختلف مستويات خبراتهم، وهناك حاجة لتطوير جاهزيتهم لرفع جودة التدريب أو الخدمات. كيف تتعامل مع الموقف؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C6-S7",
-    "number": 7,
-    "type": "scenario",
-    "question": "كيف تقود عملية تطوير فريقك؟ وما الأساليب التي تعتمدها لرفع جاهزيتهم وتحسين أدائهم؟",
-    "sample_answer": "أبدأ بتحديد احتياجات كل فرد في الفريق عبر الملاحظة المباشرة والتغذية الراجعة. بعدها أضع خطة تطوير فردية وجماعية تشمل التدريب العملي، التوجيه المباشر، وإتاحة الفرص لتحمل مسؤوليات تدريجية. أحرص على خلق بيئة تعلم مستمرة مبنية على التحفيز وليس الانتقاد. أتابع التقدم بشكل دوري وأجري التعديلات اللازمة لضمان أن التطوير ينعكس على الأداء الفعلي. هذا الأسلوب أثبت فعاليته في بناء فرق أكثر جاهزية وثقة.",
-    "pdf_page": 47,
-    "display_question": "كيف تقود عملية تطوير فريقك؟ وما الأساليب التي تعتمدها لرفع جاهزيتهم وتحسين أدائهم؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C6-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً ساعدت فيه أحد أفراد فريقك على تطوير مهارة أو تجاوز ضعف معين. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": null,
-      "points": [
-        "Situation: وصف الضعف",
-        "Task: دور المرشح",
-        "Action: خطة التطوير",
-        "Result: التحسن",
-        "Learning: الدرس المستفاد"
-      ]
     },
-    "sample_answer": "واجه أحد الأعضاء صعوبة في تنظيم العمل. وضعت معه خطة أسبوعية وحددت معه أولويات واضحة. النتيجة كانت تحسناً كبيراً في التزامه بالمواعيد. تعلمت أن الدعم المستمر يصنع فرقاً كبيراً.",
-    "pdf_page": 48,
-    "display_question": "صف موقفاً ساعدت فيه أحد أفراد فريقك على تطوير مهارة أو تجاوز ضعف معين. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C6-B1",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": null,
-      "points": [
-        {
-          "id": "C6-B1-EP1",
-          "text": "Situation: وصف الضعف"
-        },
-        {
-          "id": "C6-B1-EP2",
-          "text": "Task: دور المرشح"
-        },
-        {
-          "id": "C6-B1-EP3",
-          "text": "Action: خطة التطوير"
-        },
-        {
-          "id": "C6-B1-EP4",
-          "text": "Result: التحسن"
-        },
-        {
-          "id": "C6-B1-EP5",
-          "text": "Learning: الدرس المستفاد"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C6-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف عملت فيه على تطوير جاهزية الفريق ككل — لا فرد واحد — للتعامل مع مرحلة أو مشروع جديد. ما الخطوات التي اتخذتها؟",
-    "label": "سلوكي – أعمق وأكثر تحدياً",
-    "expected_answer_points": {
-      "lead": "يجب أن يوضح المرشح",
-      "points": [
-        "تحليل الفجوة الجماعية",
-        "تصميم برنامج تطوير مناسب",
-        "إشراك الفريق",
-        "تخصيص أدوار ومسارات تعلم",
-        "المتابعة والتقييم",
-        "الأثر النهائي"
-      ]
+    "sample_answer_seal": {
+      "situation": "الفريق مقبل على مرحلة تحتاج مهارات لم تكن من عمله سابقا، كمرحلة تقنية جديدة، والوقت محدود. المطلوب جاهزية كافية للمرحلة في وقت قصير.",
+      "evaluation": "سأحدد أولا المهارات التي تتطلبها المرحلة بالضبط. ثم أقيم مستوى الفريق الحالي فيها لأعرف الفجوة عند كل عضو. بهذا أعرف أين أركز: أي المهارات لا تبدأ المرحلة دونها، ومن الأقرب إلى الجاهزية ومن يحتاج دعما أكثر.",
+      "action": "سأصمم برنامج تطوير سريعا ومركزا على الفجوات المحددة فقط، مثل تدريب مكثف لأسبوعين. أستعين بأصحاب الخبرة داخل الفريق لنقل معرفتهم، وبخبرة خارجية عند الحاجة. أوزع أدوار المرحلة بحسب استعداد كل عضو. وأتابع التحسن، وأعدل البرنامج أو توزيع الأدوار إن لزم.",
+      "leadership_impact": "يدخل الفريق المرحلة الجديدة دون تأخير وهو قادر على مهامها. ويكتسب مهارات تبقى معه بعد هذه المرحلة، وهذا استثمار في أداء الفريق على المدى الطويل."
     },
-    "sample_answer": "واجه فريقي مرحلة تتطلب مهارات تحليل بيانات. قيمت مستوى الجميع، ثم صممت برنامج تدريب داخلي عبر جلسات قصيرة، ووزعت الأدوار حسب قوة كل عضو. لاحقاً أصبح الفريق قادراً على إدارة المرحلة بثقة. تعلمت أهمية التطوير الجماعي.",
-    "pdf_page": 48,
-    "display_question": "أخبرني عن موقف عملت فيه على تطوير جاهزية الفريق ككل — لا فرد واحد — للتعامل مع مرحلة أو مشروع جديد. ما الخطوات التي اتخذتها؟",
-    "owner_type": "competency",
-    "competency_id": "C6",
-    "competency_name": "تطوير المهارات",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C6-B2",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يجب أن يوضح المرشح",
-      "points": [
-        {
-          "id": "C6-B2-EP1",
-          "text": "تحليل الفجوة الجماعية"
-        },
-        {
-          "id": "C6-B2-EP2",
-          "text": "تصميم برنامج تطوير مناسب"
-        },
-        {
-          "id": "C6-B2-EP3",
-          "text": "إشراك الفريق"
-        },
-        {
-          "id": "C6-B2-EP4",
-          "text": "تخصيص أدوار ومسارات تعلم"
-        },
-        {
-          "id": "C6-B2-EP5",
-          "text": "المتابعة والتقييم"
-        },
-        {
-          "id": "C6-B2-EP6",
-          "text": "الأثر النهائي"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C6-B3",
@@ -2880,11 +1568,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C6-B1",
-    "variant_group": "C6-B1",
-    "learning_status": "alternate",
-    "alternate_of": "C6-B1",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B4",
@@ -2908,11 +1598,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C6-B2",
-    "variant_group": "C6-B2",
-    "learning_status": "alternate",
-    "alternate_of": "C6-B2",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B5",
@@ -2940,7 +1632,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B6",
@@ -2968,7 +1662,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B7",
@@ -2994,9 +1690,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C6-B9",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B8",
@@ -3022,9 +1720,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C6-B5",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B9",
@@ -3058,7 +1758,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C6-B10",
@@ -3089,9 +1791,11 @@
     "rubric_mode": "star_l",
     "variant_of": null,
     "variant_group": null,
-    "learning_status": "alternate",
-    "alternate_of": "C6-B6",
-    "expected_points": null
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C7-S1",
@@ -3121,7 +1825,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C7-S1",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -3152,7 +1856,14 @@
           "text": "بدء التنفيذ دون ارتباك"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "الجهة العليا غيرت خطة العمل فجأة، وفريقي كان جاهزا لتنفيذ الخطة السابقة. المطلوب أن ننتقل إلى الخطة الجديدة بسرعة ودون تعطيل.",
+      "evaluation": "خطوتي الأولى أن أفهم التغيير نفسه بوضوح قبل أن أنقله: ما المطلوب الآن بالضبط، وما الذي ألغي. ثم أقيم أثره على العمل الجاري: ما الذي يتوقف، وما الذي يستمر، وما الذي تتغير أولويته. فإن نقلت التغيير للفريق قبل أن أفهمه نقلت معه الارتباك.",
+      "action": "سأعدل الأولويات بسرعة بناء على هذا التقييم. ثم أجمعالفريق فورا وأشرح المطلوب الجديد بوضوح وهدوء. أهدئ قلقهم، وأوضح الخطوة التالية لكل منهم. ونحدد معا أول الخطوات ومن ينفذها، ونبدأ التنفيذ مباشرة.",
+      "leadership_impact": "ينتقل الفريق إلى الخطة الجديدة بسالسة ودون توقف. ويأخذ من هدوئي واتزاني أن التغيير المفاجئ يدار بإعادة ترتيب الأولويات لا بالارتباك، فيحافظ على أدائه."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C7-S2",
@@ -3183,7 +1894,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C7-S2",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -3218,233 +1929,14 @@
           "text": "استخراج الدروس"
         }
       ]
-    }
-  },
-  {
-    "id": "C7-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "تفاجأت بصدور توجيه جديد من الإدارة العليا بتغيير خطة العمل المعتمدة، بينما كان فريقك مستعدًا لتنفيذ الخطة السابقة. ما الخطوة الأولى التي ستقوم بها لضمان التكيف بسرعة دون تعطيل؟",
-    "label": "التكيف مع تغيير مفاجئ من الإدارة العليا",
-    "sample_answer": "أول خطوة أقوم بها هي فهم التوجيه الجديد بدقة وتحديد ما الذي تغيّر وما الذي بقي ثابتًا. بعدها أقيم أثر التغيير على العمل الجاري وأحدد الأولويات التي يجب تعديلها فورًا. أجمع الفريق سريعًا لشرح التغيير بلغة واضحة وهادئة لتخفيف القلق، ثم أوضح الخطوة التالية المطلوبة منهم بدقة. أعيد توزيع المهام بما يتناسب مع الوضع الجديد وأبدأ التنفيذ مباشرة مع متابعة لصيقة للتأكد من ثبات التغيير. هذا الأسلوب جربته سابقًا في عدة مشاريع انتقالية وحقق انتقالاً سلسًا دون تعطيل.",
-    "pdf_page": 54,
-    "display_question": "تفاجأت بصدور توجيه جديد من الإدارة العليا بتغيير خطة العمل المعتمدة، بينما كان فريقك مستعدًا لتنفيذ الخطة السابقة. ما الخطوة الأولى التي ستقوم بها لضمان التكيف بسرعة دون تعطيل؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C7-S1",
-    "variant_group": "C7-S1",
-    "learning_status": "alternate",
-    "alternate_of": "C7-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C7-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "أثناء مرحلة حرجة من مشروع مهم، حدث ظرف خارجي أدى إلى نقص الموارد أو تغيير كبير في المتطلبات. كيف تعيد ضبط الخطة وتضمن استمرار العمل بأقل خسائر؟",
-    "label": "نقص مفاجئ في الموارد أو تغيير جذري في المتطلبات",
-    "sample_answer": "أبدأ بتحليل تأثير التغيير على الهدف النهائي للمشروع وليس على خطوة واحدة منه فقط. أحدد أولاً المهام الحرجة التي لا يمكن المساس بها، ثم أعيد ترتيب الأولويات بما يلائم الموارد المتاحة. بعدها أبتكر حلولاً بديلة، مثل تعديل طريقة التنفيذ أو استخدام موارد داخلية بديلة. أتواصل مع الفريق لشرح الوضع وتوضيح سبب التعديلات، ثم أتابع التنفيذ عن قرب لضمان استقرار الأداء. بعد تجاوز المرحلة، أوثق الدروس لتطوير قدرة الفريق على التكيف مستقبلاً.",
-    "pdf_page": 55,
-    "display_question": "أثناء مرحلة حرجة من مشروع مهم، حدث ظرف خارجي أدى إلى نقص الموارد أو تغيير كبير في المتطلبات. كيف تعيد ضبط الخطة وتضمن استمرار العمل بأقل خسائر؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C7-S2",
-    "variant_group": "C7-S2",
-    "learning_status": "alternate",
-    "alternate_of": "C7-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C7-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء العمل على مشروع أو نشاط تشغيلي ميداني، طرأت ظروف جديدة سريعة التغيّر جعلت الخطة الأصلية غير مناسبة. ماذا تفعل؟",
-    "label": "ظرف تشغيلي مفاجئ يفرض تعديل الخطة",
-    "sample_answer": "أحافظ على هدوئي أولاً، ثم أقيم سرعة التغيير وتأثيره على جودة التنفيذ. أعدل خطة العمل أو آلية التنفيذ بما يرفع هامش الأمان ويحافظ على الهدف. أعيد توزيع المهام على الفريق للتعامل مع الوضع الجديد وأفعّل خطط الطوارئ إذا لزم الأمر. بعد السيطرة على الوضع، أبلغ الإدارة بالتحديثات. الهدف هو التكيف السريع دون فقدان السيطرة أو الإضرار بجودة العمل.",
-    "pdf_page": 55,
-    "display_question": "أثناء العمل على مشروع أو نشاط تشغيلي ميداني، طرأت ظروف جديدة سريعة التغيّر جعلت الخطة الأصلية غير مناسبة. ماذا تفعل؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C7-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "أثناء تنفيذ برنامج تدريبي أو مشروع تطويري، صدر توجيه بتغيير طريقة التقييم أو مخرجات المشروع بشكل مفاجئ. كيف تتكيف وتضمن تنفيذ التغيير دون التأثير على جودة الناتج؟",
-    "label": "تغيير مفاجئ في متطلبات برنامج تدريبي أو مشروع تطوير",
-    "sample_answer": "أبدأ بتحليل التوجيه الجديد لمعرفة تأثيره على المخرجات. بعدها أعدل الخطة بسرعة عبر مواءمة عناصر التقييم أو العمل الجديد مع ما تم إنجازه فعليًا. أتواصل مع الفريق لشرح التغيير بوضوح وتقديم نماذج وإرشادات جاهزة لتخفيف الارتباك. أتابع التنفيذ من خلال حضور جزئي أو تقارير قصيرة للتأكد من ثبات الجودة. بعد انتهاء المرحلة، أجري مراجعة تقييمية لضمان أن التغيير لم يؤثر على العدالة أو الجودة.",
-    "pdf_page": 55,
-    "display_question": "أثناء تنفيذ برنامج تدريبي أو مشروع تطويري، صدر توجيه بتغيير طريقة التقييم أو مخرجات المشروع بشكل مفاجئ. كيف تتكيف وتضمن تنفيذ التغيير دون التأثير على جودة الناتج؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C7-S7",
-    "number": 7,
-    "type": "scenario",
-    "question": "كنت قائداً لفريق خلال مهمة خارجية ولاحظت انخفاض معنوياتهم. ما الإجراءات التي تتخذها لاستعادة توازنهم النفسي وتحفيزهم؟",
-    "sample_answer": "أبدأ بتحديد أسباب انخفاض المعنويات من خلال ملاحظات مباشرة وحوارات فردية قصيرة لمعرفة ما إذا كان الأمر متعلقًا بالضغط، أو الغربة، أو ضبابية التوجيهات. بعدها أعقد لقاءً هادئًا أقدم فيه توضيحًا للمرحلة الحالية وأبرز دور كل فرد وتأثيره على نجاح المهمة. أخلق سلسلة أهداف قصيرة تعطي إحساسًا بالإنجاز السريع، وأوفر بيئة دعم نفسي عبر تشجيع التواصل الداخلي بين الفريق. أظهر حضورًا قياديًا مستمرًا لأكون قريبًا منهم، وأحتفي بأي تقدم. هذه الإجراءات تعيد الثقة، وتخفف التوتر، وترفع جاهزية الفريق.",
-    "pdf_page": 56,
-    "display_question": "كنت قائداً لفريق خلال مهمة خارجية ولاحظت انخفاض معنوياتهم. ما الإجراءات التي تتخذها لاستعادة توازنهم النفسي وتحفيزهم؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C7-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً اضطررت فيه إلى تعديل خطتك الأصلية بسبب ظرف مفاجئ. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": "يجب أن تشمل الإجابة",
-      "points": [
-        "Situation: التغيير المفاجئ",
-        "Task: مسؤولية التعديل",
-        "Action: كيف تم تعديل الخطة؟",
-        "Result: أثر الخطوة",
-        "Learning: الدرس المستفاد"
-      ]
     },
-    "sample_answer": "تغير موعد تسليم المهمة بشكل مفاجئ. عدّلت الخطة وركزت على أولويات التنفيذ، ونسقت مع الفريق لتوزيع المهام بسرعة. تم الالتزام بالموعد. تعلمت أهمية إعادة ترتيب الأولويات فوراً.",
-    "pdf_page": 56,
-    "display_question": "صف موقفاً اضطررت فيه إلى تعديل خطتك الأصلية بسبب ظرف مفاجئ. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C7-B1",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يجب أن تشمل الإجابة",
-      "points": [
-        {
-          "id": "C7-B1-EP1",
-          "text": "Situation: التغيير المفاجئ"
-        },
-        {
-          "id": "C7-B1-EP2",
-          "text": "Task: مسؤولية التعديل"
-        },
-        {
-          "id": "C7-B1-EP3",
-          "text": "Action: كيف تم تعديل الخطة؟"
-        },
-        {
-          "id": "C7-B1-EP4",
-          "text": "Result: أثر الخطوة"
-        },
-        {
-          "id": "C7-B1-EP5",
-          "text": "Learning: الدرس المستفاد"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C7-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف واجه فيه فريقك ارتباكاً أو توتراً نتيجة تغيير كبير، وكان عليك أن تقود عملية التكيف. كيف تعاملت مع الموقف؟",
-    "label": "سلوكي – أعمق وأكثر تحدياً",
-    "expected_answer_points": {
-      "lead": "يجب أن يوضح المرشح",
-      "points": [
-        "إدارة التوتر داخل الفريق",
-        "توضيح الصورة العامة",
-        "تعديل الأسلوب الشخصي حسب الحاجة",
-        "توجيه الفريق بخطوات عملية",
-        "متابعة الأداء",
-        "الأثر النهائي"
-      ]
+    "sample_answer_seal": {
+      "situation": "في مرحلة حرجة من مشروع مهم طرأ ظرف خارجي غير المعطيات بالكامل، كنقص مفاجئ في الموارد. الخطة التي نعمل بها لم تعد تطابق الواقع، والعمل يجب ألا يتوقف.",
+      "evaluation": "سأحلل أثر التغيير على الهدف العام: ما الذي ما زال ممكنا، وما الذي صار مهددا. ثم أحدد المهام التي يجب تعديلها فورا وأفصلها عن التي تستمر كما هي. وأقدر بواقعية المخاطر والخيارات المتاحة أمامي.",
+      "action": "سأعيد ترتيب الأولويات وأوجه الموارد المتاحة إلى المهام الحرجة. أبحث عن حلول بديلة سريعة تغطي النقص، ولا أتمسك بطريقة واحدة. أتواصل معالفريق بوضوح لأهيئه للانتقال: ما الذي تغير، وما دور كل فرد الآن. ثم أتابع التنفيذ حتى يثبت الوضع الجديد، وأستخرج الدروس بعد انتهاء المرحلة.",
+      "leadership_impact": "يستمر التقدم بأقل خسائر، ويبقى الهدف النهائي قائما مع تغير الخطة. ويحافظ الفريق على أدائه، ويخرج بدروس تفيده عند التغيير القادم."
     },
-    "sample_answer": "واجه الفريق تغييراً في نظام العمل، مما سبب ارتباكاً كبيراً. تواصلت معهم لشرح النظام الجديد، وخصصت وقتاً للتدريب، ورافقتهم خطوة بخطوة حتى استقر الأداء. تعلمت أهمية الهدوء والوضوح في قيادة التغيير.",
-    "pdf_page": 56,
-    "display_question": "أخبرني عن موقف واجه فيه فريقك ارتباكاً أو توتراً نتيجة تغيير كبير، وكان عليك أن تقود عملية التكيف. كيف تعاملت مع الموقف؟",
-    "owner_type": "competency",
-    "competency_id": "C7",
-    "competency_name": "القدرة على التكيف",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C7-B2",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يجب أن يوضح المرشح",
-      "points": [
-        {
-          "id": "C7-B2-EP1",
-          "text": "إدارة التوتر داخل الفريق"
-        },
-        {
-          "id": "C7-B2-EP2",
-          "text": "توضيح الصورة العامة"
-        },
-        {
-          "id": "C7-B2-EP3",
-          "text": "تعديل الأسلوب الشخصي حسب الحاجة"
-        },
-        {
-          "id": "C7-B2-EP4",
-          "text": "توجيه الفريق بخطوات عملية"
-        },
-        {
-          "id": "C7-B2-EP5",
-          "text": "متابعة الأداء"
-        },
-        {
-          "id": "C7-B2-EP6",
-          "text": "الأثر النهائي"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C7-B3",
@@ -3468,11 +1960,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C7-B1",
-    "variant_group": "C7-B1",
-    "learning_status": "alternate",
-    "alternate_of": "C7-B1",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C7-B4",
@@ -3496,11 +1990,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C7-B2",
-    "variant_group": "C7-B2",
-    "learning_status": "alternate",
-    "alternate_of": "C7-B2",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C7-B5",
@@ -3528,7 +2024,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C7-B6",
@@ -3555,7 +2053,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C8-S1",
@@ -3586,7 +2086,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C8-S1",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -3621,7 +2121,14 @@
           "text": "مراجعة الخطة قبل تنفيذها"
         }
       ]
-    }
+    },
+    "sample_answer_seal": {
+      "situation": "مهمة جديدة تحتاج خطة عمل، والوقت المتاح لإلعداد محدود. المطلوب خطة واضحة يمكن البدء بها فورا.",
+      "evaluation": "سأجمعالمعلومات الأساسية بسرعة، وأتأكد أنني أفهم الهدف النهائي بدقة: ما النتيجة المطلوبة، ومتى. ثم أنظر في ما أملكه من موارد وأفراد، وفي التحديات التي قد تعترض التنفيذ. ضيق الوقت يجعلني أقتصر على ما تحتاجه الخطة فعلا.",
+      "action": "سأقسم المهمة إلى مراحل قصيرة وخطوات واضحة بتسلسل منطقي، وأحدد ما ينفذ أولا. أوزع المهام والموارد على الأفراد بحسب خبراتهم. أضع جدولا زمنيا بسيطا لكل مرحلة، مع بديل للتحدي الأكثر احتمالا. ثم أراجع الخطة قبل البدء لأتأكد من ترابطها.",
+      "leadership_impact": "يبدأ الفريق العمل فورا وكل يعرف دوره وموعده. وتصبح الخطة مرجعا أتابع به التنفيذ وأقيم النتائج بانتظام."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C8-S2",
@@ -3652,7 +2159,7 @@
     "linked_competencies": [],
     "rubric_mode": "seal",
     "variant_of": null,
-    "variant_group": "C8-S2",
+    "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
     "expected_points": {
@@ -3687,238 +2194,14 @@
           "text": "متابعة التنفيذ بشكل لصيق"
         }
       ]
-    }
-  },
-  {
-    "id": "C8-S3",
-    "number": 3,
-    "type": "scenario",
-    "question": "طُلب منك إعداد خطة عمل لمهمة جديدة، والوقت المتاح محدود. ما الخطوات الأساسية التي ستتبعها لضمان إعداد خطة واضحة وقابلة للتنفيذ؟",
-    "label": "إعداد خطة عمل بسرعة \"تشغيل / تدريب / تخطيط \"",
-    "sample_answer": "أبدأ بجمع المعلومات الأساسية بسرعة من المصادر المتاحة، ثم أحدد الهدف النهائي بدقة وبصياغة قابلة للقياس. أقسم المهمة إلى مراحل واضحة، وأرتب الأولويات بناءً على تأثير كل مرحلة على النتيجة النهائية. بعدها أوزع الأدوار على الفريق وفق خبرات كل فرد، وأحدد الموارد المطلوبة بدقة. أضع جدولاً زمنيًا مختصرًا يوضح نقاط التقدم الرئيسية. قبل بدء التنفيذ، أجري مراجعة قصيرة مع الفريق للتأكد من فهم الجميع ولضمان مواءمة الخطة مع الواقع. هذا الأسلوب استخدمته في إعداد خطط تدريبية وتطويرية عديدة، وكان يضمن انطلاقة منظمة مهما كان الوقت محدودًا.",
-    "pdf_page": 61,
-    "display_question": "طُلب منك إعداد خطة عمل لمهمة جديدة، والوقت المتاح محدود. ما الخطوات الأساسية التي ستتبعها لضمان إعداد خطة واضحة وقابلة للتنفيذ؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C8-S1",
-    "variant_group": "C8-S1",
-    "learning_status": "alternate",
-    "alternate_of": "C8-S1",
-    "expected_points": null
-  },
-  {
-    "id": "C8-S4",
-    "number": 4,
-    "type": "scenario",
-    "question": "أثناء تنفيذ خطة عمل معقدة، اكتشفت تناقضات بين المعلومات المتوفرة والواقع العملي، مما قد يؤثر على النتائج. كيف ستعيد التحليل وتعدل الخطة دون تعطيل التنفيذ؟",
-    "label": "التناقض بين الخطة والواقع – تشغيلي / استراتيجي",
-    "sample_answer": "أبدأ بتحليل مصدر التناقض وتحديد نطاق تأثيره على الخطة. أعدل فقط البنود المتأثرة دون المساس بالخطة الأساسية لتجنب تعطيل التنفيذ. أعيد حساب البدائل وفق البيانات الجديدة، ثم أطبق مسارًا معدلاً يناسب الواقع. أتواصل مع الفريق لشرح التعديلات وأسبابها، مع توضيح الخطوة التالية المطلوبة منهم. بعد التطبيق، أتابع التنفيذ بشكل لصيق لضمان ثبات التغيير. استخدمت هذا الأسلوب في عدة مشاريع تطويرية، وكان يحافظ على دقة التنفيذ دون إرباك الفريق.",
-    "pdf_page": 61,
-    "display_question": "أثناء تنفيذ خطة عمل معقدة، اكتشفت تناقضات بين المعلومات المتوفرة والواقع العملي، مما قد يؤثر على النتائج. كيف ستعيد التحليل وتعدل الخطة دون تعطيل التنفيذ؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": "C8-S2",
-    "variant_group": "C8-S2",
-    "learning_status": "alternate",
-    "alternate_of": "C8-S2",
-    "expected_points": null
-  },
-  {
-    "id": "C8-S5",
-    "number": 5,
-    "type": "scenario",
-    "question": "أثناء تنفيذ مشروع تشغيلي أو تطويري، ظهرت ظروف جديدة تختلف عن التقديرات السابقة. كيف تتعامل مع هذا التغير في التخطيط؟",
-    "label": "تخطيط أثناء ظروف متغيرة",
-    "sample_answer": "أعيد تقييم خطة التنفيذ بناءً على المستجدات، وأحدد نقاط اتخاذ القرار المرتبطة بالمتغيرات الجديدة. أضع بدائل جاهزة إذا تطور الوضع، مثل تعديل آلية التنفيذ أو إعادة ترتيب العناصر الحرجة. أتواصل مع الفريق لشرح التحديثات بوضوح، وأتابع الأداء لضمان الاستقرار. الهدف هو الحفاظ على الاتجاه العام للمشروع دون اتخاذ مخاطر غير محسوبة.",
-    "pdf_page": 61,
-    "display_question": "أثناء تنفيذ مشروع تشغيلي أو تطويري، ظهرت ظروف جديدة تختلف عن التقديرات السابقة. كيف تتعامل مع هذا التغير في التخطيط؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C8-S6",
-    "number": 6,
-    "type": "scenario",
-    "question": "خلال مرحلة تصميم برنامج تدريبي، اكتشفت بأن مستوى المتدربين الفعلي يختلف عن البيانات الواردة. كيف تعيد ضبط الخطة التدريبية؟",
-    "label": "تخطيط تدريبي مع بيانات غير دقيقة",
-    "sample_answer": "أبدأ بإعادة تقييم مستوى المتدربين باستخدام اختبارات قصيرة أو تقييمات أولية. بناءً على ذلك، أعيد مواءمة الخطة التدريبية مع المستوى الحقيقي وليس المفترض. أعدل زمن الشرح ونوعية التطبيقات ومحتوى التمارين العملية. أبلغ فريق التدريب بالتعديلات وأوضح أثرها على جودة النتائج. هذه الطريقة تضمن مخرجات دقيقة وواقعية.",
-    "pdf_page": 62,
-    "display_question": "خلال مرحلة تصميم برنامج تدريبي، اكتشفت بأن مستوى المتدربين الفعلي يختلف عن البيانات الواردة. كيف تعيد ضبط الخطة التدريبية؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C8-S7",
-    "number": 7,
-    "type": "scenario",
-    "question": "كيف تقوم بتقييم وتحديد مواطن القصور عند حدوث مشكلة أو إخفاق في العمل؟ وما الخطوات التي تتبعها لتحليلها؟",
-    "sample_answer": "أبدأ بجمع الحقائق المتعلقة بالموقف دون تبني أي افتراضات، ثم أستخدم تحليل الأسباب الجذرية لتحديد أين وقع الخلل: هل في التخطيط، التنفيذ، التواصل، أو في توزيع المسؤوليات. بعد ذلك أقيّم أثر القصور على النتائج النهائية، وأقارن بين المطلوب وما تم تحقيقه فعليًا. أضع خطة تصحيح تشمل تعديلات فورية على الإجراءات، وأخرى طويلة المدى لمنع تكرار المشكلة. أتابع تطبيق الخطة وأجري مراجعة لاحقة للتأكد من أن الإجراءات التصحيحية كانت فعّالة.",
-    "pdf_page": 62,
-    "display_question": "كيف تقوم بتقييم وتحديد مواطن القصور عند حدوث مشكلة أو إخفاق في العمل؟ وما الخطوات التي تتبعها لتحليلها؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "seal",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "C8-B1",
-    "number": 1,
-    "type": "behavioural",
-    "question": "صف موقفاً قمت فيه بتحليل مشكلة معقدة ووضع خطة عملية لمعالجتها. ماذا فعلت؟",
-    "label": "سلوكي – بسيط وواضح",
-    "expected_answer_points": {
-      "lead": "يتوقع أن يشمل المرشح",
-      "points": [
-        "Situation: وصف المشكلة",
-        "Task: دوره في التحليل",
-        "Action: جمع البيانات– تحليل – وضع خطة",
-        "Result: تأثير الخطة",
-        "Learning: الدرس المستفاد"
-      ]
     },
-    "sample_answer": "واجهنا خللاً متكرراً في سير العمل. جمعت البيانات، وحددت السبب الرئيس، وصممت خطة تصحيح. النتيجة: انخفاض الأخطاء. تعلمت أهمية التحليل الدقيق قبل اتخاذ الإجراء.",
-    "pdf_page": 62,
-    "display_question": "صف موقفاً قمت فيه بتحليل مشكلة معقدة ووضع خطة عملية لمعالجتها. ماذا فعلت؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C8-B1",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يتوقع أن يشمل المرشح",
-      "points": [
-        {
-          "id": "C8-B1-EP1",
-          "text": "Situation: وصف المشكلة"
-        },
-        {
-          "id": "C8-B1-EP2",
-          "text": "Task: دوره في التحليل"
-        },
-        {
-          "id": "C8-B1-EP3",
-          "text": "Action: جمع البيانات– تحليل – وضع خطة"
-        },
-        {
-          "id": "C8-B1-EP4",
-          "text": "Result: تأثير الخطة"
-        },
-        {
-          "id": "C8-B1-EP5",
-          "text": "Learning: الدرس المستفاد"
-        }
-      ]
-    }
-  },
-  {
-    "id": "C8-B2",
-    "number": 2,
-    "type": "behavioural",
-    "question": "أخبرني عن موقف واجهت فيه مهمة متعددة العناصر وكان عليك تنظيمها وتخطيطها بشكل منهجي لضمان التنفيذ دون أخطاء. كيف تعاملت مع الأمر؟",
-    "label": "سلوكي – أعمق وأكثر تحدياً",
-    "expected_answer_points": {
-      "lead": "يجب أن يظهر المرشح",
-      "points": [
-        "تحليل العناصر المتداخلة",
-        "ترتيب الأولويات",
-        "تصميم خطة تفصيلية",
-        "استخدام أدوات التنظيم",
-        "متابعة دقيقة للتنفيذ",
-        "النتيجة النهائية",
-        "التعلم"
-      ]
+    "sample_answer_seal": {
+      "situation": "أثناء تنفيذ خطة معقدة اكتشفت أن المعلومات التي بنيت عليها لا تطابق الواقع العملي في بعض الجوانب. إن استمررنا دون تصحيح تأثرت النتائج، وإن أوقفنا كل شيء تعطل التنفيذ.",
+      "evaluation": "سأراجع بسرعة مصدر التناقض: أين تختلف البيانات عن الواقع، ولماذا. ثم أحدد البنود المتأثرة بالضبط وأفصلها عن البنود السليمة. بهذا أعرف أن المطلوب تعديل جزء من الخطة لا إعادة بنائها.",
+      "action": "سأعدل البنود المتأثرة بناء على المعلومات الجديدة، وأحافظ على الإطار العام للخطة ليستمر العمل في بقية البنود. أبلغ الفريق بالتحديث بوضوح: ما الذي تغير، ولماذا، وما المطلوب من كل فرد. أجهز بدائل إن تطور الموقف. وأتابع التنفيذ عن قرب بعد التعديل.",
+      "leadership_impact": "يستمر التنفيذ دون تعطيل، وتتجاوز المشكلة قبل أن تؤثر في النتائج. ويعمل الفريق على خطة تطابق الواقع، ويرى أن الخطة تتابع وتقيم بانتظام."
     },
-    "sample_answer": "كنت مسؤولاً عن تنظيم فعالية كبيرة ذات عناصر متعددة. قسمت العمل إلى مسارات واضحة، وأنشأت لوحة متابعة، وتابعت التقدم مع الفريق يومياً. تم تنفيذ الحدث دون أخطاء. تعلمت قيمة التخطيط التفصيلي.",
-    "pdf_page": 63,
-    "display_question": "أخبرني عن موقف واجهت فيه مهمة متعددة العناصر وكان عليك تنظيمها وتخطيطها بشكل منهجي لضمان التنفيذ دون أخطاء. كيف تعاملت مع الأمر؟",
-    "owner_type": "competency",
-    "competency_id": "C8",
-    "competency_name": "التحليل المنهجي والتخطيط",
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "star_l",
-    "variant_of": null,
-    "variant_group": "C8-B2",
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": {
-      "lead": "يجب أن يظهر المرشح",
-      "points": [
-        {
-          "id": "C8-B2-EP1",
-          "text": "تحليل العناصر المتداخلة"
-        },
-        {
-          "id": "C8-B2-EP2",
-          "text": "ترتيب الأولويات"
-        },
-        {
-          "id": "C8-B2-EP3",
-          "text": "تصميم خطة تفصيلية"
-        },
-        {
-          "id": "C8-B2-EP4",
-          "text": "استخدام أدوات التنظيم"
-        },
-        {
-          "id": "C8-B2-EP5",
-          "text": "متابعة دقيقة للتنفيذ"
-        },
-        {
-          "id": "C8-B2-EP6",
-          "text": "النتيجة النهائية"
-        },
-        {
-          "id": "C8-B2-EP7",
-          "text": "التعلم"
-        }
-      ]
-    }
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "C8-B3",
@@ -3942,11 +2225,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C8-B1",
-    "variant_group": "C8-B1",
-    "learning_status": "alternate",
-    "alternate_of": "C8-B1",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C8-B4",
@@ -3970,11 +2255,13 @@
     "principle_title": null,
     "linked_competencies": [],
     "rubric_mode": "star_l",
-    "variant_of": "C8-B2",
-    "variant_group": "C8-B2",
-    "learning_status": "alternate",
-    "alternate_of": "C8-B2",
-    "expected_points": null
+    "variant_of": null,
+    "variant_group": null,
+    "learning_status": "primary",
+    "alternate_of": null,
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "C8-B5",
@@ -4002,7 +2289,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "M1-S1",
@@ -4027,7 +2316,14 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": {
+      "situation": "أعضاء في الفريق يترددون في قرارات تقع ضمن صالحياتهم ويرجعون إلي في كل تفصيلة، والوقت ضاغط وأحتاج سرعة في التنفيذ.",
+      "evaluation": "أبدأ بتشخيص سبب التردد: هل هو غموض في الصالحيات، أم خوف من الخطأ، أم تجارب سابقة سلبية؟ وأدرك أن تدخلي في كل تفصيلة يثبت هذا التردد ولا يعالجه.",
+      "action": "أوضح للفريق حدود الصالحيات المتاحة لهم، وأؤكد دعمي لقراراتهم ما دامت منسجمة معالهدف العام. أمتنع عن التدخل في التفاصيل التشغيلية إلا عند الضرورة، وأتابع النتائج بدل مراقبة كل خطوة. حين يتخذ أحدهم قرارا صحيحا أبرزه نموذجا إيجابيا، وحين يقع خطأ أتعامل معه كفرصة تعلم لا كمساءلة عقابية.",
+      "leadership_impact": "تتكون الثقة تدريجيا، ويبدأ الفريق بالتصرف بثقة واستقلالية معالحفاظ على جودة النتائج. وهذه الثقة أساس لنجاح التفويض وشرط للمبادرة وتحمل المسؤولية."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "M1-B1",
@@ -4058,7 +2354,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "M2-S1",
@@ -4082,7 +2380,14 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": {
+      "situation": "الفرق الفرعية تعمل بجهد عال، لكن قراراتها غير متناسقة لأن كل فريق يفهم الهدف والسياق العام فهما مختلفا. الجهد موجود، والاتجاه غير موحد.",
+      "evaluation": "أبدأ بتحديد نقاط الاختالف في الفهم بدقة: أين يختلف فهم كل فريق للهدف، وللقيود، ولمعايير القرار. فالمطلوب تصحيح مواضع الاختالف دون تعطيل التنفيذ.",
+      "action": "أعقد تواصال قصيرا ومركزا معًالفرق المعنية أعرض فيه الصورة الكلية للمهمة: الهدف النهائي، والقيود، والمعايير الحاكمة للقرار. أستخدم لغة بسيطة وأمثلة عملية تربط الأعمال اليومية بالقصد العام. أتحقق من الفهم بأن أطلب من كل فريق تلخيصا قصيرا لما يعنيه الهدف بالنسبة له. ثم أوحد الأولويات، وأوضح نقاط التداخل والتنسيق المطلوبة، وأحدد آلية تواصل سريعة لمعالجة أي التباس الحق.",
+      "leadership_impact": "تتجه الجهود فورا وجهة واحدة، ويتوقف العمل في اتجاهات متباينة. ويصبح لدى الفرق فهم واضح للسياق والهدف والقيود يضمن انسجام جهودها."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "M2-B1",
@@ -4112,7 +2417,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "M3-S1",
@@ -4136,7 +2443,14 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": {
+      "situation": "أقود فريقا في بيئة سريعة التغير، ولا أستطيع متابعة التنفيذ خطوة بخطوة. الفريق سيواجه ظروفا جديدة وأنا غير حاضر، وعليه أن يقرر بنفسه.",
+      "evaluation": "ما يحتاجه الفريق في هذا الوضع هو القصد: ما الذي نريد تحقيقه ولماذا. فإذا فهمه استطاع أن يتصرف تصرفا سليما عند تغير الظروف، ولذلك أوضح القصد ولا أفرض طريقة التنفيذ.",
+      "action": "أشرح الهدف النهائي، ومعايير النجاح، والقيود التي لا يجب تجاوزها، ثم أترك للفريق اختيار أسلوب التنفيذ الأنسب وفق المستجدات. أستخدم أمثلة توضيحية تربط القصد بالنتائج المتوقعة. أتأكد من الفهم بأن يلخص الفريق القصد بلغته. أظهر ثقتي بقدرتهم على التصرف، وأوفر قناة تواصل قصيرة لللأسئلة الحرجة فقط.",
+      "leadership_impact": "يصبح القصد مرجعا لاتخاذ القرار حتى في غياب التوجيه المباشر. ومقياس وضوحه أن يتخذ الفريق قرارات صحيحة ومتسقة معالهدف وأنا غير موجود."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "M3-B1",
@@ -4166,7 +2480,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "M4-S1",
@@ -4191,7 +2507,14 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": {
+      "situation": "مهمة حساسة تتطلب سرعة استجابة، وقرارات فورية على مستويات مختلفة، وأنا لا أستطيع متابعة كل التفاصيل.",
+      "evaluation": "المطلوب تمكين الفريق من القرار دون أن يضيع الانضباط أو تنخفض الجودة. وهذا يتحقق بحدود واضحة: من يقرر ماذا، ومتى يجب التصعيد. فاللامركزية تمكين في نطاق المسؤولية، وليست تخليا عن القيادة.",
+      "action": "أحدد بوضوح صالحيات كل مستوى وحدود قراره، وأربطها بالقصد العام للمهمة. أحرص على أن يفهم الفريق متى يتخذ القرار بنفسه ومتى يصعد. أمتنع عن التدخل في التفاصيل التشغيلية ما دامت القرارات منسجمة معالقصد والمعايير المتفق عليها. أركز على المتابعة اللاحقة للنتائج بدل الرقابة المسبقة، وأتعامل معالأخطاء كفرص تعلم ضمن إطار منضبط.",
+      "leadership_impact": "استجابة أسرع ومرونة أعلى دون إخلال بالمسؤولية أو جودة التنفيذ. ويمارس الفريق مبادرة منضبطة، وتبقى القيادة والمسؤولية عندي."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "M4-B1",
@@ -4222,7 +2545,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "M5-S1",
@@ -4246,7 +2571,14 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": {
+      "situation": "موقف يتطلب قرارا فوريا، والمعلومات غير مكتملة، والتأخير سيضيع فرصة أو يفاقم المشكلة. التوقيت هنا لا يقل أهمية عن صحة القرار.",
+      "evaluation": "أبدأ بتحديد العناصر الحرجة التي لا يمكن تأجيل القرار دونها، وأفصلها عن المعلومات الثانوية التي يمكن تعويضها لاحقا. ثم أقيم بسرعة المخاطر المحتملة لكل خيار، مستندا إلى الخبرة والمعايير المتفق عليها.",
+      "action": "أختار المسار الذي يحقق الهدف بأقل ضرر ممكن، وأتخذ القرار في وقته. أوضح للفريق منطق القرار والخطوة التالية المطلوبة. أبقي القرار قابلا للمراجعة إذا ظهرت معطيات جديدة، وأتابع التنفيذ عن قرب.",
+      "leadership_impact": "لا تضيع الفرصة ولا تتفاقم المشكلة، ويتحرك الفريق وهو يفهم منطق القرار. وإن تغيرت المعطيات تكيفنا بسرعة، لأن المتابعة قائمة والقرار قابل للتعديل."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "M5-B1",
@@ -4276,7 +2608,9 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   },
   {
     "id": "M6-S1",
@@ -4305,7 +2639,14 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": {
+      "situation": "أمامي خياران لهدف مهم: خيار منخفض المخاطر قد لا يحقق الأثر المطلوب كاملا، وخيار بمخاطر محسوبة قد يحقق أثرا أكبر ويتماشى معالقصد العام. أبدأ بتحديد الهدف النهائي ومعايير النجاح، فعليهما أقارن بين الخيارين.",
+      "evaluation": "أقيم طبيعة المخاطر في كل خيار وأثرها المحتمل على الأشخاص والموارد والزمن. أبحث عن المخاطر التي يمكن التحكم بها أو تخفيف آثارها بإجراءات وقائية، وأميزها عن المخاطر غير المقبولة. والعامالن الحاسمان عندي: هل يخدم الخيار القصد العام، وهل يمكن إدارة مخاطره بخطط بديلة واضحة؟",
+      "action": "إذا تحقق الشرطان أختار الخيار ذا المخاطر المحسوبة، وأضع له خططا بديلة وآليات متابعة واستجابة سريعة. أوضح للفريق منطق القرار. وأحدد نقاط مراجعة تسمح بتعديل المسار عند الحاجة. وإن كانت المخاطر من النوع غير المقبول أخذت بالخيار الأقل مخاطرة.",
+      "leadership_impact": "يتحقق أثر أكبر للهدف بمخاطر معروفة ولها إجراءات تحد من آثارها. ويرى الفريق أن قبول المخاطر ليس اندفاعا ولا تهورا، بل قرار واع يوازن بين الهدف والموارد والتهديدات."
+    },
+    "model_answer_status": "approved_expanded_seal"
   },
   {
     "id": "M6-B1",
@@ -4335,48 +2676,8 @@
     "variant_group": null,
     "learning_status": "primary",
     "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "X1",
-    "number": 1,
-    "type": "general",
-    "question": "كيف تفسّر مفهوم الذكاء الاصطناعي؟ وما أهم تطبيقاته في بيئة العمل الحديثة؟",
-    "sample_answer": "الذكاء الاصطناعي هو مجال علمي وتقني يهدف إلى تطوير أنظمة قادرة على أداء مهام تتطلب قدرات إدراكية تشبه الإنسان، مثل التحليل، واتخاذ القرار، والتعلّم من البيانات، وفهم اللغة الطبيعية، والتعرّف على الأنماط، تعتمد هذه الأنظمة على خوارزميات متقدمة وهياكل حسابية ومعالجة بيانات واسعة، مما يمكّن المؤسسات من رفع جودة الأداء، وتحسين التنبؤ، وتسريع اتخاذ القرار في البيئات المعقدة، أما الذكاء الاصطناعي التوليدي فهو فرع متخصص يعتمد على نماذج ضخمة تتعلّم من البيانات وتنتج محتوى جديداً — نصوصاً أو صوراً أو أكواداً — بطريقة متسقة وسياقية، ما يجعله أداة فعالة في تحسين العمليات، والتحليل، وخدمة المتعاملين، وتصميم الحلول المعقدة.",
-    "pdf_page": 71,
-    "display_question": "كيف تفسّر مفهوم الذكاء الاصطناعي؟ وما أهم تطبيقاته في بيئة العمل الحديثة؟",
-    "owner_type": "additional",
-    "competency_id": null,
-    "competency_name": null,
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
-  },
-  {
-    "id": "X2",
-    "number": 2,
-    "type": "general",
-    "question": "كيف يمكن للذكاء الاصطناعي أن يدعم عملك الحالي؟ وما التحديات التي قد تواجهك في تطبيقه؟",
-    "sample_answer": "يمكن للذكاء الاصطناعي أن يدعم عملي من خلال أتمتة الأعمال الروتينية، وتحليل البيانات الضخمة، وتحسين دقة التنبؤ، واستخراج أنماط لا يمكن ملاحظتها بالطرق التقليدية. كما يساعد على تعزيز جودة التقارير، وتسريع اتخاذ القرار، ورفع كفاءة التدريب عبر المحتوى التفاعلي الذكي. أما التحديات فتتمثل في توفير بيانات دقيقة لبناء نماذج فعّالة، تهيئة الموظفين للتعامل مع الأدوات الجديدة وبناء ثقافة تقبل التغيير، ضمان الحوكمة والأمن المعلوماتي عند استخدام الأنظمة الذكية، اختيار الحلول المناسبة التي تتوافق مع احتياجات المؤسسة الحقيقية. التعامل مع الذكاء الاصطناعي يتطلب رؤية واضحة، وتدرجًا في التطبيق، ومتابعة دقيقة للنتائج للتأكد من أنه يحقق قيمة فعلية للمؤسسة.",
-    "pdf_page": 71,
-    "display_question": "كيف يمكن للذكاء الاصطناعي أن يدعم عملك الحالي؟ وما التحديات التي قد تواجهك في تطبيقه؟",
-    "owner_type": "additional",
-    "competency_id": null,
-    "competency_name": null,
-    "principle_id": null,
-    "principle_title": null,
-    "linked_competencies": [],
-    "rubric_mode": "general",
-    "variant_of": null,
-    "variant_group": null,
-    "learning_status": "primary",
-    "alternate_of": null,
-    "expected_points": null
+    "expected_points": null,
+    "sample_answer_seal": null,
+    "model_answer_status": "complete_source_star_l"
   }
 ]

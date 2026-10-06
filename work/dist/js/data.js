@@ -7,8 +7,8 @@ const FILES = Object.freeze({
   searchIndex: 'data/derived/search-index.json',
   variants: 'data/derived/variants.json',
   curation: 'data/derived/curation.json',
-  manifest: 'data/derived/manifest.json',
-  exercises: 'data/exercises.json'
+  questionAudit: 'data/derived/question-audit.json',
+  manifest: 'data/derived/manifest.json'
 });
 
 let cache = null;
@@ -48,12 +48,17 @@ export function sectionsByNumber(part) {
 
 export function questionSamples(question) {
   const results = [];
-  if (question.sample_answer) results.push({ title: 'نموذج إجابة', text: question.sample_answer });
-  if (question.sample_answer_star_l) results.push({ title: 'نموذج STAR-L', parts: question.sample_answer_star_l });
-  if (Array.isArray(question.sample_answers)) {
-    question.sample_answers.forEach((answer, index) => {
-      if (typeof answer === 'string') results.push({ title: `نموذج ${index + 1}`, text: answer });
-      else results.push({ title: answer.leader || `نموذج ${index + 1}`, subtitle: answer.role || '', text: answer.answer || '' });
+  if (question.sample_answer_seal) {
+    results.push({
+      title: 'إجابة نموذجية إرشادية',
+      subtitle: 'استخدمها لفهم طريقة بناء القرار، ولا تحفظها حرفيًا.',
+      parts: question.sample_answer_seal
+    });
+  } else if (question.sample_answer_star_l) {
+    results.push({
+      title: 'إجابة نموذجية إرشادية',
+      subtitle: 'استخدمها لفهم طريقة بناء الإجابة، ولا تحفظها حرفيًا.',
+      parts: question.sample_answer_star_l
     });
   }
   return results;

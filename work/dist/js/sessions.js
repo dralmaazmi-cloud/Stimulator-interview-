@@ -12,7 +12,8 @@ if (typeof window !== 'undefined') {
 const MODE_LABELS = Object.freeze({
   single: 'سؤال واحد',
   realistic: 'محاكاة واقعية',
-  extended: 'محاكاة ممتدة'
+  extended: 'محاكاة ممتدة',
+  full: 'مقابلة كاملة'
 });
 
 function responsesOf(session) {

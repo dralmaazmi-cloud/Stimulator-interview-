@@ -183,15 +183,127 @@ export function renderEvaluationReport(options) {
   return panel;
 }
 
-export function renderSessionSummary(session, options = {}) {
-  const allResponses = [session.intro_response, ...(session.responses || [])]
+function roundedAverage(values) {
+  const valid = values.filter(Number.isFinite);
+  return valid.length ? Math.round(valid.reduce((sum, value) => sum + value, 0) / valid.length) : null;
+}
+
+function frequentItems(items, limit = 5) {
+  const counts = new Map();
+  items.filter(Boolean).forEach(item => counts.set(item, (counts.get(item) || 0) + 1));
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ar'))
+    .slice(0, limit)
+    .map(([text, count]) => ({ text, count }));
+}
+
+export function buildSessionInsights(session) {
+  const responses = [session.intro_response, ...(session.responses || [])]
     .filter(item => item?.report && item?.question);
-  const trusted = allResponses.filter(item => Number.isFinite(item.report?.final_score));
-  const average = trusted.length
-    ? Math.round(trusted.reduce((sum, item) => sum + item.report.final_score, 0) / trusted.length)
-    : null;
-  const strengths = [...new Set(allResponses.flatMap(item => item.report?.strengths || []))].slice(0, 5);
-  const actions = [...new Set(allResponses.flatMap(item => item.report?.next_actions || []))].slice(0, 5);
+  const trusted = responses.filter(item => Number.isFinite(item.report?.final_score));
+  const average = roundedAverage(trusted.map(item => item.report.final_score));
+  const criteria = new Map();
+  const elements = new Map();
+  const competencies = new Map();
+  let coverageTotal = 0;
+  let coverageCovered = 0;
+
+  // التقارير غير الموثوقة تبقى في التفصيل، لكنها لا تدخل في الاستنتاجات التجميعية.
+  trusted.forEach(item => {
+    (item.report.criteria || []).forEach(criterion => {
+      const entry = criteria.get(criterion.key) || { key: criterion.key, scores: [] };
+      entry.scores.push(Number(criterion.score) * 20);
+      criteria.set(criterion.key, entry);
+    });
+    Object.entries(item.report.elements || {}).forEach(([key, value]) => {
+      if (!ELEMENT_LABELS[key]) return;
+      const entry = elements.get(key) || { key, present: 0, total: 0 };
+      entry.total += 1;
+      if (value?.present) entry.present += 1;
+      elements.set(key, entry);
+    });
+    (item.report.expected_points_coverage || []).forEach(point => {
+      coverageTotal += 1;
+      if (point.covered) coverageCovered += 1;
+    });
+    const competencyId = item.question.competency_id || item.question.principle_id;
+    const competencyName = item.question.competency_name || item.question.principle_title;
+    if (competencyId) {
+      const entry = competencies.get(competencyId) || { id: competencyId, name: competencyName || competencyId, scores: [] };
+      entry.scores.push(item.report.final_score);
+      competencies.set(competencyId, entry);
+    }
+  });
+
+  const criterionScores = [...criteria.values()].map(item => ({
+    key: item.key,
+    label: CRITERIA_LABELS[item.key] || item.key,
+    score: roundedAverage(item.scores)
+  })).sort((a, b) => a.score - b.score);
+  const elementCoverage = [...elements.values()].map(item => ({
+    key: item.key,
+    label: ELEMENT_LABELS[item.key],
+    present: item.present,
+    total: item.total,
+    percent: item.total ? Math.round(item.present / item.total * 100) : 0
+  }));
+  const competencyScores = [...competencies.values()].map(item => ({
+    id: item.id,
+    name: item.name,
+    count: item.scores.length,
+    score: roundedAverage(item.scores)
+  })).sort((a, b) => a.score - b.score);
+  const strengths = frequentItems(trusted.flatMap(item => item.report.strengths || []));
+  const weaknesses = frequentItems(trusted.flatMap(item => item.report.missing || []));
+  const actions = frequentItems(trusted.flatMap(item => item.report.next_actions || []), 6);
+  const flags = frequentItems(trusted.flatMap(item => item.report.flags || []));
+  const priorities = [
+    ...criterionScores.slice(0, 2).map(item => `ارفع مستوى «${item.label}» من ${item.score}% عبر إضافة دليل وتفصيل أوضح.`),
+    ...elementCoverage.filter(item => item.percent < 75).slice(0, 2).map(item => `ثبّت عنصر «${item.label}»؛ ظهر بوضوح في ${item.present} من ${item.total} إجابات فقط.`),
+    ...competencyScores.slice(0, 1).filter(item => item.score < 75).map(item => `خصّص تدريبك التالي لكفاءة «${item.name}»؛ متوسطها الحالي ${item.score}%.`),
+    ...actions.map(item => item.text)
+  ].filter((item, index, all) => all.indexOf(item) === index).slice(0, 5);
+
+  return {
+    responses,
+    trusted_count: trusted.length,
+    untrusted_count: responses.length - trusted.length,
+    average,
+    classification: average == null ? 'غير مكتمل' : average >= 80 ? 'أداء قوي' : average >= 60 ? 'أداء متوسط' : 'يحتاج إلى تطوير',
+    criterion_scores: criterionScores,
+    element_coverage: elementCoverage,
+    competency_scores: competencyScores,
+    coverage: { covered: coverageCovered, total: coverageTotal, percent: coverageTotal ? Math.round(coverageCovered / coverageTotal * 100) : null },
+    action_ratio: roundedAverage(trusted.map(item => item.report.action_ratio)),
+    strengths,
+    weaknesses,
+    actions,
+    flags,
+    priorities
+  };
+}
+
+function insightList(title, items, tone, emptyText) {
+  return el('section', { class: `card aggregate-list ${tone}` },
+    el('h2', { text: title }),
+    items.length ? el('ol', {}, ...items.map(item => el('li', {},
+      el('span', { text: item.text || item }),
+      item.count > 1 ? el('small', { text: `ظهر ${item.count} مرات` }) : null
+    ))) : el('p', { class: 'muted', text: emptyText })
+  );
+}
+
+function metricCard(value, label, detail) {
+  return el('article', { class: 'card aggregate-metric' },
+    el('strong', { text: value }),
+    el('span', { text: label }),
+    el('small', { text: detail })
+  );
+}
+
+export function renderSessionSummary(session, options = {}) {
+  const insights = buildSessionInsights(session);
+  const { responses: allResponses, average } = insights;
   const previousAverages = (options.previousSessions || []).map(item => {
     const responses = [item.intro_response, ...(item.responses || [])].filter(response => response?.report);
     const scores = responses.map(response => response.report?.final_score).filter(Number.isFinite);
@@ -200,35 +312,74 @@ export function renderSessionSummary(session, options = {}) {
   const previousAverage = previousAverages.length ? previousAverages.at(-1) : null;
   const change = average != null && previousAverage != null ? average - previousAverage : null;
   return el('section', { class: 'session-summary section-block' },
-    el('header', { class: 'card session-summary-hero' },
-      el('div', {}, el('small', { text: 'اكتملت المحاكاة' }), el('h1', { text: 'ملخص الجلسة' }),
-        el('p', { text: `${allResponses.length} إجابة تم تحليلها` })),
+    el('header', { class: 'card session-summary-hero aggregate-hero' },
+      el('div', {}, el('small', { text: 'اكتملت المحاكاة' }), el('h1', { text: 'تقرير المقابلة الشامل' }),
+        el('p', { text: `${allResponses.length} إجابة محللة · ${insights.trusted_count} تقييم موثوق` }),
+        el('span', { class: `aggregate-classification ${classificationTone(average >= 80 ? 'قوية' : average >= 60 ? 'متوسطة' : 'ضعيفة')}`, text: insights.classification })),
       el('div', { class: 'session-average' },
         average == null ? el('strong', { text: '—' }) : el('strong', {}, el('bdi', { text: String(average) }), '%'),
         el('span', { text: average == null ? 'لا توجد درجة موثقة' : 'المتوسط التدريبي' })
       )
     ),
-    notice('هذا التقرير أداة تدريب ومتابعة، ولا يتنبأ بنتيجة المقابلة الفعلية.', 'warning'),
+    notice('هذا التقرير يجمع أدلة جميع الإجابات لتحديد الأنماط المتكررة. هو أداة تدريب ولا يتنبأ بنتيجة المقابلة الفعلية.', 'warning'),
     change != null ? el('section', { class: 'card session-comparison' },
       el('strong', { text: 'المقارنة مع آخر جلسة موثقة' }),
       el('span', { class: change >= 0 ? 'positive-change' : 'negative-change' }, el('bdi', { text: `${change >= 0 ? '+' : ''}${change}` }), ' نقطة'),
       el('small', {}, 'السابق ', el('bdi', { text: String(previousAverage) }), ' · الحالي ', el('bdi', { text: String(average) }))
     ) : null,
-    el('section', { class: 'session-results' }, ...allResponses.map((item, index) =>
+    el('section', { class: 'aggregate-metrics' },
+      metricCard(average == null ? '—' : `${average}%`, 'الأداء العام', insights.classification),
+      metricCard(insights.action_ratio == null ? '—' : `${insights.action_ratio}%`, 'تركيز الإجراء', 'مدى وضوح ما فعلته أنت'),
+      metricCard(insights.coverage.percent == null ? '—' : `${insights.coverage.percent}%`, 'تغطية النقاط', insights.coverage.total ? `${insights.coverage.covered} من ${insights.coverage.total}` : 'لا توجد نقاط مصدرية'),
+      metricCard(`${insights.trusted_count}/${allResponses.length}`, 'موثوقية التقارير', insights.untrusted_count ? `${insights.untrusted_count} يحتاج مراجعة` : 'جميعها موثوقة')
+    ),
+    insights.criterion_scores.length ? el('section', { class: 'card aggregate-section' },
+      el('div', { class: 'aggregate-section-head' }, el('div', {}, el('small', { text: 'محاور القياس' }), el('h2', { text: 'متوسط معايير المقابلة' }))),
+      el('div', { class: 'aggregate-bars' }, ...insights.criterion_scores.map(item => el('article', {},
+        el('div', {}, el('strong', { text: item.label }), el('span', { text: `${item.score}%` })),
+        el('div', { class: 'mini-score-track' }, el('span', { style: { width: `${item.score}%` } }))
+      )))
+    ) : null,
+    insights.competency_scores.length ? el('section', { class: 'card aggregate-section' },
+      el('div', { class: 'aggregate-section-head' }, el('div', {}, el('small', { text: 'قياس المجالات' }), el('h2', { text: 'أداؤك حسب الكفاءة أو مبدأ قيادة المهمة' }))),
+      el('div', { class: 'aggregate-bars' }, ...insights.competency_scores.map(item => el('article', {},
+        el('div', {}, el('strong', { text: item.name }), el('span', { text: `${item.score}% · ${item.count} إجابة` })),
+        el('div', { class: 'mini-score-track' }, el('span', { style: { width: `${item.score}%` } }))
+      )))
+    ) : null,
+    insights.element_coverage.length ? el('section', { class: 'card aggregate-section' },
+      el('div', { class: 'aggregate-section-head' }, el('div', {}, el('small', { text: 'بناء الإجابة' }), el('h2', { text: 'اكتمال عناصر STAR-L' }))),
+      el('div', { class: 'structure-coverage-grid' }, ...insights.element_coverage.map(item => el('article', { class: item.percent >= 75 ? 'ready' : 'needs-work' },
+        el('strong', { text: item.label }),
+        el('bdi', { text: `${item.percent}%` }),
+        el('small', { text: `${item.present} من ${item.total}` })
+      )))
+    ) : null,
+    el('div', { class: 'aggregate-feedback-grid' },
+      insightList('نقاط القوة المتكررة', insights.strengths, 'positive', 'لم تتوفر أدلة كافية بعد.'),
+      insightList('نقاط الضعف المتكررة', insights.weaknesses, 'negative', 'لم تظهر نواقص متكررة موثوقة.')
+    ),
+    el('section', { class: 'card development-plan' },
+      el('small', { text: 'خطة التطوير' }),
+      el('h2', { text: 'أولوياتك للمحاكاة القادمة' }),
+      insights.priorities.length ? el('ol', {}, ...insights.priorities.map((item, index) => el('li', {},
+        el('span', { class: 'priority-number', text: String(index + 1) }),
+        el('p', { text: item })
+      ))) : el('p', { text: 'أكمل إجابات موثوقة أكثر لبناء خطة تطوير شخصية.' })
+    ),
+    el('section', { class: 'session-results aggregate-question-results' },
+      el('div', { class: 'aggregate-section-head' }, el('div', {}, el('small', { text: 'تفصيل المقابلة' }), el('h2', { text: 'نتيجة كل إجابة' }))),
+      ...allResponses.map((item, index) =>
       el('article', { class: 'card session-result-row' },
         el('span', { class: 'session-question-number', text: String(index + 1) }),
         el('div', {}, el('strong', { text: item.question.id === 'SELF-INTRO' ? 'تقديم الذات' : (item.question.competency_name || item.question.principle_title || 'سؤال عام') }),
           el('small', { text: item.question.question })),
         el('span', { class: `session-result-score ${classificationTone(item.report.classification)}`, text: item.report.final_score == null ? '—' : String(item.report.final_score) })
       ))),
-    el('div', { class: 'feedback-grid' },
-      renderBulletCard('أبرز نقاط القوة', strengths, 'positive', '✓'),
-      renderBulletCard('خطوات التحسين', actions, 'action', '↗')
-    ),
     el('div', { class: 'button-row no-print' },
       button('طباعة أو تصدير PDF', { onClick: () => window.print() }),
       button('محاكاة جديدة', { variant: 'secondary', onClick: options.onRestart || (() => { location.hash = '#/simulation'; }) }),
-      button('سجل الجلسات', { href: '#/sessions', variant: 'secondary' }),
+      button('سجل التقارير', { href: '#/reports', variant: 'secondary' }),
       button('العودة للرئيسية', { href: '#/home', variant: 'ghost' })
     )
   );

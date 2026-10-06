@@ -3,13 +3,15 @@ import { evaluateWithAi, getAiHealth, transcribeWithAi } from './evaluate-client
 import { AudioRecorder, recordingSupported } from './recorder.js';
 import { renderEvaluationReport, renderSessionSummary } from './report.js';
 import { get, getAll, getPendingRecording, pendingRecordingId, remove, removePendingRecording, savePendingRecording, set } from './storage.js';
-import { el, button, clear, formatModel, formatType, notice, pageHead, tag, toast } from './ui.js';
+import { el, button, clear, formatModel, formatType, icon, notice, pageHead, tag, toast } from './ui.js';
 import { acquireWakeLock, releaseAllWakeLocks, releaseWakeLock, wakeLockUnsupportedNoticeOnce } from './wake-lock.js';
+import { modelElements } from './guidance.js';
 
 const MODE_CONFIG = Object.freeze({
-  single: { title: 'سؤال واحد', description: 'سؤال مع تقييم وتقرير سريع.', count: 1, minutes: '2–4 دقائق', icon: '▤' },
-  realistic: { title: 'محاكاة واقعية', description: 'كفاءة واحدة وأسئلة متنوعة مع متابعات.', count: 2, minutes: 'نحو 7 دقائق', icon: '◎' },
-  extended: { title: 'محاكاة ممتدة', description: 'عدة كفاءات أو مسار قيادة المهمة.', count: 5, minutes: 'نحو 16 دقيقة', icon: '▥' }
+  single: { title: 'سؤال واحد', description: 'تدريب سريع', count: 1, minutes: '2–4 دقائق', icon: 'communication' },
+  realistic: { title: 'مقابلة واقعية', description: 'سؤالان', count: 2, minutes: 'نحو 7 دقائق', icon: 'interview' },
+  extended: { title: 'مقابلة موسّعة', description: 'خمسة أسئلة', count: 5, minutes: 'نحو 16 دقيقة', icon: 'book' },
+  full: { title: 'مقابلة كاملة', description: 'نحو 20 دقيقة', count: 6, minutes: 'نحو 20 دقيقة', icon: 'checklist' }
 });
 
 let activeRecorder = null;
@@ -130,6 +132,20 @@ function buildQuestionSet(data, mode, scope, requestedId) {
     }
     return chooseMixedQuestions(pool, Math.min(MODE_CONFIG.realistic.count, pool.length));
   }
+  if (mode === 'full') {
+    if (scope === 'mission') {
+      return ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
+        .map(principle => selectSessionQuestions(pool.filter(item => item.principle_id === principle), 1)[0])
+        .filter(Boolean);
+    }
+    if (scope) return selectSessionQuestions(pool, Math.min(MODE_CONFIG.full.count, pool.length));
+    const competencyIds = [...new Set(pool.map(item => item.competency_id).filter(Boolean))]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, MODE_CONFIG.full.count);
+    return competencyIds
+      .map(id => selectSessionQuestions(pool.filter(item => item.competency_id === id), 1)[0])
+      .filter(Boolean);
+  }
   if (scope === 'mission') {
     return ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
       .map(principle => selectSessionQuestions(pool.filter(item => item.principle_id === principle), 1)[0])
@@ -175,9 +191,9 @@ function renderModeCard(id, config, selected, choose) {
     on: { click: () => choose(id) },
     'aria-pressed': selected ? 'true' : 'false'
   },
-  el('span', { class: 'simulation-mode-icon', text: config.icon }),
-  el('div', {}, el('strong', { text: config.title }), el('p', { text: config.description }), el('small', { text: config.minutes })),
-  el('span', { class: 'mode-radio', text: selected ? '●' : '○' })
+  el('span', { class: 'mode-radio', 'aria-hidden': 'true' }, selected ? '●' : '○'),
+  el('span', { class: 'simulation-mode-icon' }, icon(config.icon)),
+  el('div', {}, el('strong', { text: config.title }), el('p', { text: config.description }), el('small', { text: config.minutes }))
   );
 }
 
@@ -397,7 +413,7 @@ function createVoicePanel(transcriptArea, setAnswer, options = {}) {
   transcriptArea.addEventListener('input', () => setAnswer(transcriptArea.value));
   panel.append(
     el('label', { class: 'privacy-consent' }, consent,
-      el('span', { text: 'أوافق على إرسال التسجيل لمزود الذكاء الاصطناعي للتفريغ ثم حذفه من ذاكرة الخادم.' })
+      el('span', { text: 'أوافق على إرسال التسجيل مؤقتًا لتحويله إلى نص، ثم حذفه بعد اكتمال العملية.' })
     ),
     el('div', { class: 'recording-visual' },
       timer,
@@ -419,7 +435,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
   let answerMode = params.get('answer') === 'voice' ? 'voice' : 'text';
   let selectedScope = params.get('competency') || '';
   let followupsEnabled = localStorage.getItem('lic:followups') !== 'off';
-  let includeSelfIntro = false;
+  let includeSelfIntro = selectedMode === 'full';
   let selfIntroDuration = 60;
   let health = null;
 
@@ -427,10 +443,10 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
   try {
     health = await getAiHealth();
     healthHost.replaceChildren(health.ai?.configured
-      ? notice('خدمة المحاكاة متصلة وجاهزة للاختبار.', '', '✓')
-      : notice('الواجهة جاهزة، لكن مسؤول التطبيق يحتاج إلى تهيئة مفتاح الخدمة في الخادم ثم إعادة النشر.', 'warning', '⚙'));
+      ? notice('المحاكاة جاهزة.', '', '✓')
+      : notice('خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.', 'warning'));
   } catch {
-    healthHost.replaceChildren(notice('التعلّم والبنك يعملان، لكن خدمة المحاكاة غير متاحة الآن.', 'warning'));
+    healthHost.replaceChildren(notice('خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.', 'warning'));
   }
 
   // البند 8: كل شاشة جديدة تبدأ من أعلى الصفحة مع نقل التركيز إلى المحتوى.
@@ -463,8 +479,10 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     scrollToTop();
     const pending = (await inProgressSessions())[0] || null;
     root.append(
-      pageHead('محاكاة المقابلة', 'اختيار المحاكاة', 'اختر طول الجلسة وطريقة الإجابة، ثم ابدأ التدريب.'),
-      notice('أداة تدريب فقط. لا تقيس أداء المقابلة الفعلية ولا تصدر نجاحًا أو رسوبًا.', 'warning'),
+      el('section', { class: 'simulation-hero' },
+        el('span', {}, icon('microphone')),
+        el('div', {}, el('small', { text: 'بيئة تدريب تفاعلية' }), el('h1', { text: 'اختر تجربة تناسب استعدادك' }), el('p', { text: 'حدّد نوع المقابلة ثم ابدأ عندما تكون جاهزًا.' }))
+      ),
       healthHost
     );
     if (pending) {
@@ -482,18 +500,40 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
 
     const modeGrid = el('div', { class: 'simulation-mode-grid' });
     let introOptions;
+    let selfIntroToggle;
+    let selfIntroHelp;
+    const syncIntroOptions = () => {
+      if (!introOptions || !selfIntroToggle || !selfIntroHelp) return;
+      introOptions.hidden = selectedMode === 'single';
+      const full = selectedMode === 'full';
+      if (full) includeSelfIntro = true;
+      selfIntroToggle.checked = includeSelfIntro;
+      selfIntroToggle.disabled = full;
+      selfIntroHelp.textContent = full
+        ? 'جزء ثابت من المقابلة الكاملة.'
+        : 'اختياري في المحاكاة الواقعية والممتدة.';
+    };
     const redrawModes = () => {
       modeGrid.replaceChildren(...Object.entries(MODE_CONFIG).map(([id, config]) =>
         renderModeCard(id, config, selectedMode === id, next => {
           selectedMode = next;
           redrawModes();
-          if (introOptions) introOptions.hidden = selectedMode === 'single';
+          syncIntroOptions();
         })
       ));
     };
     redrawModes();
 
     const answerSwitch = el('div', { class: 'segmented simulation-answer-switch', role: 'group', 'aria-label': 'طريقة الإجابة' });
+    const readinessStrip = el('div', { class: 'simulation-readiness-strip' });
+    const drawReadiness = () => readinessStrip.replaceChildren(
+      icon(answerMode === 'voice' ? 'microphone' : 'answer'),
+      el('div', {},
+        el('strong', { text: answerMode === 'voice' ? 'الميكروفون جاهز' : 'الإجابة النصية جاهزة' }),
+        el('small', { text: answerMode === 'voice' ? 'سيُطلب إذن التسجيل عند البدء.' : 'ستكتب إجابتك قبل إرسالها للتقييم.' })
+      ),
+      el('span', { class: 'ready-dot', 'aria-hidden': 'true' })
+    );
     const drawAnswerSwitch = () => {
       answerSwitch.replaceChildren(...[
         ['text', '▤', 'إجابة نصية'],
@@ -501,10 +541,11 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       ].map(([id, icon, label]) => el('button', {
         type: 'button',
         class: answerMode === id ? 'active' : '',
-        on: { click: () => { answerMode = id; drawAnswerSwitch(); } }
+        on: { click: () => { answerMode = id; drawAnswerSwitch(); drawReadiness(); } }
       }, el('span', { text: icon }), document.createTextNode(label))));
     };
     drawAnswerSwitch();
+    drawReadiness();
 
     const scope = el('select', { class: 'input', 'aria-label': 'مجال المحاكاة' },
       el('option', { value: '', text: 'اختيار عشوائي' }),
@@ -518,7 +559,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       followupsEnabled = followupToggle.checked;
       localStorage.setItem('lic:followups', followupsEnabled ? 'on' : 'off');
     });
-    const selfIntroToggle = el('input', { type: 'checkbox', checked: includeSelfIntro });
+    selfIntroToggle = el('input', { type: 'checkbox', checked: includeSelfIntro });
     selfIntroToggle.addEventListener('change', () => { includeSelfIntro = selfIntroToggle.checked; });
     const durationSelect = el('select', { class: 'input compact-select', 'aria-label': 'مدة تقديم الذات' },
       el('option', { value: '60', text: 'حتى 60 ثانية' }),
@@ -530,11 +571,12 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       el('label', { class: 'toggle-row' }, selfIntroToggle,
         el('span', {},
           el('strong', { text: 'ابدأ بتقديم الذات' }),
-          el('small', { text: 'اختياري في المحاكاة الواقعية والممتدة.' })
+          selfIntroHelp = el('small', { text: 'اختياري في المحاكاة الواقعية والممتدة.' })
         )
       ),
       el('label', { class: 'field' }, el('span', { text: 'المدة المستهدفة' }), durationSelect)
     );
+    syncIntroOptions();
 
     const startSession = async () => {
       const questions = buildQuestionSet(data, selectedMode, selectedScope, params.get('question'));
@@ -551,7 +593,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         mode: selectedMode,
         answer_mode: answerMode,
         followups_enabled: followupsEnabled,
-        include_self_intro: includeSelfIntro && selectedMode !== 'single',
+        include_self_intro: selectedMode === 'full' || (includeSelfIntro && selectedMode !== 'single'),
         self_intro_duration: selfIntroDuration,
         created_at: new Date().toISOString(),
         status: 'in_progress',
@@ -571,6 +613,8 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         el('span', {}, el('strong', { text: 'أسئلة المتابعة' }), el('small', { text: 'حتى سؤالين عند وجود نقص واضح فقط.' }))
       ),
       introOptions,
+      readinessStrip,
+      notice('هذه أداة تدريبية؛ لا تصدر نجاحًا أو رسوبًا ولا تتنبأ بنتيجة المقابلة الفعلية.', 'warning'),
       button('ابدأ المحاكاة', { className: 'wide simulation-start', onClick: startSession })
     ));
   };
@@ -676,8 +720,12 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     scrollToTop();
     const progressValue = Math.round(((session.current_index + 1) / questions.length) * 100);
     root.append(
-      pageHead('المحاكاة', `السؤال ${session.current_index + 1} من ${questions.length}`, 'اقرأ السؤال، ثم أجب من خبرتك أو حلّل السيناريو.'),
-      el('div', { class: 'simulation-progress', role: 'progressbar', 'aria-valuenow': String(progressValue), 'aria-valuemin': '0', 'aria-valuemax': '100' },
+      pageHead(
+        session.direct_training ? (question.competency_name || question.principle_title || 'تدريب موجه') : 'المحاكاة',
+        session.direct_training ? 'التدرّب على السؤال' : `السؤال ${session.current_index + 1} من ${questions.length}`,
+        session.direct_training ? 'أجب بطريقتك أولًا، ثم أرسل الإجابة لتحصل على تحليل تطويري.' : 'اقرأ السؤال، ثم أجب من خبرتك أو حلّل السيناريو.'
+      ),
+      session.direct_training ? null : el('div', { class: 'simulation-progress', role: 'progressbar', 'aria-valuenow': String(progressValue), 'aria-valuemin': '0', 'aria-valuemax': '100' },
         el('span', { style: { width: `${progressValue}%` } })
       ),
       renderQuestionText(question)
@@ -711,11 +759,11 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       window.removeEventListener('pagehide', flushDraft);
       clearTimeout(draftTimer);
     });
-    answerInput.addEventListener('input', () => { answer = answerInput.value; scheduleDraft(); });
+    answerInput.addEventListener('input', () => { answer = answerInput.value; scheduleDraft(); syncSubmitState(); });
     if (session.answer_mode === 'voice') answerInput.hidden = !answer;
 
     const capture = session.answer_mode === 'voice'
-      ? createVoicePanel(answerInput, value => { answer = value; scheduleDraft(); }, { sessionId: session.id, questionId: question.id, onPersistSession: () => set('sessions', { ...session, updated_at: new Date().toISOString() }) })
+      ? createVoicePanel(answerInput, value => { answer = value; scheduleDraft(); syncSubmitState(); }, { sessionId: session.id, questionId: question.id, onPersistSession: () => set('sessions', { ...session, updated_at: new Date().toISOString() }) })
       : el('label', { class: 'field card text-answer-card' },
         el('span', { text: 'إجابتك' }), answerInput,
         el('small', { text: 'قيّم التطبيق المضمون، وليس اللغة أو الطلاقة.' })
@@ -724,6 +772,30 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     const submit = button('إرسال الإجابة للتقييم', { className: 'wide' });
     const retryButton = button('إعادة الإرسال', { className: 'wide resend-evaluation', hidden: true });
     const runner = createEvaluationRunner({ status, submit, retryButton, workingText: 'جارٍ تحليل الأدلة والتحقق من الاقتباسات…', workingHint: 'قد يستغرق ذلك عدة ثوانٍ.' });
+    function syncSubmitState() {
+      submit.disabled = answerInput.value.trim().length < 5;
+    }
+    syncSubmitState();
+
+    const answerSwitch = session.direct_training ? el('div', { class: 'segmented direct-training-switch', role: 'group', 'aria-label': 'طريقة الإجابة' },
+      ...[['voice', 'إجابة صوتية'], ['text', 'إجابة نصية']].map(([mode, label]) => el('button', {
+        type: 'button',
+        class: session.answer_mode === mode ? 'active' : '',
+        text: label,
+        on: { click: async () => {
+          if (session.answer_mode === mode) return;
+          session.draft_answer = answerInput.value;
+          session.draft_question_id = question.id;
+          session.answer_mode = mode;
+          await set('sessions', { ...session, updated_at: new Date().toISOString() });
+          drawQuestion(session, questions);
+        } }
+      }))
+    ) : null;
+    const methodReminder = session.direct_training ? el('section', { class: 'training-method-reminder' },
+      el('strong', { text: question.rubric_mode === 'star_l' ? 'تذكّر بناء STAR-L' : 'تذكّر بناء SEAL' }),
+      el('div', {}, ...modelElements(question.rubric_mode).map(item => el('span', {}, el('b', { text: item.key }), el('small', { text: item.title }))))
+    ) : null;
 
     const submitEvaluation = async (followups = previousFollowups) => {
       const corrected = answerInput.value.trim();
@@ -756,10 +828,12 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     submit.addEventListener('click', () => submitEvaluation(previousFollowups));
     retryButton.addEventListener('click', () => submitEvaluation(previousFollowups));
     root.append(el('section', { class: 'answer-capture section-block' },
+      answerSwitch,
       capture,
       session.answer_mode === 'voice' ? el('label', { class: 'field transcript-field' },
         el('span', { text: 'راجع التفريغ وصححه' }), answerInput
       ) : null,
+      methodReminder,
       status,
       submit,
       retryButton,
@@ -872,5 +946,21 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     root.append(renderSessionSummary(session, { onRestart: drawSetup, previousSessions }));
   };
 
-  drawSetup();
+  const requestedQuestion = params.get('question') ? data.questionById.get(params.get('question')) : null;
+  if (requestedQuestion) {
+    const session = {
+      id: sessionId(),
+      mode: 'single',
+      direct_training: true,
+      answer_mode: params.get('answer') === 'text' ? 'text' : 'voice',
+      followups_enabled: followupsEnabled,
+      include_self_intro: false,
+      created_at: new Date().toISOString(),
+      status: 'in_progress',
+      current_index: 0,
+      question_ids: [requestedQuestion.id],
+      responses: []
+    };
+    drawQuestion(session, [requestedQuestion]);
+  } else drawSetup();
 }

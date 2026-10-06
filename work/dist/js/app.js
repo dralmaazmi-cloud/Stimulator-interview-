@@ -1,7 +1,6 @@
 import { loadData } from './data.js';
 import { renderHome } from './home.js';
 import { cleanupLearn, renderLearnIndex, renderLesson } from './learn.js';
-import { renderBank, renderQuestionDetail } from './bank.js';
 import { renderCompetenciesIndex, renderCompetencyDetail } from './competencies.js';
 import { renderQuickReview, renderAnswerGuide } from './quick-review.js';
 import { renderSelfIntroPage } from './self-intro.js';
@@ -16,7 +15,8 @@ import { purgeExpiredRecordings } from './storage.js';
 
 const root = document.querySelector('#main-content');
 const backButton = document.querySelector('#back-button');
-const themeButton = document.querySelector('#theme-toggle');
+const appHeader = document.querySelector('#app-header');
+const routeTitle = document.querySelector('#route-title');
 const scrollPositions = new Map();
 let activeHash = location.hash || '#/home';
 const navigationStack = [activeHash];
@@ -40,14 +40,15 @@ async function route({ restoreScroll = false } = {}) {
   root.setAttribute('aria-busy', 'true');
   try {
     if (page === 'home') await renderHome(root, data);
-    else if (page === 'competencies' && parts[1]) await renderCompetencyDetail(root, data, parts[1]);
+    else if (page === 'preparation' && parts[1]) await renderLesson(root, data, parts[1], params);
+    else if (page === 'preparation') await renderLearnIndex(root, data);
+    else if (page === 'reports' && parts[1]) await renderSavedSession(root, parts[1]);
+    else if (page === 'reports') await renderSessions(root);
+    else if (page === 'competencies' && parts[1]) await renderCompetencyDetail(root, data, parts[1], params);
     else if (page === 'competencies') await renderCompetenciesIndex(root, data);
     else if (page === 'learn' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'learn') await renderLearnIndex(root, data);
-    else if (page === 'bank' && parts[1]) renderQuestionDetail(root, data, parts[1]);
-    else if (page === 'bank') renderBank(root, data, params);
-    else if (page === 'practice' && params.get('question')) renderQuestionDetail(root, data, params.get('question'));
-    else if (page === 'practice') renderBank(root, data, params);
+    else if (page === 'bank' || page === 'practice') await renderCompetenciesIndex(root, data);
     else if (page === 'quick-review') renderQuickReview(root);
     else if (page === 'answer-guide') renderAnswerGuide(root);
     else if (page === 'self-intro') await renderSelfIntroPage(root);
@@ -77,39 +78,51 @@ async function route({ restoreScroll = false } = {}) {
 }
 
 function navPage(page) {
-  if (page === 'learn' || page === 'competencies') return 'learn';
-  if (page === 'bank' || page === 'practice') return 'bank';
-  if (page === 'tools' || page === 'self-intro' || page === 'quick-review' || page === 'sessions') return 'tools';
-  if (page === 'simulation') return 'home';
+  if (page === 'preparation' || page === 'learn' || page === 'competencies' || page === 'bank' || page === 'practice') return 'preparation';
+  if (page === 'reports' || page === 'sessions') return 'reports';
+  if (page === 'simulation') return 'simulation';
+  if (page === 'settings' || page === 'tools' || page === 'search') return 'more';
   return 'home';
 }
 
 function updateChrome(page) {
   const active = navPage(page);
   document.querySelectorAll('[data-nav]').forEach(link => link.classList.toggle('active', link.dataset.nav === active));
+  document.body.dataset.page = page;
+  appHeader.hidden = page === 'home';
   backButton.hidden = page === 'home';
   backButton.disabled = page === 'home';
+  const titles = {
+    preparation: 'التحضير للمقابلة', learn: 'التحضير للمقابلة', competencies: 'الكفاءات الثمانية',
+    bank: 'الكفاءات الثمانية', practice: 'التدريب', simulation: 'المحاكاة', reports: 'التقارير',
+    sessions: 'التقارير', settings: 'المزيد', search: 'البحث', tools: 'الأدوات',
+    'quick-review': 'المراجعة السريعة', 'answer-guide': 'بناء الإجابة', 'self-intro': 'تقديم الذات'
+  };
+  routeTitle.textContent = titles[page] || 'مدرّب المقابلات';
 }
 
 function applyTheme(theme) {
-  const next = theme === 'dark' ? 'dark' : 'light';
+  const next = ['dark', 'light', 'cream'].includes(theme) ? theme : 'cream';
   document.documentElement.dataset.theme = next;
   localStorage.setItem('lic:theme', next);
-  themeButton.textContent = next === 'dark' ? '☀' : '◐';
-  themeButton.setAttribute('aria-label', next === 'dark' ? 'استخدام المظهر الفاتح' : 'استخدام المظهر الداكن');
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#071b2e' : '#0f5b57');
 }
 
 function setupPreferences() {
   const savedTheme = localStorage.getItem('lic:theme');
-  applyTheme(savedTheme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-  themeButton.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+  applyTheme(savedTheme || 'cream');
   document.documentElement.dataset.fontSize = localStorage.getItem('lic:font-size') || 'medium';
   document.documentElement.dataset.lineSpace = localStorage.getItem('lic:line-space') || 'comfortable';
+  document.documentElement.dataset.accent = localStorage.getItem('lic:accent') || 'petrol';
+  document.documentElement.dataset.contrast = localStorage.getItem('lic:contrast') || 'standard';
+  document.documentElement.dataset.motion = localStorage.getItem('lic:motion') || 'full';
   window.addEventListener('lic:preferences', event => {
     if (event.detail?.theme) applyTheme(event.detail.theme);
     if (event.detail?.fontSize) document.documentElement.dataset.fontSize = event.detail.fontSize;
     if (event.detail?.lineSpace) document.documentElement.dataset.lineSpace = event.detail.lineSpace;
+    if (event.detail?.accent) document.documentElement.dataset.accent = event.detail.accent;
+    if (event.detail?.contrast) document.documentElement.dataset.contrast = event.detail.contrast;
+    if (event.detail?.motion) document.documentElement.dataset.motion = event.detail.motion;
   });
 }
 
@@ -128,10 +141,11 @@ async function init() {
   try {
     purgeExpiredRecordings().catch(() => {});
     data = await loadData();
-    if (data.manifest.counts.total_questions !== 127
-      || data.manifest.counts.unique_question_ids !== 127
-      || data.manifest.counts.primary_questions !== 89
-      || data.manifest.counts.alternate_questions !== 38) {
+    if (data.manifest.counts.total_questions !== data.questions.length
+      || data.manifest.counts.unique_question_ids !== new Set(data.questions.map(question => question.id)).size
+      || data.manifest.counts.primary_questions !== data.curation.primary_ids.length
+      || data.manifest.counts.excluded_questions !== data.questionAudit.excluded_question_count
+      || !data.questions.every(question => ['complete_source_star_l', 'approved_expanded_seal'].includes(question.model_answer_status))) {
       throw new Error('فشل تحقق سلامة بيانات الأسئلة.');
     }
     window.addEventListener('hashchange', async () => {

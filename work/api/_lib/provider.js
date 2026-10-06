@@ -135,8 +135,11 @@ async function singleCall(body, budget) {
   const payload = await response.json().catch(() => ({}));
   budget.lastProviderStatus = response.status;
   if (!response.ok) {
-    // تفاصيل المزود تذهب إلى سجل الخادم فقط؛ العميل يرى رسالة عربية ثابتة.
-    console.error('[provider]', response.status, payload?.error?.status || '', payload?.error?.message || `HTTP ${response.status}`);
+    // لا نسجل رسالة المزود الخام؛ قد تتضمن تفاصيل لا حاجة لها. الحالة والرمز فقط.
+    console.error('[provider]', JSON.stringify({
+      status: response.status,
+      code: String(payload?.error?.status || 'AI_PROVIDER_ERROR').slice(0, 80)
+    }));
     let error;
     if (response.status === 429) {
       error = httpError(429, 'الخدمة مشغولة حاليًا. حاول بعد دقيقة.', 'AI_RATE_LIMITED');

@@ -13,7 +13,7 @@ export function renderQuickReview(root) {
     notice('هذه الصفحة أداة تذكّر سريعة. التفاصيل الكاملة موجودة في دروس المرجع.', '', 'ⓘ'),
     el('div', { class: 'button-row' },
       button('بناء الإجابة', { href: '#/answer-guide' }),
-      button('فتح بنك الأسئلة والأجوبة', { href: '#/bank', variant: 'secondary' })
+      button('استعراض الكفاءات وأسئلتها', { href: '#/competencies', variant: 'secondary' })
     )
   );
 }
@@ -42,7 +42,7 @@ export function renderAnswerGuide(root) {
       el('p', { class: 'muted', text: 'معايير تعليمية من الدليل تُستخدم أيضًا في تقييم المحاكاة.' })
     ),
     el('div', { class: 'button-row' },
-      button('افتح بنك الأسئلة والأجوبة', { href: '#/bank' }),
+      button('استعرض الكفاءات وأسئلتها', { href: '#/competencies' }),
       button('اقرأ وحدة STAR-L وSEAL', { href: '#/learn/U2', variant: 'secondary' })
     )
   );

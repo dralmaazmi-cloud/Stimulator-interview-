@@ -75,10 +75,14 @@ export function handleApiError(res, error) {
       : 'تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.';
   } else if (status >= 500) {
     safeMessage = error?.code === 'AI_NOT_CONFIGURED'
-      ? 'خدمة المحاكاة غير مهيأة بعد. أضف مفتاح الذكاء الاصطناعي في إعدادات الخادم.'
+      ? 'خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.'
       : 'تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.';
   } else safeMessage = error.message;
-  if (status >= 500 || fromProvider) console.error('[api]', error?.code || error?.name, error?.providerStatus ?? '', error?.message);
+  if (status >= 500 || fromProvider) console.error('[api]', JSON.stringify({
+    code: String(error?.code || error?.name || 'INTERNAL_ERROR').slice(0, 80),
+    provider_status: error?.providerStatus ?? null,
+    http_status: status
+  }));
   const payload = { error: safeMessage, code: error?.code || undefined };
   // 429: نمرر Retry-After كعدد ثوانٍ آمن فقط (لا ترويسات حساسة).
   if (error?.code === 'AI_RATE_LIMITED' && Number.isFinite(error?.retryAfter) && error.retryAfter > 0) payload.retry_after = error.retryAfter;

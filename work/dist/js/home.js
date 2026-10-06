@@ -1,79 +1,84 @@
 import { completedLessons, getAll } from './storage.js';
-import { el, button, clear } from './ui.js';
+import { clear, el, icon } from './ui.js';
+
+function sessionAverage(session) {
+  const responses = [session.intro_response, ...(session.responses || [])]
+    .filter(item => Number.isFinite(item?.report?.final_score));
+  return responses.length
+    ? Math.round(responses.reduce((sum, item) => sum + item.report.final_score, 0) / responses.length)
+    : null;
+}
+
+function startCard(kind, title, subtitle, href, iconName) {
+  return el('a', { class: `home-start-card ${kind}`, href, 'aria-label': `${title}: ${subtitle}` },
+    el('span', { class: 'home-start-icon' }, icon(iconName)),
+    el('strong', { text: title }),
+    el('span', { text: subtitle }),
+    el('i', { class: 'home-start-arrow', 'aria-hidden': 'true', text: '‹' })
+  );
+}
+
+function pathNode(iconName, label, active = false) {
+  return el('span', { class: `path-node ${active ? 'active' : ''}` },
+    el('i', {}, icon(iconName)),
+    el('small', { text: label })
+  );
+}
 
 export async function renderHome(root, data) {
   clear(root);
   const completed = await completedLessons();
-  const completedInCurrentPath = new Set(data.lessons.filter(lesson => completed.has(lesson.id)).map(lesson => lesson.id));
-  const percent = Math.round((completedInCurrentPath.size / data.lessons.length) * 100);
-  const next = data.lessons.find(lesson => !completedInCurrentPath.has(lesson.id)) || data.lessons.at(-1);
-  const pendingSession = (await getAll('sessions').catch(() => []))
-    .filter(item => item.status === 'in_progress' && Array.isArray(item.question_ids) && item.question_ids.length)
-    .sort((a, b) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || '')))[0] || null;
+  const done = data.lessons.filter(lesson => completed.has(lesson.id)).length;
+  const percent = Math.round((done / Math.max(1, data.lessons.length)) * 100);
+  const sessions = (await getAll('sessions').catch(() => []))
+    .filter(item => item.status === 'completed')
+    .sort((a, b) => String(b.completed_at || '').localeCompare(String(a.completed_at || '')));
+  const latestAverage = sessions.length ? sessionAverage(sessions[0]) : null;
 
   root.append(el('section', { class: 'home-dashboard' },
-    el('section', { class: 'home-hero card' },
-      el('div', { class: 'home-hero-copy' },
-        el('span', { class: 'offline-pill', text: '✓ التعلّم يعمل دون إنترنت' }),
-        el('h1', { text: 'استعد للمقابلة القيادية بثقة' }),
-        el('p', { text: 'تعلّم من الدليل، راجع الأسئلة، ثم اختبر إجابتك في محاكاة مدعومة بالذكاء الاصطناعي.' })
-      ),
+    el('section', { class: 'home-photo-hero', 'aria-label': 'مدرّب المقابلات القيادية' },
       el('img', {
-        class: 'journey-art',
-        src: 'assets/illustrations/journey.svg',
-        alt: 'طريق متدرج يرمز إلى مسار الاستعداد للمقابلة'
+        src: 'assets/images/abu-dhabi-sea-hero.jpg',
+        alt: 'أفق مدينة أبوظبي كما يبدو من البحر'
       }),
-      button(completedInCurrentPath.size ? 'تابع المسار التعليمي' : 'ابدأ المسار التعليمي', {
-        href: `#/learn/${next.id}`,
-        className: 'wide home-primary-action'
-      })
-    ),
-
-    el('a', { class: 'next-step-card card', href: `#/learn/${next.id}` },
-      el('span', { class: 'next-step-icon', 'aria-hidden': 'true', text: next.number }),
-      el('div', {},
-        el('small', { text: completedInCurrentPath.size ? 'خطوتك التالية' : 'ابدأ من هنا' }),
-        el('strong', { text: next.title }),
-        el('p', { text: next.subtitle })
-      ),
-      el('span', { class: 'row-chevron', 'aria-hidden': 'true', text: '‹' })
-    ),
-
-    pendingSession ? el('a', { class: 'next-step-card resume-session-card card', href: '#/simulation' },
-      el('span', { class: 'next-step-icon', 'aria-hidden': 'true', text: '◎' }),
-      el('div', {},
-        el('small', { text: 'جلسة غير مكتملة' }),
-        el('strong', { text: 'استئناف المحاكاة' }),
-        el('p', { text: `السؤال ${Math.min((Number(pendingSession.current_index) || 0) + 1, pendingSession.question_ids.length)} من ${pendingSession.question_ids.length}` })
-      ),
-      el('span', { class: 'row-chevron', 'aria-hidden': 'true', text: '‹' })
-    ) : null,
-
-    el('section', { class: 'home-main-links', 'aria-label': 'أقسام التطبيق الرئيسية' },
-      mainLink('▤', 'المسار التعليمي', 'ست وحدات مترابطة تأخذك خطوة بخطوة.', '#/learn', 'teal'),
-      mainLink('؟', 'بنك الأسئلة والأجوبة', '89 سؤالًا أساسيًا مع المطلوب والإجابة النموذجية.', '#/bank', 'gold'),
-      mainLink('◎', 'محاكاة المقابلة', 'أجب نصيًا أو صوتيًا، ثم احصل على تقرير موثق وأسئلة متابعة.', '#/simulation', 'purple'),
-      mainLink('▣', 'أدوات الاستعداد', 'تقديم الذات، قائمة التحضير، والمراجعة السريعة.', '#/tools', 'blue')
-    ),
-
-    el('section', { class: 'home-progress-strip card' },
-      el('div', { class: 'progress-copy' },
-        el('strong', { text: `تقدم المسار ${percent}%` }),
-        el('span', { text: `${completedInCurrentPath.size} من ${data.lessons.length} وحدات مكتملة` })
-      ),
-      el('div', { class: 'progress-track', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(percent) },
-        el('span', { style: { width: `${percent}%` } })
+      el('div', { class: 'home-photo-overlay' },
+        el('h1', { text: 'مدرّب المقابلات' }),
+        el('p', { text: 'استعد للمقابلة القيادية بثقة' })
       )
     ),
 
-    el('p', { class: 'home-disclaimer', text: 'التعلّم والبنك محليان. المحاكاة فقط تحتاج إلى الإنترنت وإلى تهيئة مفتاح الذكاء الاصطناعي في الخادم.' })
-  ));
-}
+    el('section', { class: 'home-start-section', 'aria-labelledby': 'home-start-title' },
+      el('h2', { id: 'home-start-title', text: 'ابدأ من هنا' }),
+      el('div', { class: 'home-start-grid' },
+        startCard('simulation', 'المحاكاة', 'اختبر نفسك', '#/simulation', 'microphone'),
+        startCard('preparation', 'التحضير للمقابلة', 'تعلّم وراجع', '#/preparation', 'book')
+      )
+    ),
 
-function mainLink(icon, title, description, href, tone) {
-  return el('a', { class: `home-main-link ${tone}`, href },
-    el('span', { class: 'home-main-icon', 'aria-hidden': 'true', text: icon }),
-    el('div', {}, el('strong', { text: title }), el('small', { text: description })),
-    el('span', { class: 'row-chevron', 'aria-hidden': 'true', text: '‹' })
-  );
+    el('section', { class: 'home-path-card card', 'aria-label': `اكتمل ${percent}% من مسار التحضير` },
+      el('div', { class: 'home-path-copy' },
+        el('h2', { text: 'مسارك التدريبي' }),
+        el('div', { class: 'path-nodes' },
+          pathNode('book', 'المعرفة', done >= 1),
+          pathNode('competencies', 'المهارات', done >= 3),
+          pathNode('flag', 'الجاهزية', done >= 5)
+        )
+      ),
+      el('div', { class: 'home-progress-ring', style: { '--progress': `${percent * 3.6}deg` } },
+        el('strong', { text: `${percent}%` }),
+        el('span', { text: `${done}/${data.lessons.length}` })
+      )
+    ),
+
+    el('a', { class: 'home-report-card card', href: '#/reports' },
+      el('span', { class: 'home-report-icon' }, icon('reports')),
+      el('div', {},
+        el('small', { text: 'آخر تقرير' }),
+        el('strong', { text: latestAverage == null ? 'ابدأ أول محاكاة' : `متوسط الأداء ${latestAverage}%` }),
+        el('span', { text: latestAverage == null ? 'سيظهر تحليلك هنا بعد المقابلة.' : 'راجع نقاط القوة وأولويات التطوير.' })
+      ),
+      el('b', { 'aria-hidden': 'true', text: '‹' })
+    ),
+    el('span', { class: 'sr-only', text: 'المحاكاة الذكية' })
+  ));
 }

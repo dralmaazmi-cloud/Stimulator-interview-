@@ -280,14 +280,14 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const { browser, page } = await newPage();
   await page.addInitScript(ALPHA4_INIT);
   await page.goto(BASE + '/#/home');
-  await page.waitForSelector('.home-hero');
+  await page.waitForSelector('.home-dashboard');
   await page.evaluate(async () => {
     const { savePendingRecording } = await import('/js/storage.js');
     await savePendingRecording({ id: 'old:Q', blob: new Blob([new Uint8Array(2000)], { type: 'audio/webm' }), mime: 'audio/webm', duration: 5, session_id: 'old', question_id: 'Q', created_at: Date.now() - 25 * 60 * 60 * 1000 });
     await savePendingRecording({ id: 'fresh:Q', blob: new Blob([new Uint8Array(2000)], { type: 'audio/webm' }), mime: 'audio/webm', duration: 5, session_id: 'fresh', question_id: 'Q', created_at: Date.now() - 60 * 1000 });
   });
   await page.reload();
-  await page.waitForSelector('.home-hero');
+  await page.waitForSelector('.home-dashboard');
   await page.waitForTimeout(800);
   log('A3 expired recording purged on start (fresh kept)', JSON.stringify((await idbPending(page)).map(p => p.id)));
   for (let round = 0; round < 4; round += 1) {
@@ -369,18 +369,18 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 {
   const { browser, context, page, errors } = await newPage();
   await page.goto(BASE + '/#/home');
-  await page.waitForSelector('.home-hero');
+  await page.waitForSelector('.home-dashboard');
   await page.waitForFunction(() => navigator.serviceWorker?.controller != null, null, { timeout: 15000 }).catch(() => log('J3', 'SW controller not ready'));
   await page.waitForTimeout(2500);
   const cached = await page.evaluate(async () => { const keys = await caches.keys(); const c = await caches.open(keys[0]); return { keys, count: (await c.keys()).length }; });
   log('J3 SW caches', JSON.stringify(cached));
   await context.setOffline(true);
-  await page.goto(BASE + '/#/learn/U1').catch(e => log('J3 nav offline err', e.message));
+  await page.goto(BASE + '/#/preparation/U1').catch(e => log('J3 nav offline err', e.message));
   await page.waitForTimeout(1200);
   log('J3 offline learn U1 h1', await text(page, 'h1'));
-  await page.goto(BASE + '/#/bank/C1-B1');
+  await page.goto(BASE + '/#/bank/C1-B3');
   await page.waitForTimeout(800);
-  log('J3 offline bank C1-B1 h2', await text(page, '.question-detail-text'));
+  log('J3 offline bank C1-B3 h2', await text(page, '.question-detail-text'));
   await page.goto(BASE + '/#/self-intro');
   await page.waitForTimeout(800);
   log('J3 offline self-intro h1', await text(page, 'h1'));
@@ -451,14 +451,14 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await browser.close();
 }
 
-// ---------- Journey 6: realistic + extended + mission modes, self-intro included ----------
+// ---------- Journey 6: realistic + extended + full + mission modes, self-intro included ----------
 {
   const { browser, page } = await newPage();
-  for (const [mode, scope] of [['realistic', ''], ['extended', ''], ['extended', 'mission']]) {
+  for (const [mode, scope] of [['realistic', ''], ['extended', ''], ['full', ''], ['extended', 'mission']]) {
     await gotoHash(page, BASE + `/#/simulation?mode=${mode}${scope ? '&competency=' + scope : ''}`);
     await page.waitForSelector('.simulation-start');
     await page.waitForTimeout(300);
-    if (mode !== 'single') await page.locator('.simulation-intro-options input[type=checkbox]').check();
+    if (mode !== 'full') await page.locator('.simulation-intro-options input[type=checkbox]').check();
     await page.locator('.simulation-start').click();
     await page.waitForTimeout(600);
     log(`J6 ${mode}/${scope || 'random'} first screen`, await text(page, '.page-head h1'));
@@ -536,7 +536,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 // ---------- Journey 8: settings delete all data ----------
 {
   const { browser, page } = await newPage();
-  await page.goto(BASE + '/#/bank/C1-B1');
+  await page.goto(BASE + '/#/bank/C1-B3');
   await page.waitForTimeout(400);
   await page.locator('button:has-text("حفظ السؤال")').click();
   await page.goto(BASE + '/#/settings');

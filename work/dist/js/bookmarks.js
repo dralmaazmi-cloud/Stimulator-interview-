@@ -30,17 +30,22 @@ export function renderSavedQuestions(root, data) {
   root.append(pageHead('محفوظة على هذا الجهاز', 'الأسئلة المحفوظة', 'احفظ الأسئلة المهمة للرجوع إليها بسرعة دون اتصال.'));
   if (!questions.length) {
     root.append(notice('لم تحفظ أي سؤال بعد. افتح سؤالًا واضغط «حفظ السؤال».', '', '☆'),
-      el('div', { class: 'button-row' }, button('فتح بنك الأسئلة', { href: '#/bank' })));
+      el('div', { class: 'button-row' }, button('استعراض الكفاءات', { href: '#/competencies' })));
     return;
   }
   const list = el('div', { class: 'question-list' });
-  questions.forEach(question => list.append(el('a', { class: 'card saved-question-card', href: `#/bank/${question.id}` },
+  questions.forEach(question => {
+    const href = question.competency_id
+      ? `#/competencies/${question.competency_id}?question=${question.id}`
+      : `#/preparation/U4?question=${question.id}`;
+    list.append(el('a', { class: 'card saved-question-card', href },
     el('div', { class: 'question-meta' },
       tag(question.competency_name || question.principle_title || 'سؤال عام', 'accent'),
       tag('إجابة نموذجية متوفرة', 'success')
     ),
     el('strong', { text: question.display_question }),
     el('span', { class: 'row-chevron', 'aria-hidden': 'true', text: '‹' })
-  )));
+    ));
+  });
   root.append(list);
 }
