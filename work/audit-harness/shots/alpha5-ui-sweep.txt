@@ -1,0 +1,10 @@
+[PREPARATION] #/preparation [light]: 5 بطاقات
+[COMPETENCIES] #/competencies [light]: 8 بطاقات
+[MODEL-ANSWER] #/competencies/C1?question=C1-S1 [light]: opened=true parts=4
+[SIMULATION-MODES] #/simulation [light]: 4 أوضاع، full=1
+[PREPARATION] #/preparation [dark]: 5 بطاقات
+[COMPETENCIES] #/competencies [dark]: 8 بطاقات
+[MODEL-ANSWER] #/competencies/C1?question=C1-S1 [dark]: opened=true parts=4
+[SIMULATION-MODES] #/simulation [dark]: 4 أوضاع، full=1
+SUMMARY routes=34 failures=0 consoleErrors=0
+EXIT=0
