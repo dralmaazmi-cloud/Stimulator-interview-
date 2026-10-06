@@ -383,9 +383,9 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto(BASE + '/#/preparation/U1').catch(e => log('J3 nav offline err', e.message));
   await page.waitForTimeout(1200);
   log('J3 offline learn U1 h1', await text(page, 'h1'));
-  await page.goto(BASE + '/#/competencies/C1?question=C1-B3');
-  await page.waitForTimeout(800);
-  log('J3 offline competency C1 question C1-B3 open', String(await page.locator('#question-C1-B3[open]').count()) + ' :: ' + (await text(page, '#question-C1-B3 summary strong')).slice(0, 60));
+  await page.goto(BASE + '/#/question/C1-B3');
+  await page.waitForSelector('.question-focus-page');
+  log('J3 offline dedicated question C1-B3', String(await page.locator('.question-focus-page').count()) + ' :: ' + (await text(page, '.question-focus-panel h1')).slice(0, 60));
   await page.goto(BASE + '/#/self-intro');
   await page.waitForTimeout(800);
   log('J3 offline self-intro h1', await text(page, 'h1'));
@@ -543,11 +543,11 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 // ---------- Journey 8: settings delete all data ----------
 {
   const { browser, page } = await newPage();
-  await page.goto(BASE + '/#/competencies/C1?question=C1-B3');
-  await page.waitForTimeout(400);
-  await page.locator('#question-C1-B3 .inline-bookmark-button').click();
+  await page.goto(BASE + '/#/question/C1-B3');
+  await page.waitForSelector('.question-focus-page');
+  await page.locator('.question-focus-bookmark').click();
   await page.waitForTimeout(200);
-  log('J8 F6 bookmark button toggles', await text(page, '#question-C1-B3 .inline-bookmark-button') + ' :: ' + JSON.stringify(await page.evaluate(() => localStorage.getItem('lic:bookmarked-questions'))));
+  log('J8 F6 bookmark button toggles', String(await page.locator('.question-focus-bookmark.active').count()) + ' :: ' + JSON.stringify(await page.evaluate(() => localStorage.getItem('lic:bookmarked-questions'))));
   await page.goto(BASE + '/#/tools/saved');
   await page.waitForTimeout(400);
   log('J8 saved questions page lists C1-B3', String(await page.locator('.saved-question-card').count()));
@@ -699,6 +699,30 @@ for (const theme of ['light', 'dark']) {
   // export includes attempts + rotation
   const backup = await page.evaluate(async () => { const { exportBackup } = await import('/js/storage.js'); const b = await exportBackup({}); return { stores: Object.keys(b.stores), attempts: (b.stores.attempts || []).length, rotation: (b.stores.rotation || []).length }; });
   log('J10 export includes attempts/rotation', JSON.stringify(backup));
+  await browser.close();
+}
+// ---------- alpha-6.1 Journey 11: SEAL element names on the focused question page (after «إظهار الإجابة النموذجية») and in the printed book ----------
+{
+  const { browser, page, errors } = await newPage();
+  const SEAL_NAMES = ['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي'];
+  await page.goto(BASE + '/#/question/C1-S1');
+  await page.waitForSelector('.question-focus-page');
+  await page.locator('.question-step').last().click();
+  await page.waitForSelector('.answer-gate');
+  await page.locator('button:has-text("إظهار الإجابة النموذجية")').click();
+  await page.waitForSelector('.focus-answer-samples');
+  const pageLabels = await page.locator('.focus-answer-part strong').allInnerTexts();
+  const pageText = await page.locator('.question-focus-page').innerText();
+  log('J11 question page SEAL labels after reveal', pageLabels.join(' | ') + ' :: exact=' + String(JSON.stringify(pageLabels) === JSON.stringify(SEAL_NAMES)) + ' oldNames=' + String(/تقييم الخيارات|خطة العمل/.test(pageText)));
+  const bookLabels = await page.evaluate(async () => {
+    const { buildPrintBook } = await import('/js/print-book.js');
+    const { loadData } = await import('/js/data.js');
+    const book = buildPrintBook(await loadData(), { kind: 'question', id: 'C1-S1' });
+    return { labels: [...book.querySelectorAll('.print-answer-part h4')].map(node => node.textContent), old: /تقييم الخيارات|خطة العمل/.test(book.textContent) };
+  });
+  log('J11 printed book SEAL labels', bookLabels.labels.join(' | ') + ' :: exact=' + String(JSON.stringify(bookLabels.labels) === JSON.stringify(SEAL_NAMES)) + ' oldNames=' + String(bookLabels.old));
+  if (JSON.stringify(pageLabels) !== JSON.stringify(SEAL_NAMES) || JSON.stringify(bookLabels.labels) !== JSON.stringify(SEAL_NAMES) || bookLabels.old || /تقييم الخيارات|خطة العمل/.test(pageText)) throw new Error('J11: SEAL element names mismatch');
+  log('J11 page errors', JSON.stringify(errors));
   await browser.close();
 }
 fs.writeFileSync(`${OUT}/journeys-done.txt`, 'ok');
