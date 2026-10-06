@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'leadership-interview-coach-v0.5.1-alpha-4-51d413de';
+const CACHE = 'leadership-interview-coach-v0.6.0-alpha-5.1-51d413de';
 const APP_SHELL = [
   './',
   './index.html',
@@ -13,7 +13,6 @@ const APP_SHELL = [
   './js/storage.js',
   './js/home.js',
   './js/learn.js',
-  './js/bank.js',
   './js/sim.js',
   './js/simulation.js',
   './js/evaluate-client.js',
@@ -29,8 +28,13 @@ const APP_SHELL = [
   './js/settings.js',
   './js/tools.js',
   './js/bookmarks.js',
+  './js/scoring-rules.js',
+  './js/retry-plan.js',
+  './js/rotation.js',
+  './js/session-plan.js',
+  './js/coverage.js',
   './data/reference.json',
-  './data/exercises.json',
+  './data/expanded-model-answers.json',
   './data/derived/questions.json',
   './data/derived/competencies.json',
   './data/derived/mission-map.json',
@@ -38,13 +42,15 @@ const APP_SHELL = [
   './data/derived/search-index.json',
   './data/derived/variants.json',
   './data/derived/curation.json',
+  './data/derived/question-audit.json',
   './data/derived/manifest.json',
-  './assets/illustrations/journey.svg',
+  './assets/images/abu-dhabi-sea-hero.jpg',
   './assets/fonts/NotoSansArabic-Regular.ttf',
   './assets/fonts/NotoSansArabic-Bold.ttf',
-  './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png'
+  './assets/icons/icon-512.png',
+  './assets/icons/icon-maskable-512.png',
+  './assets/icons/apple-touch-icon-180.png'
 ];
 
 self.addEventListener('install', event => {

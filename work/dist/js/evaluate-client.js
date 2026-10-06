@@ -42,7 +42,7 @@ async function apiRequest(path, options = {}) {
     return payload;
   } catch (error) {
     if (error?.name === 'AbortError') throw new Error('استغرق الطلب وقتًا أطول من المتوقع. حاول مرة أخرى.');
-    if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.');
+    if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالخدمة. تحقق من الإنترنت ثم أعد المحاولة.');
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -69,6 +69,11 @@ export async function transcribeWithAi(blob, durationSeconds, options = {}) {
       'X-Audio-Duration': Math.max(0, Number(durationSeconds) || 0).toFixed(2)
     }
   });
+}
+
+// alpha-5 (الخطوة 5): طلب «مثال مكتمل على غرار موقفك» بطلب المتدرب فقط.
+export async function requestWorkedExample(payload, options = {}) {
+  return apiRequest('/example', { method: 'POST', body: payload, timeout: LONG_TIMEOUT, onSlow: options.onSlow });
 }
 
 export async function improveSelfIntroduction(payload) {

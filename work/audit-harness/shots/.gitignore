@@ -1,0 +1,7 @@
+*.png
+*.pdf
+logs/
+v060/
+journeys-done.txt
+!j-9-*.png
+!j-9-*.pdf

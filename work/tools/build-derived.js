@@ -10,8 +10,12 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const dataDir = path.join(projectRoot, 'dist', 'data');
 const derivedDir = path.join(dataDir, 'derived');
 const referencePath = path.join(dataDir, 'reference.json');
+const expandedAnswersPath = path.join(dataDir, 'expanded-model-answers.json');
 const referenceBytes = fs.readFileSync(referencePath);
 const reference = JSON.parse(referenceBytes.toString('utf8'));
+const expandedAnswersBytes = fs.readFileSync(expandedAnswersPath);
+const expandedAnswers = JSON.parse(expandedAnswersBytes.toString('utf8'));
+const expandedAnswerById = new Map(expandedAnswers.answers.map(item => [item.id, item.answer]));
 
 fs.mkdirSync(derivedDir, { recursive: true });
 
@@ -28,22 +32,27 @@ const VARIANT_PAIRS = [
   ['C8-S1', 'C8-S3'], ['C8-S2', 'C8-S4'], ['C8-B1', 'C8-B3'], ['C8-B2', 'C8-B4']
 ];
 
-// Approved learning-bank curation. The source file remains untouched and all
-// 127 questions remain addressable, while the default learning experience
-// presents 89 distinct questions. Alternate wordings are grouped under the
-// closest primary question instead of repeating the same learning objective.
-const CURATED_ALTERNATES = new Map(Object.entries({
-  'C1-S3': 'C1-S1', 'C1-S5': 'C1-S2', 'C1-B4': 'C1-B2',
-  'C2-S3': 'C2-S1', 'C2-S6': 'C2-S5', 'C2-B3': 'C2-B1', 'C2-B4': 'C2-B2',
-  'C3-S3': 'C3-S1', 'C3-S4': 'C3-S2', 'C3-B3': 'C3-B1', 'C3-B4': 'C3-B2',
-  'C3-B6': 'C3-B1', 'C3-B9': 'C3-B5', 'C3-B11': 'C3-B7', 'C3-B13': 'C3-B5',
-  'C4-S3': 'C4-S1', 'C4-S4': 'C4-S2', 'C4-B3': 'C4-B1', 'C4-B4': 'C4-B2',
-  'C5-S3': 'C5-S1', 'C5-S4': 'C5-S2', 'C5-B3': 'C5-B1', 'C5-B4': 'C5-B2',
-  'C6-S3': 'C6-S1', 'C6-S4': 'C6-S2', 'C6-B3': 'C6-B1', 'C6-B4': 'C6-B2',
-  'C6-B7': 'C6-B9', 'C6-B8': 'C6-B5', 'C6-B10': 'C6-B6',
-  'C7-S3': 'C7-S1', 'C7-S4': 'C7-S2', 'C7-B3': 'C7-B1', 'C7-B4': 'C7-B2',
-  'C8-S3': 'C8-S1', 'C8-S4': 'C8-S2', 'C8-B3': 'C8-B1', 'C8-B4': 'C8-B2'
-}));
+// v0.6.0 content rule: the published bank contains only questions whose
+// source includes a complete, fielded STAR-L model answer. A paragraph of
+// guidance, expected points, or competency indicators is not a model answer.
+// The immutable reference remains untouched and the audit records every
+// exclusion explicitly.
+// alpha-5 (C1): سؤالا الذكاء الاصطناعي X1 وX2 يُنشران بإجابتَي الدليل (sample_answer) كما هما،
+// بنموذج general وحالة complete_source_paragraph. لا يُنشر أي سؤال آخر بهذه القاعدة.
+const PARAGRAPH_PUBLISHED_IDS = new Set(['X1', 'X2']);
+function hasCompleteParagraphAnswer(question) {
+  return PARAGRAPH_PUBLISHED_IDS.has(question?.id) && typeof question.sample_answer === 'string' && question.sample_answer.trim().length > 0;
+}
+
+function hasCompleteModelAnswer(question) {
+  if (expandedAnswerById.has(question?.id)) return true;
+  if (hasCompleteParagraphAnswer(question)) return true;
+  const answer = question?.sample_answer_star_l;
+  if (!answer || typeof answer !== 'object') return false;
+  return ['situation', 'task', 'result', 'learning'].every(key => typeof answer[key] === 'string' && answer[key].trim())
+    && ((typeof answer.action === 'string' && answer.action.trim())
+      || (Array.isArray(answer.action_points) && answer.action_points.length && answer.action_points.every(Boolean)));
+}
 
 const variantOf = new Map(VARIANT_PAIRS.map(([canonical, variant]) => [variant, canonical]));
 const variantGroup = new Map();
@@ -90,6 +99,7 @@ function joinedQuestion(question) {
 }
 
 function flattenQuestion(question, owner) {
+  const expanded = expandedAnswerById.get(question.id) || null;
   return {
     ...question,
     display_question: joinedQuestion(question),
@@ -100,11 +110,13 @@ function flattenQuestion(question, owner) {
     principle_title: owner.principle_title ?? null,
     linked_competencies: owner.linked_competencies ?? [],
     rubric_mode: rubricFor(question),
-    variant_of: variantOf.get(question.id) ?? null,
-    variant_group: variantGroup.get(question.id) ?? null,
-    learning_status: CURATED_ALTERNATES.has(question.id) ? 'alternate' : 'primary',
-    alternate_of: CURATED_ALTERNATES.get(question.id) ?? null,
-    expected_points: stableExpectedPoints(question)
+    variant_of: null,
+    variant_group: null,
+    learning_status: 'primary',
+    alternate_of: null,
+    expected_points: stableExpectedPoints(question),
+    sample_answer_seal: expanded,
+    model_answer_status: expanded ? 'approved_expanded_seal' : hasCompleteParagraphAnswer(question) ? 'complete_source_paragraph' : 'complete_source_star_l'
   };
 }
 
@@ -117,8 +129,12 @@ for (const competency of reference.part_3_competencies.competencies) {
     competency_id: competency.id,
     competency_name: competency.name
   };
-  for (const question of competency.scenario_questions) questions.push(flattenQuestion(question, owner));
-  for (const question of competency.behavioural_questions) questions.push(flattenQuestion(question, owner));
+  for (const question of competency.scenario_questions) {
+    if (hasCompleteModelAnswer(question)) questions.push(flattenQuestion(question, owner));
+  }
+  for (const question of competency.behavioural_questions) {
+    if (hasCompleteModelAnswer(question)) questions.push(flattenQuestion(question, owner));
+  }
 
   competencySummaries.push({
     id: competency.id,
@@ -130,7 +146,9 @@ for (const competency of reference.part_3_competencies.competencies) {
     what_interviewer_measures: competency.what_interviewer_measures,
     supporting_behaviours: stableBehaviourList(competency.id, 'supporting', competency.supporting_behaviours),
     negative_behaviours: stableBehaviourList(competency.id, 'negative', competency.negative_behaviours),
-    question_ids: [...competency.scenario_questions, ...competency.behavioural_questions].map(q => q.id)
+    question_ids: [...competency.scenario_questions, ...competency.behavioural_questions]
+      .filter(hasCompleteModelAnswer)
+      .map(q => q.id)
   });
 }
 
@@ -141,12 +159,12 @@ for (const principle of reference.part_4_mission_command.principles) {
     principle_title: principle.title,
     linked_competencies: principle.linked_competencies
   };
-  questions.push(flattenQuestion(principle.scenario_question, owner));
-  questions.push(flattenQuestion(principle.behavioural_question, owner));
+  if (hasCompleteModelAnswer(principle.scenario_question)) questions.push(flattenQuestion(principle.scenario_question, owner));
+  if (hasCompleteModelAnswer(principle.behavioural_question)) questions.push(flattenQuestion(principle.behavioural_question, owner));
 }
 
 for (const question of reference.part_5_additional_questions.questions) {
-  questions.push(flattenQuestion(question, { owner_type: 'additional' }));
+  if (hasCompleteModelAnswer(question)) questions.push(flattenQuestion(question, { owner_type: 'additional' }));
 }
 
 const missionMap = reference.part_4_mission_command.principles.map(principle => ({
@@ -158,16 +176,17 @@ const missionMap = reference.part_4_mission_command.principles.map(principle => 
   linked_competency_ids: competencySummaries
     .filter(c => principle.linked_competencies.some(name => c.name.includes(name) || name.includes(c.name)))
     .map(c => c.id),
-  question_ids: [principle.scenario_question.id, principle.behavioural_question.id]
+  question_ids: [principle.scenario_question, principle.behavioural_question]
+    .filter(hasCompleteModelAnswer)
+    .map(question => question.id)
 }));
 
 const lessonIndex = [
-  { id: 'U1', number: 1, title: 'افهم المقابلة', subtitle: 'المفهوم والقواعد الأساسية', source_refs: ['1.1', '1.2', '1.3', '1.4', '1.5'] },
-  { id: 'U2', number: 2, title: 'ابنِ إجابة قوية', subtitle: 'STAR-L وSEAL وعقلية المقيّم', source_refs: ['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'] },
-  { id: 'U3', number: 3, title: 'قدّم نفسك', subtitle: 'تقديم ذاتي واضح خلال 60 أو 120 ثانية', source_refs: ['6.3'] },
-  { id: 'U4', number: 4, title: 'الكفاءات الثماني', subtitle: 'التعريف والسلوكيات والأسئلة', source_refs: competencySummaries.map(c => c.id) },
-  { id: 'U5', number: 5, title: 'قيادة المهمة', subtitle: 'المبادئ الستة والتطبيق القيادي', source_refs: missionMap.map(m => m.principle_id) },
-  { id: 'U6', number: 6, title: 'الجاهزية النهائية', subtitle: 'التحضير والحضور والمراجعة', source_refs: ['6.1', '6.2', '6.4', '6.5', 'X1', 'X2'] }
+  { id: 'U1', number: 1, title: 'افهم المقابلة', subtitle: 'المفهوم والقواعد الأساسية', icon: 'interview', source_refs: ['1.1', '1.2', '1.3', '1.4', '1.5'] },
+  { id: 'U2', number: 2, title: 'بناء الإجابة النموذجية', subtitle: 'STAR-L وSEAL وعقلية المقيّم', icon: 'answer', source_refs: ['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'] },
+  { id: 'U3', number: 3, title: 'الكفاءات الثمانية', subtitle: 'ثماني بطاقات للشرح والأسئلة الكاملة', icon: 'competencies', source_refs: competencySummaries.map(c => c.id) },
+  { id: 'U4', number: 4, title: 'قيادة المهمة', subtitle: 'المبادئ الستة والتطبيق القيادي', icon: 'mission', source_refs: missionMap.map(m => m.principle_id) },
+  { id: 'U5', number: 5, title: 'الجاهزية النهائية', subtitle: 'التحضير وتقديم الذات والحضور المهني', icon: 'readiness', source_refs: ['6.1', '6.2', '6.3', '6.4', '6.5'] }
 ];
 
 function searchable(value) {
@@ -200,7 +219,7 @@ sectionSearchEntries.push({
   id: 'section-mission-intro',
   kind: 'section',
   title: reference.part_4_mission_command.title,
-  route: '#/learn/L6',
+  route: '#/learn/U4',
   text: searchable(reference.part_4_mission_command.intro),
   tags: ['قيادة المهمة']
 });
@@ -209,7 +228,7 @@ for (const principle of reference.part_4_mission_command.principles) {
     id: `principle-${principle.id}`,
     kind: 'principle',
     title: `${principle.id} — ${principle.title}`,
-    route: `#/learn/L6`,
+    route: `#/learn/U4`,
     text: searchable(principle),
     tags: ['قيادة المهمة', ...(principle.linked_competencies || [])]
   });
@@ -218,7 +237,7 @@ sectionSearchEntries.push({
   id: 'section-additional',
   kind: 'section',
   title: reference.part_5_additional_questions.title,
-  route: '#/learn/L8',
+  route: '#/learn/U5',
   text: searchable(reference.part_5_additional_questions),
   tags: ['الأسئلة الإضافية', 'الذكاء الاصطناعي']
 });
@@ -228,7 +247,7 @@ const searchIndex = [
     id: q.id,
     kind: 'question',
     title: q.display_question,
-    route: `#/bank/${q.id}`,
+    route: q.competency_id ? `#/competencies/${q.competency_id}?question=${q.id}` : `#/preparation/U4?question=${q.id}`,
     text: searchable(q),
     tags: [q.type, q.rubric_mode, q.competency_name, q.principle_title, q.label].filter(Boolean)
   })),
@@ -478,28 +497,66 @@ questions.filter(q => q.rubric_mode === 'general').forEach((question, index) => 
   explanation: 'هذا السؤال مصنّف سؤالاً عامًا في موجز التنفيذ.'
 })));
 
-// Re-home the existing source-grounded exercises under the six approved
-// learning units. Only a small selection is shown per visit in the UI, but the
-// full exercise source remains available for future spaced review.
+// The source-derived exercise generator remains here for provenance, but the
+// approved preparation experience contains no comprehension quizzes.
 const EXERCISE_UNIT_MAP = {
   L1: 'U1', L2: 'U2', L3: 'U2', L4: 'U2',
-  L5: 'U4', L6: 'U5', L7: 'U6', L8: 'U6'
+  L5: 'U3', L6: 'U4', L7: 'U5', L8: 'U5'
 };
 exercises.forEach(exercise => { exercise.lesson_id = EXERCISE_UNIT_MAP[exercise.lesson_id] || exercise.lesson_id; });
+const publishedExercises = [];
 
 const primaryQuestions = questions.filter(question => question.learning_status === 'primary');
 const alternateQuestions = questions.filter(question => question.learning_status === 'alternate');
 const curation = {
-  schema_version: '1.0',
-  policy: 'approved-distinct-learning-bank',
-  total_source_questions: questions.length,
+  schema_version: '2.0',
+  policy: 'complete-model-answers-only',
+  total_source_questions: 127,
+  excluded_source_questions: 127 - questions.length,
   primary_count: primaryQuestions.length,
   alternate_count: alternateQuestions.length,
   primary_ids: primaryQuestions.map(question => question.id),
-  alternates: alternateQuestions.map(question => ({
+  alternates: []
+};
+
+const allSourceQuestions = [
+  ...reference.part_3_competencies.competencies.flatMap(competency => [
+    ...competency.scenario_questions,
+    ...competency.behavioural_questions
+  ]),
+  ...reference.part_4_mission_command.principles.flatMap(principle => [
+    principle.scenario_question,
+    principle.behavioural_question
+  ]),
+  ...reference.part_5_additional_questions.questions
+];
+const questionAudit = {
+  schema_version: '1.0',
+  policy: 'لا يُنشر إلا السؤال الذي يتضمن إجابة نموذجية مكتملة العناصر ومعتمدة للمراجعة والتدريب.',
+  source_question_count: allSourceQuestions.length,
+  published_question_count: questions.length,
+  excluded_question_count: allSourceQuestions.length - questions.length,
+  reference_sha256: crypto.createHash('sha256').update(referenceBytes).digest('hex'),
+  reviewed_sources: [
+    'dist/data/reference.json',
+    'دليل المقابلات القيادية المبنية على الكفاءات v1.pdf',
+    'دليل الهنداسي - للمقابلات القيادية المبنية على الكفاءات v5.pdf'
+  ],
+  published: allSourceQuestions.filter(hasCompleteModelAnswer).map(question => ({
     id: question.id,
-    primary_id: question.alternate_of,
-    reason: 'صياغة إضافية تقيس الهدف التدريبي نفسه أو هدفًا شديد التقارب.'
+    status: 'published',
+    evidence: expandedAnswerById.has(question.id)
+      ? 'إجابة SEAL موسعة ومعتمدة مبنية على الدليل'
+      : hasCompleteParagraphAnswer(question)
+        ? 'sample_answer فقرة كاملة من الدليل (سؤال معرفي)'
+        : 'sample_answer_star_l كامل في المصدر'
+  })),
+  excluded: allSourceQuestions.filter(question => !hasCompleteModelAnswer(question)).map(question => ({
+    id: question.id,
+    status: 'excluded',
+    reason: question.sample_answer || question.sample_answers?.length
+      ? 'المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر.'
+      : 'لا يوجد جواب نموذجي في المصدر.'
   }))
 };
 
@@ -523,9 +580,10 @@ const manifest = {
   schema_version: '1.0',
   derived_schema_version: '1.0',
   reference_sha256: sourceHash,
-  prompt_version: 'execution-brief-1.0+approved-restructure-3',
-  rubric_version: 'phase1-reference-review-3.0',
-  config_version: '3.0',
+  expanded_answers_sha256: crypto.createHash('sha256').update(expandedAnswersBytes).digest('hex'),
+  prompt_version: 'evaluation-1.2+approved-content-audit-1',
+  rubric_version: 'phase2-reference-review-4.0',
+  config_version: '6.0',
   model_id: null,
   source_block_counts: sourceBlockCounts,
   counts: {
@@ -535,12 +593,14 @@ const manifest = {
     mission_command_questions: questions.filter(q => q.owner_type === 'mission_command').length,
     additional_questions: questions.filter(q => q.owner_type === 'additional').length,
     total_questions: questions.length,
+    source_questions: allSourceQuestions.length,
+    excluded_questions: questionAudit.excluded_question_count,
     unique_question_ids: new Set(questionIds).size,
     primary_questions: primaryQuestions.length,
     alternate_questions: alternateQuestions.length,
-    variant_pairs: VARIANT_PAIRS.length,
+    variant_pairs: VARIANT_PAIRS.filter(pair => pair.every(id => questionIds.includes(id))).length,
     lessons: lessonIndex.length,
-    exercises: exercises.length
+    exercises: publishedExercises.length
   }
 };
 
@@ -549,13 +609,14 @@ writeJson('competencies.json', competencySummaries);
 writeJson('mission-map.json', missionMap);
 writeJson('lessons.json', lessonIndex);
 writeJson('search-index.json', searchIndex);
-writeJson('variants.json', VARIANT_PAIRS.map(([canonical, variant], index) => ({
+writeJson('variants.json', VARIANT_PAIRS.filter(pair => pair.every(id => questionIds.includes(id))).map(([canonical, variant], index) => ({
   id: `VG${String(index + 1).padStart(2, '0')}`,
   canonical,
   variant
 })));
 writeJson('curation.json', curation);
+writeJson('question-audit.json', questionAudit);
 writeJson('manifest.json', manifest);
-fs.writeFileSync(path.join(dataDir, 'exercises.json'), `${JSON.stringify(exercises, null, 2)}\n`, 'utf8');
+fs.writeFileSync(path.join(dataDir, 'exercises.json'), `${JSON.stringify(publishedExercises, null, 2)}\n`, 'utf8');
 
 console.log(JSON.stringify(manifest, null, 2));

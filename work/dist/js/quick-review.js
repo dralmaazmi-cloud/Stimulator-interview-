@@ -13,7 +13,7 @@ export function renderQuickReview(root) {
     notice('هذه الصفحة أداة تذكّر سريعة. التفاصيل الكاملة موجودة في دروس المرجع.', '', 'ⓘ'),
     el('div', { class: 'button-row' },
       button('بناء الإجابة', { href: '#/answer-guide' }),
-      button('فتح بنك الأسئلة والأجوبة', { href: '#/bank', variant: 'secondary' })
+      button('استعراض الكفاءات وأسئلتها', { href: '#/competencies', variant: 'secondary' })
     )
   );
 }
@@ -25,7 +25,7 @@ export function renderAnswerGuide(root) {
     ['S', 'الموقف'], ['T', 'المهمة'], ['A', 'الإجراء'], ['R', 'النتيجة'], ['L', 'التعلّم']
   ], 'purple');
   const seal = methodCard('SEAL', 'لسؤال السيناريو: ماذا ستفعل؟', [
-    ['S', 'فهم الموقف'], ['E', 'تقييم الخيارات'], ['A', 'الإجراء'], ['L', 'الأثر القيادي']
+    ['S', 'فهم الوضع'], ['E', 'التقييم'], ['A', 'الإجراء'], ['L', 'الأثر القيادي']
   ], 'teal');
   root.append(el('div', { class: 'method-grid' }, star, seal),
     notice('السؤال السلوكي: أنت تختار موقفًا حقيقيًا حدث لك. سؤال السيناريو: الموقف موجود في نص السؤال، وأنت تشرح كيف ستتصرف.', '', 'مهم'),
@@ -42,7 +42,7 @@ export function renderAnswerGuide(root) {
       el('p', { class: 'muted', text: 'معايير تعليمية من الدليل تُستخدم أيضًا في تقييم المحاكاة.' })
     ),
     el('div', { class: 'button-row' },
-      button('افتح بنك الأسئلة والأجوبة', { href: '#/bank' }),
+      button('استعرض الكفاءات وأسئلتها', { href: '#/competencies' }),
       button('اقرأ وحدة STAR-L وSEAL', { href: '#/learn/U2', variant: 'secondary' })
     )
   );

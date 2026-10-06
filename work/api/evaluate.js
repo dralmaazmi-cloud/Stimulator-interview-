@@ -6,10 +6,11 @@ import { getQuestionContext, sampleAnswerTexts } from './_lib/data.js';
 import { evaluationSchema } from './_lib/schemas.js';
 import { buildEvaluationPrompt } from './_lib/prompts.js';
 import { nearReferenceModel, referenceSimilarity, referenceSimilarityDetails, sanitizeEvaluation, shapeErrors, verifyEvidence } from './_lib/validation.js';
-import { calculateScore } from './_lib/scoring.js';
+import { calculateScore, fallbackSummary, WEIGHTS_VERSION } from './_lib/scoring.js';
+import { EXAMPLE_CRITERION_NAMES } from './_lib/prompts.js';
 import { recordUsage } from './_lib/usage.js';
 
-const PROMPT_VERSION = 'evaluation-1.1';
+const PROMPT_VERSION = 'evaluation-1.2';
 const RUBRIC_VERSION = 'reference-rubric-1.0';
 
 function cleanFollowups(value) {
@@ -99,14 +100,18 @@ export default async function handler(req, res) {
     const trusted = evaluated.failureRate <= 0.3
       && evaluated.unverifiedCriteria <= Math.floor(evaluated.scoredCriteria / 2);
     let score;
-    if (!trusted) score = { final_score: null, classification: 'غير موثوق', action_ratio: null, weights_version: 'phase2-1.0' };
+    if (!trusted) score = { final_score: null, classification: 'غير موثوق', action_ratio: null, elements_complete: null, elements_total: null, weights_version: WEIGHTS_VERSION };
     else {
       score = calculateScore(evaluated.report, context.question.type, evaluated.combinedText);
       if (evaluated.scoredCriteria === 0) score = { ...score, final_score: 0, classification: 'ضعيفة' };
     }
+    // alpha-5 (R2): إن غاب summary من المقيّم يُبنى ملخص احتياطي من العناصر المكتملة وأثقل معيار دون 60%.
+    const summary = evaluated.report.summary || fallbackSummary(evaluated.report, context.question.type, EXAMPLE_CRITERION_NAMES);
     const report = {
       ...evaluated.report,
       ...score,
+      summary,
+      summary_source: evaluated.report.summary ? 'evaluator' : 'fallback',
       trusted,
       reliability_label: trusted ? 'موثّق بالاقتباسات' : 'تقييم غير موثوق — لا توجد درجة رقمية',
       near_reference_model: nearReference,

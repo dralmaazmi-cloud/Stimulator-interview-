@@ -1,0 +1,35 @@
+[J1 health notice] ✓ المحاكاة جاهزة.
+[J1 modes] ● / سؤال واحد /  / تدريب سريع /  / 2–4 دقائق || ○ / مقابلة واقعية /  / سؤالان /  / نحو 7 دقائق || ○ / مقابلة موسّعة /  / خمسة أسئلة /  / نحو 16 دقيقة || ○ / مقابلة كاملة /  / نحو 20 دقيقة /  / نحو 20 دقيقة
+[J1 default mode] سؤال واحد
+[J1 default answer mode] ▤إجابة نصية
+[J1 question header] السؤال 1 من 1
+[J1 question] C4-B4 :: أخبرني عن موقف واجه فيه فريقك تحدياً كبيراً أو إخفاقًا، وتمكنت رغم ذلك من إعادة 
+[J1 progress bar] 100
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('button:has-text("إرسال الإجابة للتقييم")')[22m
+[2m    - locator resolved to <button disabled type="button" class="button  wide">إرسال الإجابة للتقييم</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    58 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+    at /home/user/Stimulator-interview-/work/audit-harness/journeys.mjs:43:66 {
+  name: 'TimeoutError'
+}
+
+Node.js v22.22.0
+EXIT=1

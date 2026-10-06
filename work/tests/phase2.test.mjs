@@ -49,10 +49,10 @@ assert.equal(biasSuite.counts.prompt_injection, 5, 'alpha-3: five prompt-injecti
 assert.equal(biasSuite.counts.total, 95);
 assert.ok(biasSuite.fixtures.filter(item => item.group === 'prompt_injection').every(item => item.injection_text && item.answer.includes(item.injection_text) && biasSuite.fixtures.some(other => other.id === item.expectation.compare_to)));
 
-const context = getQuestionContext('C1-B1');
+const context = getQuestionContext('C1-B3');
 const sourceSamples = sampleAnswerTexts(context.question);
 const prompt = buildEvaluationPrompt(context, 'شرحت الخطة بنفسي ثم طلبت من كل عضو أن يلخص دوره.', []);
-assert.match(prompt, /C1-B1/);
+assert.match(prompt, /C1-B3/);
 assert.match(prompt, /إجابة المستخدم المصححة/);
 assert.ok(sourceSamples.length);
 sourceSamples.forEach(sample => assert.ok(!prompt.includes(sample), 'Evaluation prompt must never contain a source sample answer'));
@@ -63,7 +63,7 @@ assert.ok(selfIntroContext.rubricSections.some(section => section.number === '6.
 
 const userText = 'في بداية المشروع كان الفريق متأخرًا. كانت مهمتي إعادة توزيع العمل. أنا عقدت اجتماعًا ووزعت الأدوار بنفسي. اكتمل المشروع في الموعد. تعلمت أن المتابعة المبكرة تمنع التأخير.';
 const rawReport = {
-  question_id: 'C1-B1',
+  question_id: 'C1-B3',
   rubric_mode: 'star_l',
   elements: {
     situation: { present: true, quote: 'في بداية المشروع كان الفريق متأخرًا' },
@@ -80,11 +80,7 @@ const rawReport = {
     { key: 'learning', score: 4, evidence: ['تعلمت أن المتابعة المبكرة تمنع التأخير'], justification: 'تعلم واضح.' },
     { key: 'competency_evidence', score: 4, evidence: ['اقتباس غير موجود في الإجابة'], justification: 'يجب رفض هذا الدليل.' }
   ],
-  expected_points_coverage: context.question.expected_points.points.map(item => ({
-    point: item.text,
-    covered: false,
-    quote: null
-  })),
+  expected_points_coverage: [],
   behaviours_observed: { supporting: [], negative: [] },
   mission_command_indicators: [],
   flags: [],
@@ -94,7 +90,7 @@ const rawReport = {
   follow_up_questions: ['ما المؤشر الذي استخدمته لقياس النتيجة؟']
 };
 
-assert.deepEqual(shapeErrors(rawReport, 'C1-B1', 'star_l'), []);
+assert.deepEqual(shapeErrors(rawReport, 'C1-B3', 'star_l'), []);
 const sanitized = sanitizeEvaluation(structuredClone(rawReport), context);
 const verified = verifyEvidence(sanitized, userText);
 assert.equal(verified.report.criteria.find(item => item.key === 'competency_evidence').score, 2,
@@ -117,10 +113,10 @@ assert.ok(ngramSimilarity('كلمات مختلفة تمامًا هنا', 'هذا
 
 const malformed = structuredClone(rawReport);
 malformed.criteria.pop();
-assert.ok(shapeErrors(malformed, 'C1-B1', 'star_l').includes('criteria'));
+assert.ok(shapeErrors(malformed, 'C1-B3', 'star_l').includes('criteria'));
 const duplicate = structuredClone(rawReport);
 duplicate.criteria[5].key = 'context';
-assert.ok(shapeErrors(duplicate, 'C1-B1', 'star_l').includes('criteria.keys'));
+assert.ok(shapeErrors(duplicate, 'C1-B3', 'star_l').includes('criteria.keys'));
 
 const clientText = fs.readdirSync(path.join(project, 'dist/js'))
   .map(file => read(`dist/js/${file}`).toString('utf8')).join('\n');
@@ -135,7 +131,10 @@ assert.match(read('dist/js/recorder.js').toString('utf8'), /MAX_SECONDS = 120/);
 assert.match(read('dist/js/recorder.js').toString('utf8'), /MAX_BYTES = 4 \* 1024 \* 1024/);
 assert.match(read('dist/js/simulation.js').toString('utf8'), /راجع التفريغ وصححه/);
 assert.match(read('dist/js/simulation.js').toString('utf8'), /SELF-INTRO/);
-assert.match(read('dist/js/report.js').toString('utf8'), /قارن بنموذج الدليل/);
+// alpha-5 (F2): زر التقرير «قارن بالإجابة النموذجية»، ونص النافذة الجديد.
+assert.match(read('dist/js/report.js').toString('utf8'), /قارن بالإجابة النموذجية/);
+assert.match(read('dist/js/report.js').toString('utf8'), /للمقارنة بعد التقييم، وليست الإجابة الصحيحة الوحيدة\./);
+assert.doesNotMatch(read('dist/js/report.js').toString('utf8'), /التصنيف النوعي/, 'old header label removed (R3)');
 
 const savedGemini = process.env.GEMINI_API_KEY;
 const savedGoogle = process.env.GOOGLE_API_KEY;
@@ -153,7 +152,7 @@ try {
     method: 'POST',
     headers: { 'x-client-id': 'phase2-test' },
     socket: { remoteAddress: '127.0.0.1' },
-    body: { question_id: 'C1-B1', answer: userText }
+    body: { question_id: 'C1-B3', answer: userText }
   }, evaluateRes);
   assert.equal(evaluateRes.statusCode, 503);
   assert.equal(evaluateRes.payload.code, 'AI_NOT_CONFIGURED');
@@ -262,7 +261,7 @@ try {
     method: 'POST',
     headers: { 'x-client-id': 'phase2-mocked-success', 'x-forwarded-for': '10.0.0.1' },
     socket: { remoteAddress: '127.0.0.1' },
-    body: { question_id: 'C1-B1', answer: userText }
+    body: { question_id: 'C1-B3', answer: userText }
   }, livePathRes);
   assert.equal(livePathRes.statusCode, 200);
   assert.equal(livePathRes.payload.report.final_score, 74);
@@ -277,7 +276,7 @@ try {
     method: 'POST',
     headers: { 'x-client-id': 'phase2-all-zero', 'x-forwarded-for': '10.0.0.5' },
     socket: { remoteAddress: '127.0.0.1' },
-    body: { question_id: 'C1-B1', answer: `${userText} ALL-ZERO` }
+    body: { question_id: 'C1-B3', answer: `${userText} ALL-ZERO` }
   }, zeroRes);
   assert.equal(zeroRes.statusCode, 200, JSON.stringify(zeroRes.payload));
   assert.equal(zeroRes.payload.report.trusted, true);
@@ -290,7 +289,7 @@ try {
     method: 'POST',
     headers: { 'x-client-id': 'phase2-no-quotes', 'x-forwarded-for': '10.0.0.6' },
     socket: { remoteAddress: '127.0.0.1' },
-    body: { question_id: 'C1-B1', answer: `${userText} NO-QUOTES` }
+    body: { question_id: 'C1-B3', answer: `${userText} NO-QUOTES` }
   }, noQuotesRes);
   assert.equal(noQuotesRes.statusCode, 200, JSON.stringify(noQuotesRes.payload));
   assert.equal(noQuotesRes.payload.report.trusted, false);
@@ -303,7 +302,7 @@ try {
     method: 'POST',
     headers: { 'x-client-id': 'phase2-failed-status', 'x-forwarded-for': '10.0.0.2' },
     socket: { remoteAddress: '127.0.0.1' },
-    body: { question_id: 'C1-B1', answer: `${userText} FAILED-STATUS` }
+    body: { question_id: 'C1-B3', answer: `${userText} FAILED-STATUS` }
   }, failedRes);
   assert.equal(failedRes.statusCode, 502);
   assert.equal(failedRes.payload.code, 'AI_PROVIDER_ERROR');
@@ -338,7 +337,7 @@ try {
         method: 'POST',
         headers: { 'x-client-id': client, 'x-forwarded-for': ip },
         socket: { remoteAddress: '127.0.0.1' },
-        body: { question_id: 'C1-B1', answer: 'قصير' }
+        body: { question_id: 'C1-B3', answer: 'قصير' }
       }, res);
       return res;
     };

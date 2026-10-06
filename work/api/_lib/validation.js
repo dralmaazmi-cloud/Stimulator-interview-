@@ -38,6 +38,29 @@ function clampScore(value) {
   return Math.max(0, Math.min(5, Math.round(Number(value) || 0)));
 }
 
+// alpha-5 (R2): جملة المقيّم تُقصّ إلى الحد وتُحذف منها أي نسبة مئوية أو «من 100» أو «من 5».
+export function cleanEvaluatorSentence(value, maximum) {
+  const text = String(value || '')
+    .replace(/[0-9\u0660-\u0669]+(?:[.,][0-9\u0660-\u0669]+)?\s*(?:%|٪|بالمئة|بالمائة|في المئة|في المائة)/g, '')
+    .replace(/[0-9\u0660-\u0669]+\s*من\s*(?:100|١٠٠|5|٥)\b/g, '')
+    .replace(/\bمن\s*(?:100|١٠٠)\b/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([.،؛:!؟)])/g, '$1')
+    .trim();
+  return text.length > maximum ? `${text.slice(0, maximum - 1).trimEnd()}…` : text;
+}
+
+// alpha-5 (R2): الملخص بلا أرقام ولا تصنيف.
+export function cleanSummary(value, maximum = 240) {
+  const stripped = cleanEvaluatorSentence(value, Number.MAX_SAFE_INTEGER)
+    .replace(/[0-9\u0660-\u0669]+/g, '')
+    .replace(/(?<!\p{L})(?:إجابة\s+)?(?:قوية|متوسطة|ضعيفة)(?!\p{L})/gu, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([.،؛:!؟)])/g, '$1')
+    .trim();
+  return stripped.length > maximum ? `${stripped.slice(0, maximum - 1).trimEnd()}…` : stripped;
+}
+
 export function shapeErrors(value, expectedQuestionId, expectedMode) {
   const errors = [];
   if (!value || typeof value !== 'object' || Array.isArray(value)) return ['root'];
@@ -83,8 +106,10 @@ export function sanitizeEvaluation(value, context) {
       key: String(item?.key || ''),
       score: clampScore(item?.score),
       evidence: strings(item?.evidence, 4),
-      justification: String(item?.justification || '').trim()
+      justification: String(item?.justification || '').trim(),
+      improve: cleanEvaluatorSentence(item?.improve, 160)
     })),
+    summary: cleanSummary(value.summary, 240),
     expected_points_coverage: sourcePoints.map(point => {
       const candidate = modelCoverage.find(item => normalizeArabic(item?.point) === normalizeArabic(point));
       return {
@@ -228,4 +253,91 @@ export function referenceSimilarity(answer, sample) {
 
 export function nearReferenceModel(details) {
   return details.four_gram >= 0.35 || details.two_gram >= 0.45 || details.word_jaccard >= 0.6;
+}
+
+// ---------- alpha-5 (الخطوة 5): «مثال مكتمل على غرار موقفك» ----------
+export const EXAMPLE_ELEMENTS_BY_MODE = ELEMENTS_BY_MODE;
+
+// كلمات ذات معنى: بعد التطبيع، أطول من حرفين، وليست من كلمات التوقف الشائعة.
+const STOP_WORDS = new Set(['في', 'من', 'على', 'إلى', 'الى', 'عن', 'مع', 'أن', 'ان', 'ثم', 'كان', 'كانت', 'هذا', 'هذه', 'ذلك', 'التي', 'الذي', 'كما', 'لم', 'لا', 'ما', 'قد', 'كل', 'بعد', 'قبل', 'حتى', 'بين', 'عند', 'لكن', 'أو', 'او', 'هو', 'هي', 'نحن', 'أنا', 'انا', 'تم', 'وقد', 'ولم', 'فقد']);
+export function meaningfulWords(value) {
+  return normalizeArabic(value).split(' ').filter(word => word.length > 2 && !STOP_WORDS.has(word));
+}
+
+// نسبة كلمات المقطع ذات المعنى الموجودة في إجابة المتدرب (0–1).
+export function traineeOverlap(segmentText, answerText) {
+  const answerWords = new Set(meaningfulWords(answerText));
+  const words = meaningfulWords(segmentText);
+  if (!words.length) return 0;
+  const hits = words.filter(word => answerWords.has(word)).length;
+  return hits / words.length;
+}
+
+export const TRAINEE_OVERLAP_THRESHOLD = 0.7;
+export const EXAMPLE_COVERED_MESSAGE = 'إجابتك تغطي العناصر المطلوبة. راجع التعليق على كل معيار لرفعها.';
+
+// تُحذف أي درجة أو نسبة من نص المثال.
+function stripScores(value) {
+  return String(value || '')
+    .replace(/[0-9\u0660-\u0669]+(?:[.,][0-9\u0660-\u0669]+)?\s*(?:%|٪|بالمئة|بالمائة|في المئة|في المائة)/g, '')
+    .replace(/[0-9\u0660-\u0669]+\s*من\s*(?:100|١٠٠|5|٥)\b/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+export function exampleShapeErrors(value, expectedQuestionId, expectedMode) {
+  const errors = [];
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return ['root'];
+  if (value.question_id !== expectedQuestionId) errors.push('question_id');
+  if (value.rubric_mode !== expectedMode) errors.push('rubric_mode');
+  if (!Array.isArray(value.segments) || !value.segments.length) errors.push('segments');
+  array(value.segments).forEach((segment, index) => {
+    if (!segment || typeof segment.text !== 'string' || !segment.text.trim()) errors.push(`segments.${index}.text`);
+    if (!['trainee', 'added'].includes(segment?.source)) errors.push(`segments.${index}.source`);
+  });
+  if (!Array.isArray(value.additions)) errors.push('additions');
+  return errors;
+}
+
+// تحقق الخادم: مقطع trainee تطابقه مع الإجابة دون 70% يُعاد وسمه added؛ تُحذف الدرجات والنسب؛
+// العناصر والمعايير خارج النموذج تُسقط؛ الإضافات حتى ست.
+export function sanitizeExample(value, context) {
+  const mode = context.question.rubric_mode;
+  const allowedElements = new Set(ELEMENTS_BY_MODE[mode] || []);
+  const allowedCriteria = new Set(CRITERIA_BY_MODE[mode] || []);
+  const answer = context.answer || '';
+  let relabelled = 0;
+  const segments = array(value.segments)
+    .filter(segment => allowedElements.has(segment?.element))
+    .map(segment => {
+      const text = stripScores(segment.text).slice(0, 1200);
+      let source = segment.source === 'trainee' ? 'trainee' : 'added';
+      if (source === 'trainee' && traineeOverlap(text, answer) < TRAINEE_OVERLAP_THRESHOLD) {
+        source = 'added';
+        relabelled += 1;
+      }
+      return { element: segment.element, text, source };
+    })
+    .filter(segment => segment.text)
+    .slice(0, 12);
+  const additions = array(value.additions)
+    .filter(item => allowedCriteria.has(item?.criterion))
+    .map(item => ({
+      criterion: item.criterion,
+      what: stripScores(item.what).slice(0, 240),
+      why: stripScores(item.why).slice(0, 240)
+    }))
+    .filter(item => item.what)
+    .slice(0, 6);
+  const hasAdded = segments.some(segment => segment.source === 'added');
+  return {
+    question_id: context.question.id,
+    rubric_mode: mode,
+    segments,
+    additions: hasAdded ? additions : [],
+    covered: !hasAdded,
+    message: hasAdded ? '' : EXAMPLE_COVERED_MESSAGE,
+    relabelled_segments: relabelled,
+    word_count: segments.map(segment => segment.text).join(' ').split(/\s+/).filter(Boolean).length
+  };
 }

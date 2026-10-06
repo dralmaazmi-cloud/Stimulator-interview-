@@ -56,6 +56,10 @@ export function sampleAnswerTexts(question) {
   const values = [];
   if (question.sample_answer) values.push(question.sample_answer);
   if (question.sample_answer_star_l) values.push(Object.values(question.sample_answer_star_l).flat().join(' '));
+  // alpha-5 (F4): الإجابة الموسّعة (SEAL) تدخل في فحص القرب من النموذج أيضًا.
+  if (question.sample_answer_seal && typeof question.sample_answer_seal === 'object') {
+    values.push(Object.values(question.sample_answer_seal).flat().filter(Boolean).join(' '));
+  }
   if (Array.isArray(question.sample_answers)) {
     question.sample_answers.forEach(item => values.push(typeof item === 'string' ? item : item.answer || ''));
   }

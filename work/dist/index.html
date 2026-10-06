@@ -9,29 +9,21 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="مدرّب المقابلات">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="css/styles.css?v=0.5.1">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-180.png">
+  <link rel="stylesheet" href="css/styles.css?v=0.6.0-alpha-5">
   <title>مدرّب المقابلات القيادية</title>
 </head>
 <body>
   <a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
 
-  <header class="app-header" id="app-header">
+  <header class="app-header" id="app-header" hidden>
     <div class="header-inner">
       <button class="icon-button back-button" id="back-button" type="button" aria-label="العودة إلى الصفحة السابقة" title="رجوع" hidden>‹</button>
-      <a class="brand" href="#/home" aria-label="الرئيسية">
-        <span class="brand-mark" aria-hidden="true">ق</span>
-        <span class="brand-copy">
-          <strong>مدرّب المقابلات</strong>
-          <small>مراجعة المقابلات القيادية</small>
-        </span>
+      <a class="route-brand" href="#/home" aria-label="العودة إلى الرئيسية">
+        <strong id="route-title">مدرّب المقابلات</strong>
       </a>
-      <div class="header-actions">
-        <a class="icon-button search-button" href="#/search" aria-label="البحث في المرجع" title="البحث">⌕</a>
-        <a class="icon-button settings-button" href="#/settings" aria-label="إعدادات التطبيق" title="الإعدادات">⚙</a>
-        <button class="icon-button" id="theme-toggle" type="button" aria-label="تبديل مظهر التطبيق" title="تبديل المظهر">◐</button>
-      </div>
+      <span class="header-spacer" aria-hidden="true"></span>
     </div>
   </header>
 
@@ -43,10 +35,11 @@
   </main>
 
   <nav class="bottom-nav" aria-label="التنقل الرئيسي">
-    <a href="#/home" data-nav="home"><span aria-hidden="true">⌂</span><small>الرئيسية</small></a>
-    <a href="#/learn" data-nav="learn"><span aria-hidden="true">▥</span><small>المسار</small></a>
-    <a href="#/bank" data-nav="bank"><span aria-hidden="true">▤</span><small>الأسئلة</small></a>
-    <a href="#/tools" data-nav="tools"><span aria-hidden="true">▣</span><small>الأدوات</small></a>
+    <a href="#/home" data-nav="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3V11Z"/></svg><small>الرئيسية</small></a>
+    <a href="#/preparation" data-nav="preparation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23V5.5Z"/></svg><small>التحضير</small></a>
+    <a href="#/simulation" data-nav="simulation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Zm-7-4a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg><small>المحاكاة</small></a>
+    <a href="#/reports" data-nav="reports"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18H5zM9 16v-4M12 16V8M15 16v-6"/></svg><small>التقارير</small></a>
+    <a href="#/settings" data-nav="more"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg><small>المزيد</small></a>
   </nav>
 
   <dialog id="app-dialog" class="app-dialog">
@@ -60,6 +53,6 @@
   </dialog>
 
   <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
-  <script type="module" src="js/app.js?v=0.5.1"></script>
+  <script type="module" src="js/app.js?v=0.6.0-alpha-5"></script>
 </body>
 </html>

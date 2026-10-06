@@ -1,0 +1,652 @@
+{
+  "schema_version": "1.0",
+  "policy": "لا يُنشر إلا السؤال الذي يتضمن إجابة نموذجية مكتملة العناصر ومعتمدة للمراجعة والتدريب.",
+  "source_question_count": 127,
+  "published_question_count": 70,
+  "excluded_question_count": 57,
+  "reference_sha256": "51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357",
+  "reviewed_sources": [
+    "dist/data/reference.json",
+    "دليل المقابلات القيادية المبنية على الكفاءات v1.pdf",
+    "دليل الهنداسي - للمقابلات القيادية المبنية على الكفاءات v5.pdf"
+  ],
+  "published": [
+    {
+      "id": "C1-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C1-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C1-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C1-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C1-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C2-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C2-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C2-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C2-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C2-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C3-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C3-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B6",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B7",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B8",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B9",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B10",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B11",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B12",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C3-B13",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C4-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C4-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C4-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C4-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C4-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C4-B6",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C5-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C5-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C5-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C5-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C5-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C5-B6",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C6-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C6-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B6",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B7",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B8",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B9",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C6-B10",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C7-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C7-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C7-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C7-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C7-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C7-B6",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C8-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C8-S2",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "C8-B3",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C8-B4",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "C8-B5",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "M1-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "M1-B1",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "M2-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "M2-B1",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "M3-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "M3-B1",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "M4-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "M4-B1",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "M5-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "M5-B1",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "M6-S1",
+      "status": "published",
+      "evidence": "إجابة SEAL موسعة ومعتمدة مبنية على الدليل"
+    },
+    {
+      "id": "M6-B1",
+      "status": "published",
+      "evidence": "sample_answer_star_l كامل في المصدر"
+    },
+    {
+      "id": "X1",
+      "status": "published",
+      "evidence": "sample_answer فقرة كاملة من الدليل (سؤال معرفي)"
+    },
+    {
+      "id": "X2",
+      "status": "published",
+      "evidence": "sample_answer فقرة كاملة من الدليل (سؤال معرفي)"
+    }
+  ],
+  "excluded": [
+    {
+      "id": "C1-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C1-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C1-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C1-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C1-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C1-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C2-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C2-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C2-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C2-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C2-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C2-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C3-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C3-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C3-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C3-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C3-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C3-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S7",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S8",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S9",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-S10",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C4-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-S7",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-S8",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C5-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-S7",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C6-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-S7",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C7-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-S3",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-S4",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-S5",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-S6",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-S7",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-B1",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    },
+    {
+      "id": "C8-B2",
+      "status": "excluded",
+      "reason": "المصدر يقدم فقرة إرشادية أو مثالًا عامًا، وليس جوابًا نموذجيًا كاملًا مفصول العناصر."
+    }
+  ]
+}

@@ -58,6 +58,7 @@ export function applyOverrides(exercises, config, salt = 0) {
 }
 
 export function positionShare(exercises) {
+  if (!exercises.length) return 0;
   const counts = new Map();
   exercises.forEach(exercise => counts.set(exercise.answer, (counts.get(exercise.answer) || 0) + 1));
   return Math.max(...counts.values()) / exercises.length;

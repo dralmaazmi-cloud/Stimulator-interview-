@@ -2,9 +2,10 @@
   "schema_version": "1.0",
   "derived_schema_version": "1.0",
   "reference_sha256": "51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357",
-  "prompt_version": "execution-brief-1.0+approved-restructure-3",
-  "rubric_version": "phase1-reference-review-3.0",
-  "config_version": "3.0",
+  "expanded_answers_sha256": "b81bd2d1a60cc6b47a45c85a15f7503b4e5f8bb28b892372d5ec5be43054160b",
+  "prompt_version": "evaluation-1.2+approved-content-audit-1",
+  "rubric_version": "phase2-reference-review-4.0",
+  "config_version": "6.0",
   "model_id": null,
   "source_block_counts": {
     "part_1_framework": {
@@ -36,16 +37,18 @@
   },
   "counts": {
     "competencies": 8,
-    "competency_questions": 113,
+    "competency_questions": 56,
     "mission_command_principles": 6,
     "mission_command_questions": 12,
     "additional_questions": 2,
-    "total_questions": 127,
-    "unique_question_ids": 127,
-    "primary_questions": 89,
-    "alternate_questions": 38,
-    "variant_pairs": 16,
-    "lessons": 6,
-    "exercises": 130
+    "total_questions": 70,
+    "source_questions": 127,
+    "excluded_questions": 57,
+    "unique_question_ids": 70,
+    "primary_questions": 70,
+    "alternate_questions": 0,
+    "variant_pairs": 0,
+    "lessons": 5,
+    "exercises": 0
   }
 }

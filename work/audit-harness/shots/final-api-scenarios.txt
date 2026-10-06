@@ -2,7 +2,7 @@ PASS | evaluate happy path | status=200 score=84 class=قوية calls=1
 PASS | all evidence quotes literal in answer | 6 quotes
 PASS | no pass/fail wording in report | checked for نجاح/رسوب
 PASS | REAL REST shape (steps[]) parsed | status=200 code=undefined error=undefined
-PASS | fabricated quotes → retried once, no numeric score | calls=2 score=null class=غير موثوق rejected=14/14
+PASS | fabricated quotes → retried once, no numeric score | calls=2 score=null class=غير موثوق rejected=11/11
 PASS | invalid JSON → retry once then safe 502 | status=502 calls=2 error="تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل." code=AI_INVALID_JSON
 PASS | schema failure → retry once then 502 | status=502 calls=2 code=AI_SCHEMA_FAILED
 PASS | "retry once only" when quotes fail then schema fails | calls=2 status=502 score=undefined
@@ -11,7 +11,7 @@ PASS | trust gate (أ): 2 verified low criteria + 4 zero → trusted, low numeri
 PASS | trust gate (ج): all criteria 0, no quotes → trusted, score 0, ضعيفة | score=0 class=ضعيفة checked=0
 PASS | injection text treated as data (server side cannot detect; model-dependent) | status=200 score=84 — model-dependent, UNTESTED live
 PASS | verbatim guide answer → near_reference flag + competency cap 3 | similarity=1 ce=3 score=78
-PASS | lightly paraphrased guide answer still detected | similarity=0.788
+PASS | lightly paraphrased guide answer still detected | similarity=0.824
 PASS | followups accepted and merged | status=200 remaining_followups=1
 PASS | self-intro rubric evaluates | status=200 score=71 criteria=coverage,structure_clarity,timing
 PASS | no key → 503 with friendly Arabic, no provider name | status=503 error="خدمة المحاكاة غير مهيأة بعد. أضف مفتاح الذكاء الاصطناعي في إعدادات الخادم."

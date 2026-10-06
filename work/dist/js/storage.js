@@ -1,6 +1,9 @@
 const DB_NAME = 'leadership-interview-coach';
-const DB_VERSION = 2;
-const STORES = ['settings', 'progress', 'stories', 'sessions', 'checklists', 'review'];
+// alpha-5: الإصدار 3 يضيف مخزني «attempts» (سجل المحاولات لكل سؤال، بلا نص إجابة) و«rotation» (تدوير الأسئلة).
+// الترحيل لا يفقد بيانات: تُنشأ المخازن الناقصة فقط ولا يُحذف أو يُعاد كتابة أي مخزن قائم.
+export const DB_VERSION = 3;
+export const STORES = ['settings', 'progress', 'stories', 'sessions', 'checklists', 'review', 'attempts', 'rotation'];
+export const MAX_ATTEMPTS_PER_QUESTION = 5;
 // alpha-4 (A3): مخزن مستقل للتسجيل الصوتي المعلق؛ لا يدخل في التصدير ولا يُكتب في localStorage.
 const PENDING_RECORDINGS = 'pending_recordings';
 const PENDING_RECORDING_TTL_MS = 24 * 60 * 60 * 1000;
@@ -13,16 +16,23 @@ function openDb() {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      [...STORES, PENDING_RECORDINGS].forEach(store => {
-        if (!db.objectStoreNames.contains(store)) db.createObjectStore(store, { keyPath: 'id' });
-      });
-    };
+    request.onupgradeneeded = event => upgradeDatabase(request.result, event.oldVersion);
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
   return dbPromise;
+}
+
+// دالة ترحيل خالصة (قابلة للاختبار): تنشئ المخازن الناقصة فقط. تعيد أسماء المخازن التي أُنشئت.
+export function upgradeDatabase(db, oldVersion = 0) {
+  const created = [];
+  [...STORES, PENDING_RECORDINGS].forEach(store => {
+    if (!db.objectStoreNames.contains(store)) {
+      db.createObjectStore(store, { keyPath: 'id' });
+      created.push(store);
+    }
+  });
+  return { from: Number(oldVersion) || 0, to: DB_VERSION, created };
 }
 
 function fallbackKey(store) { return `lic:${store}`; }
@@ -207,6 +217,63 @@ export async function purgeExpiredRecordings(now = Date.now()) {
     }
   } catch { /* ignore */ }
   return removed;
+}
+
+// ---------- alpha-5 (R5): سجل المحاولات لكل سؤال — بلا نص إجابة ----------
+// attempt = { key, at, score, classification, criteria: {key: score}, elements_complete, elements_total, weights_version }
+export function attemptSummary(report, key, at = new Date().toISOString()) {
+  if (!report || report.trusted === false || !Number.isFinite(report.final_score)) return null;
+  const criteria = {};
+  (report.criteria || []).forEach(item => { if (item?.key) criteria[item.key] = Number(item.score) || 0; });
+  const elements = {};
+  Object.entries(report.elements || {}).forEach(([name, value]) => { elements[name] = Boolean(value?.complete); });
+  return {
+    key,
+    at,
+    score: report.final_score,
+    classification: report.classification || '',
+    criteria,
+    elements,
+    elements_complete: Number.isFinite(report.elements_complete) ? report.elements_complete : null,
+    elements_total: Number.isFinite(report.elements_total) ? report.elements_total : null,
+    weights_version: report.weights_version || ''
+  };
+}
+
+export async function recordAttempt(questionId, attempt) {
+  if (!questionId || !attempt) return null;
+  const current = (await get('attempts', questionId)) || { id: questionId, attempts: [] };
+  const attempts = (current.attempts || []).filter(item => item.key !== attempt.key);
+  attempts.push(attempt);
+  attempts.sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  const value = { id: questionId, attempts: attempts.slice(-MAX_ATTEMPTS_PER_QUESTION), updated_at: new Date().toISOString() };
+  await set('attempts', value);
+  return value;
+}
+
+export async function attemptsFor(questionId) {
+  const value = await get('attempts', questionId);
+  return Array.isArray(value?.attempts) ? value.attempts : [];
+}
+
+// المحاولة السابقة القابلة للمقارنة: آخر محاولة قبل المفتاح الحالي بنسخة الأوزان نفسها.
+export function previousComparableAttempt(attempts, currentKey, weightsVersion) {
+  const list = attempts || [];
+  const current = list.find(item => item.key === currentKey);
+  const others = list.filter(item => item.key !== currentKey
+    && item.weights_version === weightsVersion
+    && (!current || String(item.at) < String(current.at)));
+  return others.length ? others[others.length - 1] : null;
+}
+
+// ---------- alpha-5 (D2): سجل التدوير — تاريخ آخر ظهور وعدد المرات، بلا إجابة ولا درجة ----------
+export async function loadRotation() {
+  const records = await getAll('rotation');
+  return new Map(records.map(item => [item.id, { count: Number(item.count) || 0, last_shown_at: item.last_shown_at || '' }]));
+}
+
+export async function saveRotationRecords(records) {
+  for (const record of records) await set('rotation', { id: record.id, count: record.count, last_shown_at: record.last_shown_at });
 }
 
 export async function completedLessons() {
