@@ -553,6 +553,9 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('J8 saved questions page lists C1-B3', String(await page.locator('.saved-question-card').count()));
   await page.goto(BASE + '/#/settings');
   await page.waitForTimeout(400);
+  // the delete button lives inside the «الخصوصية والتحكم» accordion item
+  await page.locator('#settings-privacy summary').click();
+  await page.waitForTimeout(200);
   await page.locator('button:has-text("حذف جميع بياناتي المحلية")').click();
   await page.waitForTimeout(600);
   const left = await page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('lic:')));
@@ -655,9 +658,9 @@ for (const theme of ['light', 'dark']) {
 // ---------- alpha-5 Journey 10: DB migration v2 → v3 keeps data; R5 retry & compare; R6 429 copy on 4176 ----------
 {
   const { browser, page } = await newPage();
-  await page.goto(BASE + '/#/home');
-  await page.waitForSelector('.home-dashboard');
-  // seed a v2 database with a completed session and a checklist, then reload the app (which opens v3)
+  // seed on a same-origin page that does not run the app (no open connection blocks deleteDatabase)
+  await page.goto(BASE + '/manifest.webmanifest');
+  // seed a v2 database with a completed session and a checklist, then load the app (which opens v3)
   await page.evaluate(() => new Promise((resolve, reject) => {
     const del = indexedDB.deleteDatabase('leadership-interview-coach');
     del.onsuccess = del.onerror = () => {
@@ -667,7 +670,7 @@ for (const theme of ['light', 'dark']) {
       open.onerror = () => reject(open.error);
     };
   }));
-  await page.reload();
+  await page.goto(BASE + '/#/home');
   await page.waitForSelector('.home-dashboard');
   await page.goto(BASE + '/#/reports');
   await page.waitForTimeout(600);
@@ -681,14 +684,14 @@ for (const theme of ['light', 'dark']) {
   await gotoHash(page, BASE + '/#/simulation?question=C1-B3&answer=text');
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' LOWSCORE');
-  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+  await page.locator('button:has-text("إرسال الإجابة للتقييم")').dispatchEvent('click');
   await page.waitForSelector('.evaluation-report', { timeout: 20000 });
   log('J10 R5 first attempt: no comparison yet', String(await page.locator('.attempt-comparison').count()));
   await page.locator('.retry-question').click();
   await page.waitForSelector('.ai-question-card');
   log('J10 R5 retry reopens the same question', await text(page, '.ai-question-card .question-id'));
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' NOFOLLOWUP');
-  await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
+  await page.locator('button:has-text("إرسال الإجابة للتقييم")').dispatchEvent('click');
   await page.waitForSelector('.evaluation-report', { timeout: 20000 });
   log('J10 R5 comparison with previous attempt', (await text(page, '.attempt-comparison')).slice(0, 220));
   const attempts = await page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const tx = r.result.transaction('attempts'); const g = tx.objectStore('attempts').get('C1-B3'); g.onsuccess = () => resolve(g.result); }; }));

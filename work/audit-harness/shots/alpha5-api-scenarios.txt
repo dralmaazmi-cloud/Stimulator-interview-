@@ -1,0 +1,44 @@
+PASS | evaluate happy path | status=200 score=84 class=قوية calls=1
+PASS | all evidence quotes literal in answer | 6 quotes
+PASS | no pass/fail wording in report | checked for نجاح/رسوب
+PASS | alpha-5 report carries elements_complete/elements_total, weights phase2-1.1, prompt evaluation-1.2 | complete=5/5 weights=phase2-1.1 prompt=evaluation-1.2
+PASS | alpha-5 improve/summary sanitised (no % / «من 100») | summary="الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي)." improve0="اذكر خطوة محددة ترفع context (جملة تجريبية بنسبة تُحذف)."
+PASS | alpha-5 fallback summary when evaluator omits it | summary="اكتمل 5 من 5 عناصر. ابدأ بـ‹النتيجة والأثر›."
+PASS | alpha-5 /api/example happy path (segments trainee+added, additions ≤ 6, no score) | status=200 calls=1 segments=7 added=2 additions=2
+PASS | alpha-5 /api/example strips scores/percentages from the example text | checked for N%
+PASS | alpha-5 /api/example relabels a "trainee" segment with < 70% overlap as added | relabelled=1
+PASS | alpha-5 /api/example with nothing added → covered message | message="إجابتك تغطي العناصر المطلوبة. راجع التعليق على كل معيار لرفعها."
+PASS | alpha-5 /api/example rejects general questions (X1) with 400 | status=400
+PASS | alpha-5 X1 (general, complete_source_paragraph) evaluates with the general rubric | status=200 mode=general score=77
+PASS | REAL REST shape (steps[]) parsed | status=200 code=undefined error=undefined
+PASS | fabricated quotes → retried once, no numeric score | calls=2 score=null class=غير موثوق rejected=11/11
+PASS | invalid JSON → retry once then safe 502 | status=502 calls=2 error="تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل." code=AI_INVALID_JSON
+PASS | schema failure → retry once then 502 | status=502 calls=2 code=AI_SCHEMA_FAILED
+PASS | "retry once only" when quotes fail then schema fails | calls=2 status=502 score=undefined
+PASS | zero quotes returned → no numeric score should be shown | score=null trusted=false label="تقييم غير موثوق — لا توجد درجة رقمية" checked=0
+PASS | trust gate (أ): 2 verified low criteria + 4 zero → trusted, low numeric score, ضعيفة | score=8 class=ضعيفة scored=2 unverified=0
+PASS | trust gate (ج): all criteria 0, no quotes → trusted, score 0, ضعيفة | score=0 class=ضعيفة checked=0
+PASS | injection text treated as data (server side cannot detect; model-dependent) | status=200 score=84 — model-dependent, UNTESTED live
+PASS | verbatim guide answer → near_reference flag + competency cap 3 | similarity=1 ce=3 score=78
+PASS | lightly paraphrased guide answer still detected | similarity=0.824
+PASS | followups accepted and merged | status=200 remaining_followups=1
+PASS | self-intro rubric evaluates | status=200 score=71 criteria=coverage,structure_clarity,timing
+PASS | no key → 503 with friendly Arabic, no provider name | status=503 error="خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا."
+PASS | provider 429 → no technical/provider text leaked | status=429 error="الخدمة مشغولة حاليًا. حاول بعد دقيقة."
+PASS | provider 400 (bad key) → safe message | status=502 error="تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل."
+PASS | input validation (short/unknown/too long) | 400/404/413
+PASS | rate limit triggers at 41st request per (IP + client id) | 41st status=429
+PASS | alpha-3: another client id from the same IP still passes (until the IP cap) | new id status=400
+PASS | transcribe rejects wrong mime / >120s header / >4MB | 415/413/413
+PASS | transcribe iOS audio/mp4 → provider gets audio/m4a | status=200 providerMime=audio/m4a transcript="هذا تفريغ تجريبي للتسجيل الصوت"
+PASS | transcribe webm happy path returns editable transcript only (no evaluation) | keys=transcript,duration_seconds,word_count
+PASS | transcribe rejects arbitrary bytes labelled audio/webm → 415 (content sniffing, v0.5.1 item 14) | status=415
+PASS | transcribe real WebM header (1A 45 DF A3 + padding) → 200; missing X-Audio-Duration → 400 | webm=200 noDuration=400
+PASS | self-intro improve returns requires_user_approval | status=200 words=17
+PASS | self-intro facts_preserved=false → rejected (relies on model self-report only) | status=502 code=SELF_INTRO_VALIDATION_FAILED
+PASS | /api/followup removed → 404 (follow-ups only via /api/evaluate) | status=404
+PASS | GET on /api/evaluate → 405 | status=405
+PASS | per-IP cap: fresh ids pass, then 429 (RATE_LIMITED) once the IP hits 200/hour | 429 after 126 fresh-id requests in this scenario (IP total ≤ 200 incl. earlier scenarios); last ok status=400; provider calls so far=28
+
+SUMMARY 41 pass / 41
+EXIT=0

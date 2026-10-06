@@ -3,41 +3,41 @@
 [J1 default mode] سؤال واحد
 [J1 default answer mode] ▤إجابة نصية
 [J1 question header] السؤال 1 من 1
-[J1 question] C4-B6 :: صف موقفاً عكست فيه أنت وفريقك مستوى عالياً من الثقة المتبادلة. ماذا حدث؟ وكيف أث
+[J1 question] C7-S1 :: فوجئت بتغيير مفاجئ في خطة العمل من الجهة العليا، وكان فريقك مستعداً لتنفيذ الخطة
 [J1 progress bar] 100
 [J1 empty submit disabled] true
 [J1 scrollY after report (item 8)] 0
-[J1 final-score text] 84%
-[J1 report hero] 84% إجابة قوية العناصر المكتملة: 5 من 5 الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J1 final-score text] 85%
+[J1 report hero] 85% إجابة قوية العناصر المكتملة: 4 من 4 الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
 [J1 trust line] اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
-[J1 R3 section order] أين ذهبت الدرجة | خطة المحاولة القادمة | ما أحسنتَ فيه | إجابتك كما قُيّمت | نصيب الإجراء من إجابتك | التعليق على كل معيار | كيف حُسبت الدرجة
+[J1 R3 section order] أين ذهبت الدرجة | خطة المحاولة القادمة | ما أحسنتَ فيه | إجابتك كما قُيّمت | نصيب الإجراء من إجابتك | التعليق على كل معيار | تغطية النقاط المتوقعة | كيف حُسبت الدرجة
 [J1 R3 no old header labels] true
-[J1 R3 breakdown total line] المجموع: 84 من 100 :: العنصر يُحتسب مكتملًا عند 60% فأكثر
+[J1 R3 breakdown total line] المجموع: 85 من 100 :: العنصر يُحتسب مكتملًا عند 60% فأكثر
 [J1 R3 action share marker] 1 :: تقديري · قاعدة الدليل: الإجراء هو الجزء الأكبر من الإجابة.
 [J1 R2 criterion three lines] ما ظهر في إجابتك | ما ينقص | كيف ترفعه
-[J1 report sections] أين ذهبت الدرجة | خطة المحاولة القادمة | ما أحسنتَ فيه | إجابتك كما قُيّمت | نصيب الإجراء من إجابتك | التعليق على كل معيار | كيف حُسبت الدرجة
+[J1 report sections] أين ذهبت الدرجة | خطة المحاولة القادمة | ما أحسنتَ فيه | إجابتك كما قُيّمت | نصيب الإجراء من إجابتك | التعليق على كل معيار | تغطية النقاط المتوقعة | كيف حُسبت الدرجة
 [J1 action buttons] تصدير PDF | أعد الإجابة وقارن | قارن بالإجابة النموذجية | الإجابة عن سؤال المتابعة | إنهاء وعرض الملخص
 [J1 null/undefined in report] 0
-[J1 compare dialog open] true :: ⓘ للمقارنة بعد التقييم، وليست الإجابة الصحيحة الوحيدة. إجابة نموذجية إرشادية استخدمها لفهم طريقة بناء الإجابة، ولا تحفظه
+[J1 compare dialog open] true :: ⓘ للمقارنة بعد التقييم، وليست الإجابة الصحيحة الوحيدة. إجابة نموذجية موسّعة، مبنية على إجابة الدليل استخدمها لفهم طريقة 
 [J1 followup card] ؟ ما المؤشر الذي استخدمته لقياس النتيجة؟ (متابعة تجريبية) أجب بإيجاز وركّز على هذا المحور فقط.
 [J1 followup merged in report] true
 [J1 followup button still shown after 1 followup?] 0
-[J1 summary] اكتملت المحاكاة تقرير المقابلة الشامل 1 إجابة محللة · 1 تقييم موثوق أداء قوي 84% المتوسط التدريبي
+[J1 summary] اكتملت المحاكاة تقرير المقابلة الشامل 1 إجابة محللة · 1 تقييم موثوق أداء قوي 85% المتوسط التدريبي
 [J1 summary buttons] طباعة أو تصدير PDF | محاكاة جديدة | خريطة التغطية | سجل التقارير | العودة للرئيسية
-[J1 sessions list] سؤال واحد نصي 06‏/10‏/2026، 5:10 ص 1 إجابة اضغط لفتح الملخص وتقارير الإجابات كاملة 84%
-[J1 saved session view headings] سؤال واحد | تقرير المقابلة الشامل | متوسط معايير المقابلة | أداؤك حسب الكفاءة أو مبدأ قيادة المهمة | اكتمال عناصر STAR-L | نقاط القوة المتكررة | نقاط الضعف المتكررة | أولوياتك للمحاكاة القادمة | نتيجة كل إجابة | تقارير الإجابات |  |  |  |  |  |  |  | المقارنة بالإجابة النموذجية | إجابة نموذجية إرشادية
+[J1 sessions list] سؤال واحد نصي 06‏/10‏/2026، 5:13 ص 1 إجابة اضغط لفتح الملخص وتقارير الإجابات كاملة 85%
+[J1 saved session view headings] سؤال واحد | تقرير المقابلة الشامل | متوسط معايير المقابلة | أداؤك حسب الكفاءة أو مبدأ قيادة المهمة | اكتمال عناصر SEAL | نقاط القوة المتكررة | نقاط الضعف المتكررة | أولوياتك للمحاكاة القادمة | نتيجة كل إجابة | تقارير الإجابات |  |  |  |  |  |  |  |  | المقارنة بالإجابة النموذجية | إجابة نموذجية موسّعة، مبنية على إجابة الدليل | إجابة الدليل كما هي
 [J1 saved view shows criteria/quotes?] 7
 [J1 saved view retry link (R5)] 1
 [J1 print: saved report criteria visible (item 7)] 1
 [J1 print: footer text present] true
 [J1 print media hides chrome] {"nav":"none","header":"none","noPrint":"none"}
 [J1b flags shown] الدور الشخصي غير واضح
-[J1b comparison with previous] المقارنة مع آخر جلسة موثقة +0 نقطة السابق 84 · الحالي 84
+[J1b comparison with previous] المقارنة مع آخر جلسة موثقة -1 نقطة السابق 85 · الحالي 84
 [J1c after save&exit: home mentions resume?] false
 [J1c sessions page lists in-progress session?] true
 [J1c IndexedDB sessions] [{"status":"completed","n":1},{"status":"in_progress","draft":"مسودة غير مرسلة","n":0},{"status":"completed","n":1}]
 [J1d resume card shown on simulation setup] 1 :: لديك جلسة غير مكتملة السؤال 1 من 1 — سؤال واحد استئناف حذف الجلسة
-[J1d resumed same question?] true (C3-B7)
+[J1d resumed same question?] true (C6-B4)
 [J1d draft restored?] true
 [J1d after finish: sessions by status (item 6)] {"completed":3,"in_progress":0,"drafts":0}
 [J1d home resume card gone after finish] 0
@@ -49,7 +49,7 @@
 [J2 transcript in editable textarea] هذا تفريغ تجريبي للتسجيل الصوتي، في بداية المشروع كان الفريق متأخرًا وأنا أعدت ت
 [J2 state after transcription] راجع النص وصححه قبل التقييم
 [J2 evaluation auto-started?] false
-[J2 provider transcribe call] {"url":"https://generativelanguage.googleapis.com/v1beta/interactions","model":"gemini-3.8-flash","kind":"transcribe","mime":"audio/webm","audioBytes":51957}
+[J2 provider transcribe call] {"url":"https://generativelanguage.googleapis.com/v1beta/interactions","model":"gemini-3.8-flash","kind":"transcribe","mime":"audio/webm","audioBytes":53889}
 [J2 report uses corrected text] true
 [J2 page errors] []
 [J2b transcription failure message] ⓘ الخدمة مشغولة حاليًا. حاول بعد 60 ثانية.
@@ -83,3 +83,103 @@
 [B5 resend locked initially] true
 [B5 text unchanged after overload] true
 [B5 wake lock released after failed evaluation] {"requests":1,"releases":1,"held":0}
+[B5 resend enabled after 15s] true :: يُفضَّل الانتظار 45 ثانية قبل إعادة الإرسال.
+[B5 double click produced one request (server-side usage lines counted below)] calls=0
+[B5 slow notice after 8s] ما زلنا نحاول الاتصال…
+[B5 slow provider still succeeds] 84%
+[J3 SW caches] {"keys":["leadership-interview-coach-v0.6.0-alpha-5-51d413de"],"count":49}
+[J3 offline learn U1 h1] افهم المقابلة
+[J3 offline competency C1 question C1-B3 open] 1 :: صف موقفًا اضطررت فيه إلى تعديل أسلوبك في التواصل أثناء مهمة 
+[J3 offline self-intro h1] بناء تقديم الذات
+[J3 offline simulation notice] ⓘ خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.
+[J3 offline start button enabled?] true
+[J3 offline submit error] ⓘ تعذّر الاتصال بالخدمة. تحقق من الإنترنت ثم أعد المحاولة.
+[J3 offline answer preserved] true
+[J3 page errors] ["Failed to load resource: net::ERR_INTERNET_DISCONNECTED","Failed to load resource: net::ERR_INTERNET_DISCONNECTED"]
+[J4 unconfigured notice] ⓘ خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.
+[J4 unconfigured submit error] ⓘ خدمة المحاكاة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.
+[J5 provider-429 message shown to user (R6)] ⓘ الخدمة مشغولة حاليًا. حاول بعد 60 ثانية. يمكنك إعادة الإرسال بعد 59 ثانية.
+[J5 R6 lock ≤ 120s and message by duration] true :: يمكنك إعادة الإرسال بعد 59 ثانية.
+[J5 untrusted report hero] تقييم غير موثوق بلا درجة ! لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية. :: ! لم تجتز نسبة كافية من الاقتباسات التحقق؛ لذلك لم تُعرض درجة رقمية.
+[dialog] confirm: لديك جلسة غير مكتملة. بدء جلسة جديدة سيحذفها. هل تريد المتابعة؟
+[J5 invalid JSON message shown to user] ⓘ تعذّر إكمال الطلب الآن. حاول مرة أخرى بعد قليل.
+[J5 answer preserved after error] true
+[J6 realistic/random first screen] تقديم الذات — حتى 60 ثانية
+[J6 realistic self-intro report] 71% إجابة متوسطة الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J6 realistic scrollY after drawQuestion (item 8)] 0
+[J6 realistic/random question ids] C3-B9,C3-S2
+[J6 realistic summary] اكتملت المحاكاة تقرير المقابلة الشامل 3 إجابة محللة · 3 تقييم موثوق أداء قوي 80% المتوسط التدريبي
+[J6 extended/random first screen] تقديم الذات — حتى 60 ثانية
+[J6 extended self-intro report] 71% إجابة متوسطة الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J6 extended scrollY after drawQuestion (item 8)] 0
+[J6 extended/random question ids] C4-B6,C5-S2,C6-B3,C1-S2,C2-B3
+[J6 extended summary] اكتملت المحاكاة تقرير المقابلة الشامل 6 إجابة محللة · 6 تقييم موثوق أداء قوي 82% المتوسط التدريبي
+[J6 full/random first screen] تقديم الذات — حتى 60 ثانية
+[J6 full self-intro report] 71% إجابة متوسطة الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J6 full scrollY after drawQuestion (item 8)] 0
+[J6 full/random question ids] C7-B6,C8-B3,C3-S1,C4-S2,M4-S1,X1
+[J6 D1 full composition (B,B,S,S,M,X)] C7-B6,C8-B3,C3-S1,C4-S2,M4-S1,X1 :: true
+[J6 full summary] اكتملت المحاكاة تقرير المقابلة الشامل 7 إجابة محللة · 7 تقييم موثوق أداء قوي 82% المتوسط التدريبي
+[J6 extended/mission first screen] تقديم الذات — حتى 60 ثانية
+[J6 extended self-intro report] 71% إجابة متوسطة الإجابة منظمة وتعرض الموقف بوضوح، وينقصها مؤشر للنتيجة (ملخص تجريبي). اجتاز التقرير فحص المخطط والاقتباسات الحرفية.
+[J6 extended scrollY after drawQuestion (item 8)] 0
+[J6 extended/mission question ids] M1-B1,M2-S1,M3-B1,M4-B1,M5-S1,M6-S1
+[J6 extended summary] اكتملت المحاكاة تقرير المقابلة الشامل 7 إجابة محللة · 7 تقييم موثوق أداء قوي 83% المتوسط التدريبي
+[J7 missing fields toast] أكمل التعريف المهني والمنصب والتدرج والإنجاز والهدف المستقبلي أولًا.
+[J7 draft] أعرّف بنفسي، أنا قائد عمليات. وعلى مستوى التأهيل، أنجزت بكالوريوس إدارة. بدأت مسيرتي في مشرف عمليات. وتطورت مسؤولياتي لاحقًا من خلال الإشراف ثم إدارة وحدة ثم قي
+[J7 metrics] 75 كلمة المدة التقديرية: 39 ثانية الهدف: حتى 60 ثانية :: ⓘ النص أقصر من المدة المختارة. أضف تفاصيل أكثر عن مسؤولياتك أو إنجازاتك.
+[J7 alternative differs] true
+[J7 manual edit persisted after leaving page?] true (result visible=true)
+[J7 AI candidate] نسخة محسّنة مقترحة تحتاج اعتمادك ⓘ قارن النصين. لن يُستبدل نصك المحلي إلا إذا ضغطت «اعتماد النسخة». ما الذي تغيّر؟ تحسين الربط بين الجمل (تجريبي) اعتماد النسخة 
+[J7 original untouched before approval] true
+[J7 replaced after approval] true
+[J7 offline improve message] ⓘ تعذّر الاتصال بالخدمة. تحقق من الإنترنت ثم أعد المحاولة.
+[J8 F6 bookmark button toggles] إزالة من المحفوظات :: "[\"C1-B3\"]"
+[J8 saved questions page lists C1-B3] 1
+[dialog] confirm: سيُحذف التقدم والتقارير والمسودات من هذا الجهاز. هل تريد المتابعة؟
+[J8 localStorage lic:* keys after delete] []
+[J9[light] full card description (F7/D1)] ● / مقابلة كاملة /  / تقديم الذات ثم ستة أسئلة: سلوكية وموقفية وقيادة بالمهمة وسؤال معرفي. /  / نحو 20 دقيقة
+[J9[light] R1 low report: elements line + badge] العناصر المكتملة: 0 من 5 :: إجابة ضعيفة
+[J9[light] example button visible when incomplete/low] 1
+[J9[light] example panel title/lead] مثال مكتمل على غرار موقفك :: مثال توضيحي يبيّن كيف تُقال الأجزاء الناقصة. ليس إجابتك، ولا
+[J9[light] example added segments highlighted (bg+font)] [{"bg":"rgb(255, 240, 207)","italic":"italic","weight":"700"},{"bg":"rgb(255, 240, 207)","italic":"italic","weight":"700"}] count=3
+[J9[light] example literal warning + key + additions list] true :: true :: 2
+[J9[light] example has no score and no copy button] true
+[J9[light] full interview ids (D1)] C5-B5,C7-B5,C8-S1,C4-S2,M5-B1,X2 :: valid=true
+[J9[light] F5 summary separates STAR-L and SEAL] اكتمال عناصر STAR-L | اكتمال عناصر SEAL
+[J9[light] coverage header] جرّبت 6 من 29 خانة :: rows=15 cells=29
+[J9[light] coverage statuses present] لم تُجرَّب | 80% فأكثر | دون 60% | 60–79%
+[J9[light] coverage not linked from home] true
+[J9[light] coverage cell opens a question] C1-B4
+[J9[light] reports page links coverage (D3)] 1
+[J9[light] R4 answer report PDF pages] 6 bytes=189473
+[J9[light] R4 print hides chrome/buttons, shows footer, page-2 break] {"nav":"none","header":"none","buttons":["none","none","none","none","none","none","none"],"footer":["block","block","block","block","block","block","block"],"pageTwo":["page","page","page","page","page","page","page"]}
+[J9[light] IndexedDB v3 stores + attempts (no answer text) + rotation] {"version":3,"names":["attempts","checklists","pending_recordings","progress","review","rotation","sessions","settings","stories"],"attempts":[{"id":"C4-S2","n":1,"hasAnswer":false},{"id":"C5-B5","n":1,"hasAnswer":false},{"id":"C7-B5","n":1,"hasAnswer":false},{"id":"C8-S1","n":1,"hasAnswer":false},{
+[J9[light] page errors] []
+[J9[dark] full card description (F7/D1)] ● / مقابلة كاملة /  / تقديم الذات ثم ستة أسئلة: سلوكية وموقفية وقيادة بالمهمة وسؤال معرفي. /  / نحو 20 دقيقة
+[J9[dark] R1 low report: elements line + badge] العناصر المكتملة: 0 من 5 :: إجابة ضعيفة
+[J9[dark] example button visible when incomplete/low] 1
+[J9[dark] example panel title/lead] مثال مكتمل على غرار موقفك :: مثال توضيحي يبيّن كيف تُقال الأجزاء الناقصة. ليس إجابتك، ولا
+[J9[dark] example added segments highlighted (bg+font)] [{"bg":"rgb(255, 240, 207)","italic":"italic","weight":"700"},{"bg":"rgb(255, 240, 207)","italic":"italic","weight":"700"}] count=3
+[J9[dark] example literal warning + key + additions list] true :: true :: 2
+[J9[dark] example has no score and no copy button] true
+[J9[dark] full interview ids (D1)] C6-B7,C4-B3,C3-S1,C2-S1,M3-B1,X2 :: valid=true
+[J9[dark] F5 summary separates STAR-L and SEAL] اكتمال عناصر STAR-L | اكتمال عناصر SEAL
+[J9[dark] coverage header] جرّبت 6 من 29 خانة :: rows=15 cells=29
+[J9[dark] coverage statuses present] لم تُجرَّب | 80% فأكثر | دون 60% | 60–79%
+[J9[dark] coverage not linked from home] true
+[J9[dark] coverage cell opens a question] C1-B5
+[J9[dark] reports page links coverage (D3)] 1
+[J9[dark] R4 answer report PDF pages] 6 bytes=189724
+[J9[dark] R4 print hides chrome/buttons, shows footer, page-2 break] {"nav":"none","header":"none","buttons":["none","none","none","none","none","none","none"],"footer":["block","block","block","block","block","block","block"],"pageTwo":["page","page","page","page","page","page","page"]}
+[J9[dark] IndexedDB v3 stores + attempts (no answer text) + rotation] {"version":3,"names":["attempts","checklists","pending_recordings","progress","review","rotation","sessions","settings","stories"],"attempts":[{"id":"C2-S1","n":1,"hasAnswer":false},{"id":"C3-S1","n":1,"hasAnswer":false},{"id":"C4-B3","n":1,"hasAnswer":false},{"id":"C6-B7","n":1,"hasAnswer":false},{
+[J9[dark] page errors] []
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.evaluate: Target page, context or browser has been closed
+    at /home/user/Stimulator-interview-/work/audit-harness/journeys.mjs:664:14
+
+Node.js v22.22.0
+EXIT=1

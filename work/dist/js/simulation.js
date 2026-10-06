@@ -701,9 +701,10 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         session.direct_training ? 'التدرّب على السؤال' : `السؤال ${session.current_index + 1} من ${questions.length}`,
         session.direct_training ? 'أجب بطريقتك أولًا، ثم أرسل الإجابة لتحصل على تحليل تطويري.' : 'اقرأ السؤال، ثم أجب من خبرتك أو حلّل السيناريو.'
       ),
-      session.direct_training ? null : el('div', { class: 'simulation-progress', role: 'progressbar', 'aria-valuenow': String(progressValue), 'aria-valuemin': '0', 'aria-valuemax': '100' },
+      // alpha-5: root.append هو DOM الأصلي؛ null كان يُطبع نصًا «null» في شاشة التدريب المباشر.
+      ...(session.direct_training ? [] : [el('div', { class: 'simulation-progress', role: 'progressbar', 'aria-valuenow': String(progressValue), 'aria-valuemin': '0', 'aria-valuemax': '100' },
         el('span', { style: { width: `${progressValue}%` } })
-      ),
+      )]),
       renderQuestionText(question)
     );
 

@@ -2313,3 +2313,71 @@ mark.example-added { background: var(--amber-soft); color: var(--ink); font-styl
   .page-head, .simulation-progress, .toast-region { display: none !important; }
   body { padding-block-end: 24px; }
 }
+
+/* R4 — ضبط الصفحتين: الأقسام الطويلة تنقسم بين الصفحات والبطاقات الصغيرة لا تنقسم */
+@media print {
+  .skip-link, .toast-region, .header-spacer { display: none !important; }
+  details.saved-report > summary, .saved-reports > h2 { font-size: 10pt; margin-block: 4px; }
+  .evaluation-report .score-breakdown, .evaluation-report .criteria-feedback, .evaluation-report .transcript-review-card, .evaluation-report .print-page-one, .evaluation-report .print-page-two { break-inside: auto !important; page-break-inside: auto !important; }
+  .evaluation-report .report-section { margin-block-end: 6px; padding: 8px 10px; }
+  .evaluation-report .report-question-line { padding: 6px 10px; }
+  .evaluation-report .score-card { gap: 6px; padding: 8px 12px; }
+  .evaluation-report .score-card .final-score { padding: 6px 8px; font-size: 20pt; min-width: 80px; }
+  .evaluation-report .breakdown-rows { gap: 4px; }
+  .evaluation-report .breakdown-row { padding: 3px 8px; border-radius: 6px; }
+  .evaluation-report .breakdown-head strong, .evaluation-report .breakdown-percent { font-size: 9pt; }
+  .evaluation-report .breakdown-row .mini-score-track { height: 4px; margin-block: 3px; }
+  .evaluation-report .breakdown-weight, .evaluation-report .breakdown-rule { font-size: 8pt; }
+  .evaluation-report .breakdown-total { margin-block-start: 6px; font-size: 9.5pt; }
+  .evaluation-report .next-plan ol, .evaluation-report .strengths-section ul { gap: 2px; }
+  .evaluation-report .user-answer-text { font-size: 9pt; line-height: 1.55; margin: 0; }
+  .evaluation-report .print-page-two { gap: 6px; }
+  .evaluation-report .print-page-two .criteria-list { gap: 5px; }
+  .evaluation-report .criterion-card { padding: 5px 8px; border-radius: 6px; }
+  .evaluation-report .criterion-head strong { font-size: 8.5pt; }
+  .evaluation-report .criterion-score { font-size: 7.5pt; padding: 1px 6px; }
+  .evaluation-report .criterion-lines { gap: 2px; margin-block-start: 2px; }
+  .evaluation-report .criterion-line b { font-size: 7.5pt; }
+  .evaluation-report .criterion-line span, .evaluation-report .criterion-line q, .evaluation-report .criterion-line .muted { font-size: 8pt; line-height: 1.45; }
+  .evaluation-report .evidence-quotes { gap: 2px; }
+  .evaluation-report .evidence-quotes q { padding: 1px 5px; border-radius: 4px; }
+  .evaluation-report .improve-line { padding: 3px 6px; }
+  .evaluation-report .action-share { padding-block: 6px; }
+  .evaluation-report .action-share-note { margin-block-start: 14px; font-size: 8pt; }
+  .evaluation-report .how-scored p, .evaluation-report .behaviours-card span, .evaluation-report .behaviours-card b { font-size: 8pt; line-height: 1.5; margin: 2px 0; }
+}
+@media print {
+  .evaluation-report .breakdown-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 8px; }
+  .evaluation-report .breakdown-row .mini-score-track { display: none; }
+  .evaluation-report .breakdown-head { flex: 1; }
+  .evaluation-report .breakdown-weight { white-space: nowrap; }
+  .evaluation-report .breakdown-row .unverified-label { font-size: 7.5pt; }
+  .evaluation-report .report-question-text, .evaluation-report .score-summary, .evaluation-report .elements-complete-line { font-size: 9pt; }
+  .evaluation-report .trust-line { font-size: 8pt; }
+  .evaluation-report .score-track { height: 6px; }
+  .evaluation-report .coverage-section { break-inside: auto !important; page-break-inside: auto !important; }
+  .evaluation-report .coverage-section small { font-size: 7.5pt; }
+  .evaluation-report .coverage-list { grid-template-columns: 1fr 1fr; gap: 3px; }
+  .evaluation-report .coverage-list li { padding: 2px 6px; grid-template-columns: 14px 1fr; gap: 4px; border-radius: 4px; break-inside: avoid; }
+  .evaluation-report .coverage-list strong { font-size: 8pt; font-weight: 600; }
+  .evaluation-report .coverage-list q { font-size: 7.5pt; }
+}
+@media print {
+  /* تغطية النقاط و«كيف حُسبت الدرجة» جنبًا إلى جنب في الصفحة الثانية */
+  .evaluation-report .print-page-two .coverage-section { grid-column: auto; }
+  .evaluation-report .coverage-list { grid-template-columns: 1fr; gap: 2px; }
+  .evaluation-report .coverage-list li { padding: 1px 5px; }
+  .evaluation-report .coverage-list strong { font-size: 7.5pt; }
+  .evaluation-report .coverage-list q { font-size: 7pt; line-height: 1.35; }
+  .evaluation-report .behaviours-card, .evaluation-report .how-scored { break-inside: avoid; }
+}
+@media print {
+  .evaluation-report .print-page-two { gap: 4px; }
+  .evaluation-report .print-page-two .report-section { margin-block-end: 4px; padding: 6px 8px; }
+  .evaluation-report .print-page-two h3 { font-size: 10pt; margin: 0 0 3px; }
+  .evaluation-report .criterion-line span, .evaluation-report .criterion-line q, .evaluation-report .criterion-line .muted { font-size: 7.5pt; line-height: 1.35; }
+  .evaluation-report .criterion-card { padding: 4px 7px; }
+  .evaluation-report .action-share-row { margin-block-start: 4px; }
+  .evaluation-report .action-share-note { margin-block-start: 10px; }
+  .evaluation-report .how-scored p { font-size: 7.5pt; line-height: 1.4; }
+}
