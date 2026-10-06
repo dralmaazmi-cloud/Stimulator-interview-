@@ -701,4 +701,28 @@ for (const theme of ['light', 'dark']) {
   log('J10 export includes attempts/rotation', JSON.stringify(backup));
   await browser.close();
 }
+// ---------- alpha-6.1 Journey 11: SEAL element names on the focused question page (after «إظهار الإجابة النموذجية») and in the printed book ----------
+{
+  const { browser, page, errors } = await newPage();
+  const SEAL_NAMES = ['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي'];
+  await page.goto(BASE + '/#/question/C1-S1');
+  await page.waitForSelector('.question-focus-page');
+  await page.locator('.question-step').last().click();
+  await page.waitForSelector('.answer-gate');
+  await page.locator('button:has-text("إظهار الإجابة النموذجية")').click();
+  await page.waitForSelector('.focus-answer-samples');
+  const pageLabels = await page.locator('.focus-answer-part strong').allInnerTexts();
+  const pageText = await page.locator('.question-focus-page').innerText();
+  log('J11 question page SEAL labels after reveal', pageLabels.join(' | ') + ' :: exact=' + String(JSON.stringify(pageLabels) === JSON.stringify(SEAL_NAMES)) + ' oldNames=' + String(/تقييم الخيارات|خطة العمل/.test(pageText)));
+  const bookLabels = await page.evaluate(async () => {
+    const { buildPrintBook } = await import('/js/print-book.js');
+    const { loadData } = await import('/js/data.js');
+    const book = buildPrintBook(await loadData(), { kind: 'question', id: 'C1-S1' });
+    return { labels: [...book.querySelectorAll('.print-answer-part h4')].map(node => node.textContent), old: /تقييم الخيارات|خطة العمل/.test(book.textContent) };
+  });
+  log('J11 printed book SEAL labels', bookLabels.labels.join(' | ') + ' :: exact=' + String(JSON.stringify(bookLabels.labels) === JSON.stringify(SEAL_NAMES)) + ' oldNames=' + String(bookLabels.old));
+  if (JSON.stringify(pageLabels) !== JSON.stringify(SEAL_NAMES) || JSON.stringify(bookLabels.labels) !== JSON.stringify(SEAL_NAMES) || bookLabels.old || /تقييم الخيارات|خطة العمل/.test(pageText)) throw new Error('J11: SEAL element names mismatch');
+  log('J11 page errors', JSON.stringify(errors));
+  await browser.close();
+}
 fs.writeFileSync(`${OUT}/journeys-done.txt`, 'ok');

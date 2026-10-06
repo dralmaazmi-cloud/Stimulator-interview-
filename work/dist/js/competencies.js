@@ -32,7 +32,7 @@ function bulletList(items, className = '') {
 
 function answerLabels(mode) {
   return mode === 'seal'
-    ? { situation: 'فهم الوضع', evaluation: 'تقييم الخيارات', action: 'خطة العمل', leadership_impact: 'الأثر القيادي' }
+    ? { situation: 'فهم الوضع', evaluation: 'التقييم', action: 'الإجراء', leadership_impact: 'الأثر القيادي' }
     : { situation: 'الموقف', task: 'المهمة ودورك', action: 'الإجراء', result: 'النتيجة', learning: 'التعلّم', action_points: 'الإجراءات' };
 }
 

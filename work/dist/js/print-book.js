@@ -3,16 +3,27 @@ import { buildAnswerGuidance } from './guidance.js';
 import { button, el, formatModel, formatType, icon, renderBlock, showDialog } from './ui.js';
 
 const BOOK_TITLE = 'مدرّب المقابلات';
+// alpha-6.1: أسماء العناصر تتبع نموذج السؤال؛ SEAL بالأسماء المعتمدة الأربعة وSTAR-L بأسمائه.
 const ANSWER_LABELS = Object.freeze({
-  situation: 'الموقف',
-  task: 'المهمة ودورك',
-  evaluation: 'تقييم الخيارات',
-  action: 'الإجراء',
-  action_points: 'الإجراءات',
-  result: 'النتيجة',
-  learning: 'التعلّم',
-  leadership_impact: 'الأثر القيادي'
+  seal: Object.freeze({
+    situation: 'فهم الوضع',
+    evaluation: 'التقييم',
+    action: 'الإجراء',
+    leadership_impact: 'الأثر القيادي'
+  }),
+  star_l: Object.freeze({
+    situation: 'الموقف',
+    task: 'المهمة ودورك',
+    action: 'الإجراء',
+    action_points: 'الإجراءات',
+    result: 'النتيجة',
+    learning: 'التعلّم'
+  })
 });
+
+function answerLabels(mode) {
+  return ANSWER_LABELS[mode] || ANSWER_LABELS.star_l;
+}
 
 function uniqueIds(ids) {
   return [...new Set(ids.filter(Boolean))];
@@ -51,11 +62,12 @@ function sourceSections(sections = []) {
   ));
 }
 
-function answerParts(parts = {}) {
+function answerParts(parts = {}, mode = 'star_l') {
+  const labels = answerLabels(mode);
   return el('div', { class: 'print-answer-parts' },
     ...Object.entries(parts).filter(([, value]) => value != null).map(([key, value]) =>
       el('section', { class: 'print-answer-part' },
-        el('h4', { text: ANSWER_LABELS[key] || key }),
+        el('h4', { text: labels[key] || key }),
         el('p', { text: Array.isArray(value) ? value.join(' • ') : value })
       )
     )
@@ -69,7 +81,7 @@ function answerSamples(question) {
     el('section', { class: `print-answer-sample sample-${sample.kind || 'guide'}` },
       el('h4', { text: sample.title || 'الإجابة النموذجية الإرشادية' }),
       sample.subtitle ? el('p', { class: 'print-answer-note', text: sample.subtitle }) : null,
-      sample.parts ? answerParts(sample.parts) : el('p', { class: 'print-guide-answer', text: sample.text })
+      sample.parts ? answerParts(sample.parts, question.rubric_mode) : el('p', { class: 'print-guide-answer', text: sample.text })
     )
   ));
 }

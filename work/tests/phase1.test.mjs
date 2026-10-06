@@ -177,7 +177,7 @@ requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(project, file)),
 assert.ok(read('dist/assets/images/abu-dhabi-sea-hero.jpg').length > 100_000, 'Hero must be a production-quality local image');
 
 const serviceWorkerText = text('dist/sw.js');
-assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-6/);
+assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-6\.1-/);
 assert.doesNotMatch(serviceWorkerText, /alpha-[45]/, 'only the alpha-6 cache name may remain');
 ['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage', 'print-book'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
 const cachedPaths = [...serviceWorkerText.matchAll(/'\.\/(.*?)'/g)].map(match => match[1]);
@@ -225,6 +225,10 @@ assert.match(competencyText, /#\/question\/\$\{encodeURIComponent\(question\.id\
 assert.match(competencyText, /إظهار الإجابة النموذجية/);
 assert.match(competencyText, /answerRevealed/);
 assert.match(text('dist/js/data.js'), /إجابة نموذجية إرشادية/);
+// alpha-6.1: صفحة السؤال تعرض عناصر SEAL بالأسماء المعتمدة فقط (التحقق الحي في journeys J11).
+assert.match(competencyText, /situation: 'فهم الوضع', evaluation: 'التقييم', action: 'الإجراء', leadership_impact: 'الأثر القيادي'/);
+assert.doesNotMatch(competencyText, /تقييم الخيارات|خطة العمل/, 'old SEAL labels must not remain in the question page');
+assert.doesNotMatch(text('dist/js/print-book.js'), /تقييم الخيارات|خطة العمل/, 'old SEAL labels must not remain in the print book');
 // alpha-5 (F2): عناوين صادقة للسؤال الموقفي + «إجابة الدليل كما هي»؛ (F6) زر حفظ السؤال داخل البطاقة.
 assert.match(text('dist/js/data.js'), /إجابة نموذجية موسّعة، مبنية على إجابة الدليل/);
 assert.match(text('dist/js/data.js'), /إجابة الدليل كما هي/);
