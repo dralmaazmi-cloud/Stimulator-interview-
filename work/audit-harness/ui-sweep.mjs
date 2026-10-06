@@ -8,7 +8,12 @@ fs.mkdirSync(OUT, { recursive: true });
 const ROUTES = [
   '#/home', '#/preparation', '#/preparation/U1', '#/preparation/U2', '#/preparation/U4', '#/preparation/U5',
   '#/competencies', '#/competencies/C1', '#/competencies/C1?question=C1-S1', '#/preparation/U4?question=M6-S1',
-  '#/simulation', '#/reports', '#/coverage', '#/tools', '#/tools/saved', '#/settings', '#/nope'
+  '#/simulation', '#/reports', '#/coverage', '#/tools', '#/tools/saved', '#/settings', '#/nope',
+  // alpha-5 fix: direct-training routes (behavioural, mission behavioural, scenario, general) in text and voice modes
+  '#/simulation?question=C2-B3&answer=text', '#/simulation?question=C2-B3&answer=voice',
+  '#/simulation?question=M1-B1&answer=text', '#/simulation?question=M1-B1&answer=voice',
+  '#/simulation?question=C1-S1&answer=text', '#/simulation?question=C1-S1&answer=voice',
+  '#/simulation?question=X1&answer=text', '#/simulation?question=X1&answer=voice'
 ];
 const findings = [];
 const note = (route, kind, detail) => {

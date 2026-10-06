@@ -1374,10 +1374,12 @@ details.saved-report .evaluation-report { padding: 12px; }
 .direct-training-switch { grid-template-columns: repeat(2,1fr); margin-block-end: 10px; }
 .training-method-reminder { padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
 .training-method-reminder > strong { display: block; margin-block-end: 8px; font-size: .82rem; }
-.training-method-reminder > div { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-.training-method-reminder span { min-width: 72px; padding: 8px 5px; display: grid; justify-items: center; border-radius: 11px; background: var(--soft-mint); }
+/* alpha-5 fix: خمس خانات STAR-L كانت بعرض أدنى 72px فتدفع الصفحة أفقيًا على 390؛ الآن أعمدة متساوية داخل العرض المتاح بلا إخفاء للتمدد. */
+.training-method-reminder { min-width: 0; }
+.training-method-reminder > div { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; min-width: 0; }
+.training-method-reminder span { min-width: 0; padding: 8px 3px; display: grid; justify-items: center; align-content: start; gap: 2px; border-radius: 11px; background: var(--soft-mint); text-align: center; }
 .training-method-reminder b { color: var(--petrol-900); }
-.training-method-reminder small { color: var(--muted); font-size: .55rem; white-space: nowrap; }
+.training-method-reminder small { color: var(--muted); font-size: .55rem; line-height: 1.35; white-space: normal; overflow-wrap: normal; }
 
 @keyframes fade-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 
