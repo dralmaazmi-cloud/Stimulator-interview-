@@ -1,8 +1,9 @@
 import { get, completedLessons, markLesson, saveChecklist } from './storage.js';
 import { renderSelfIntroLauncher } from './self-intro.js';
 import { renderInlineQuestion } from './competencies.js';
+import { bookActions } from './print-book.js';
 import {
-  bindExclusiveAccordions, button, clear, el, icon, printActions, renderBlock, tag, toast
+  bindExclusiveAccordions, button, clear, el, icon, renderBlock, tag, toast
 } from './ui.js';
 
 const LESSON_DESCRIPTIONS = Object.freeze({
@@ -44,7 +45,8 @@ export async function renderLearnIndex(root, data) {
     ),
     el('div', { class: 'preparation-grid' },
       ...data.lessons.map(lesson => preparationCard(lesson, completed.has(lesson.id)))
-    )
+    ),
+    bookActions(data, { type: 'preparation' }, 'دليل التحضير الكامل')
   ));
 }
 
@@ -266,13 +268,10 @@ function renderAiQuestions(data, params = new URLSearchParams()) {
     el('div', { class: 'section-heading smart-section-heading' },
       el('div', {}, el('small', { text: 'سؤالان معرفيان من الدليل' }), el('h2', { text: 'أسئلة الذكاء الاصطناعي' }))
     ),
-    el('div', { class: 'ai-question-grid' }, ...questions.map(question => el('article', { class: 'card ai-guide-card', id: `question-${question.id}` },
-      el('div', { class: 'question-meta' }, tag('سؤال معرفي', 'warning'), tag('إجابة الدليل', 'accent')),
-      el('h3', { text: question.question }),
-      el('h4', { text: 'إجابة الدليل' }),
-      el('p', { class: 'guide-paragraph', text: question.sample_answer }),
-      button('تدرّب على هذا السؤال', { href: `#/simulation?question=${encodeURIComponent(question.id)}&answer=text`, className: 'wide' })
-    )))
+    el('p', { class: 'section-intro', text: 'افتح كل سؤال في صفحة تركيز مستقلة، ثم راجع إجابة الدليل بعد أن تكوّن إجابتك.' }),
+    el('div', { class: 'smart-question-list ai-question-grid' },
+      ...questions.map((question, index) => renderInlineQuestion(question, data, index, { open: question.id === requested }))
+    )
   );
 }
 
@@ -307,6 +306,6 @@ export async function renderLesson(root, data, lessonId, params = new URLSearchP
   if (lesson.id === 'U2') renderAnswerBuilding(body, data, lesson);
   if (lesson.id === 'U4') renderMission(body, data, lesson, params);
   if (lesson.id === 'U5') await renderReadiness(body, data, lesson, params);
-  body.append(printActions(lesson.title), finishLesson(lesson));
+  body.append(bookActions(data, { type: 'lesson', id: lesson.id }, lesson.title), finishLesson(lesson));
   root.append(body);
 }

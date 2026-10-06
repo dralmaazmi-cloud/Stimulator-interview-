@@ -7,6 +7,7 @@ import { selectSessionQuestions } from '../dist/js/sim.js';
 import { buildAnswerGuidance } from '../dist/js/guidance.js';
 import { buildSelfIntroduction } from '../dist/js/self-intro.js';
 import { buildSessionInsights } from '../dist/js/report.js';
+import { printBookQuestionIds } from '../dist/js/print-book.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const project = path.resolve(here, '..');
@@ -169,15 +170,16 @@ const requiredFiles = [
   'dist/assets/fonts/NotoSansArabic-Regular.ttf', 'dist/assets/fonts/NotoSansArabic-Bold.ttf',
   'dist/js/wake-lock.js', 'dist/js/report.js', 'dist/data/derived/question-audit.json',
   'dist/data/expanded-model-answers.json',
-  'dist/js/scoring-rules.js', 'dist/js/retry-plan.js', 'dist/js/rotation.js', 'dist/js/session-plan.js', 'dist/js/coverage.js', 'api/example.js'
+  'dist/js/scoring-rules.js', 'dist/js/retry-plan.js', 'dist/js/rotation.js', 'dist/js/session-plan.js', 'dist/js/coverage.js',
+  'dist/js/print-book.js', 'api/example.js'
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(project, file)), `Missing ${file}`));
 assert.ok(read('dist/assets/images/abu-dhabi-sea-hero.jpg').length > 100_000, 'Hero must be a production-quality local image');
 
 const serviceWorkerText = text('dist/sw.js');
-assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-5/);
-assert.doesNotMatch(serviceWorkerText, /alpha-4/, 'only the alpha-5 cache name may remain');
-['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
+assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-6/);
+assert.doesNotMatch(serviceWorkerText, /alpha-[45]/, 'only the alpha-6 cache name may remain');
+['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage', 'print-book'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
 const cachedPaths = [...serviceWorkerText.matchAll(/'\.\/(.*?)'/g)].map(match => match[1]);
 cachedPaths.filter(Boolean).forEach(file => assert.ok(fs.existsSync(path.join(project, 'dist', file)), `Service worker caches missing file: ${file}`));
 assert.match(serviceWorkerText, /url\.pathname\.startsWith\('\/api\/'\)/, 'API responses must never be cached');
@@ -203,7 +205,7 @@ assert.match(homeText, /home-report-card/);
 assert.doesNotMatch(homeText, /أيام الأسبوع|الاثنين|الثلاثاء/);
 
 const learnText = text('dist/js/learn.js');
-assert.match(learnText, /printActions/);
+assert.match(learnText, /bookActions/);
 assert.match(learnText, /part_1_framework\.sections/);
 assert.match(learnText, /part_2_answering\.sections/);
 assert.match(learnText, /#\/competencies/);
@@ -217,13 +219,48 @@ assert.doesNotMatch(learnText, /اختبار فهم|اختبر فهمك/);
 const competencyText = text('dist/js/competencies.js');
 assert.match(competencyText, /competency-card-grid/);
 assert.match(competencyText, /smart-question-card/);
+assert.match(competencyText, /renderQuestionFocus/);
+assert.match(competencyText, /\['understand', 'فهم الكفاءة'\], \['show', 'كيف تُظهرها'\], \['questions', 'الأسئلة'\]/);
+assert.match(competencyText, /#\/question\/\$\{encodeURIComponent\(question\.id\)\}/);
+assert.match(competencyText, /إظهار الإجابة النموذجية/);
+assert.match(competencyText, /answerRevealed/);
 assert.match(text('dist/js/data.js'), /إجابة نموذجية إرشادية/);
 // alpha-5 (F2): عناوين صادقة للسؤال الموقفي + «إجابة الدليل كما هي»؛ (F6) زر حفظ السؤال داخل البطاقة.
 assert.match(text('dist/js/data.js'), /إجابة نموذجية موسّعة، مبنية على إجابة الدليل/);
 assert.match(text('dist/js/data.js'), /إجابة الدليل كما هي/);
 assert.match(competencyText, /حفظ السؤال/);
 assert.match(competencyText, /toggleBookmark/);
-assert.match(competencyText, /تدرّب على هذا السؤال/);
+assert.match(competencyText, /تدرّب بصوتك/);
+assert.match(competencyText, /تدرّب بالكتابة/);
+
+const appText = text('dist/js/app.js');
+assert.match(appText, /page === 'question' && parts\[1\]/);
+assert.match(appText, /renderQuestionFocus/);
+assert.match(appText, /question: 'سؤال تدريبي'/);
+
+const printBookText = text('dist/js/print-book.js');
+['print-cover', 'print-toc', 'print-question-page', 'print-model-answer', 'print-memory-box']
+  .forEach(className => assert.match(printBookText, new RegExp(className)));
+assert.match(printBookText, /هذا السؤال فقط/);
+assert.match(printBookText, /دليل التحضير كاملًا/);
+assert.match(printBookText, /لن تُطبع واجهة الهاتف/);
+
+const printableData = {
+  questions,
+  competencies,
+  missionMap,
+  lessons,
+  questionById: new Map(questions.map(item => [item.id, item])),
+  primaryIdsByCompetency: new Map(competencies.map(item => [item.id, item.question_ids])),
+  competencyById: new Map(competencies.map(item => [item.id, item])),
+  lessonById: new Map(lessons.map(item => [item.id, item]))
+};
+assert.deepEqual(new Set(printBookQuestionIds(printableData)), new Set(questions.map(item => item.id)),
+  'The complete preparation book must include all 70 published questions');
+assert.equal(printBookQuestionIds(printableData, { kind: 'competency', id: 'C3' }).length, 13);
+assert.equal(printBookQuestionIds(printableData, { kind: 'lesson', id: 'U4' }).length, 12);
+assert.deepEqual(printBookQuestionIds(printableData, { kind: 'lesson', id: 'U5' }), ['X1', 'X2']);
+assert.deepEqual(printBookQuestionIds(printableData, { kind: 'question', id: 'C1-S1' }), ['C1-S1']);
 
 const settingsText = text('dist/js/settings.js');
 ['المظهر والقراءة', 'الصوت والمحاكاة', 'البيانات والنسخة الاحتياطية', 'الخصوصية والتحكم', 'عن التطبيق']
@@ -238,6 +275,11 @@ const cssText = text('dist/css/styles.css');
 assert.match(cssText, /grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/, 'Bottom navigation must fit five destinations');
 assert.match(cssText, /html:not\(\[data-font-size="large"\]\) body\[data-page="home"\]\s*\{\s*overflow:\s*hidden;/,
   'Normal phone home viewport must not scroll, while large text keeps a safe scrolling fallback');
+assert.match(cssText, /\.header-inner \{ direction: rtl; \}/, 'The RTL back control must be placed on the right');
+assert.match(cssText, /body\[data-page="question"\] \.bottom-nav \{ display: none; \}/,
+  'The dedicated question page must remove navigation distractions');
+assert.match(cssText, /body\.book-printing > \*:not\(#print-book-root\)/,
+  'Book export must print an independent document instead of the current screen');
 
 assert.doesNotMatch(clientText, /استُبعدت الأسئلة|الواجهة جاهزة|تهيئة مفتاح|إعادة النشر/);
 assert.doesNotMatch(settingsText, /الأسئلة المستبعدة|بصمة المرجع|بنك الأسئلة/);

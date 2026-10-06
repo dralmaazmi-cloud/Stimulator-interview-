@@ -1,5 +1,5 @@
 export const CONFIG = Object.freeze({
-  appVersion: '0.6.0-alpha-5',
+  appVersion: '0.6.0-alpha-6',
   referenceSha256: '51d413def77dd11a33a672222acbad46e9612da0f2d202bc28537928c2b7a357',
   promptVersion: 'evaluation-1.2',
   examplePromptVersion: 'example-1.0',

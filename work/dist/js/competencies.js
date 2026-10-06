@@ -1,8 +1,9 @@
+import { isBookmarked, toggleBookmark } from './bookmarks.js';
 import { questionSamples } from './data.js';
 import { buildAnswerGuidance } from './guidance.js';
-import { isBookmarked, toggleBookmark } from './bookmarks.js';
+import { bookActions } from './print-book.js';
 import {
-  button, clear, el, formatModel, formatType, icon, notice, printActions, tag, toast
+  bindExclusiveAccordions, button, clear, el, formatModel, formatType, icon, notice, tag, toast
 } from './ui.js';
 
 const COMPETENCY_ICONS = ['leadership', 'decision', 'communication', 'team', 'planning', 'problem', 'resilience', 'results'];
@@ -25,6 +26,43 @@ function skyline() {
   );
 }
 
+function bulletList(items, className = '') {
+  return el('ul', { class: className }, ...items.filter(Boolean).map(item => el('li', { text: item })));
+}
+
+function answerLabels(mode) {
+  return mode === 'seal'
+    ? { situation: 'فهم الوضع', evaluation: 'تقييم الخيارات', action: 'خطة العمل', leadership_impact: 'الأثر القيادي' }
+    : { situation: 'الموقف', task: 'المهمة ودورك', action: 'الإجراء', result: 'النتيجة', learning: 'التعلّم', action_points: 'الإجراءات' };
+}
+
+function renderAnswerParts(parts, mode) {
+  const labels = answerLabels(mode);
+  return el('div', { class: `focus-answer-parts answer-mode-${mode}` },
+    ...Object.entries(parts || {}).filter(([, value]) => value != null).map(([key, value], index) =>
+      el('article', { class: `focus-answer-part part-${index + 1}` },
+        el('span', { class: 'focus-answer-code', text: String(index + 1) }),
+        el('div', {},
+          el('strong', { text: labels[key] || key }),
+          el('p', { text: Array.isArray(value) ? value.join(' • ') : value })
+        )
+      )
+    )
+  );
+}
+
+function renderSample(sample, mode) {
+  return el('section', { class: `focus-answer-sample sample-${sample.kind || 'guide'}` },
+    el('header', { class: 'focus-answer-sample-heading' },
+      el('h3', { text: sample.title || 'الإجابة النموذجية' }),
+      sample.subtitle ? el('p', { text: sample.subtitle }) : null
+    ),
+    sample.parts
+      ? renderAnswerParts(sample.parts, mode)
+      : el('p', { class: 'focus-guide-answer', text: sample.text })
+  );
+}
+
 export async function renderCompetenciesIndex(root, data) {
   clear(root);
   const list = el('section', { class: 'competencies-screen' },
@@ -32,7 +70,7 @@ export async function renderCompetenciesIndex(root, data) {
       skyline(),
       el('small', { text: 'التحضير للمقابلة' }),
       el('h1', { text: 'الكفاءات الثمانية' }),
-      el('p', { text: 'اختر الكفاءة، افهم ما يقيسه المقابل، ثم تدرّب على أسئلتها.' })
+      el('p', { text: 'اختر الكفاءة، افهم ما يبحث عنه المقابل، ثم افتح أسئلتها وتدرّب عليها.' })
     )
   );
 
@@ -43,121 +81,129 @@ export async function renderCompetenciesIndex(root, data) {
       el('span', { class: 'competency-number', text: String(index + 1) }),
       el('span', { class: 'competency-symbol' }, icon(COMPETENCY_ICONS[index])),
       el('strong', { text: competency.name }),
-      el('small', { text: `${count} ${count === 1 ? 'سؤال للتدريب' : 'أسئلة للتدريب'}` }),
+      el('small', { text: `${count} ${count === 1 ? 'سؤال' : 'أسئلة'} بإجابات نموذجية` }),
       el('i', { class: 'card-chevron', 'aria-hidden': 'true', text: '‹' })
     ));
   });
-  list.append(grid, printActions('ملخص الكفاءات'));
+  list.append(grid, bookActions(data, { type: 'competencies' }, 'الكفاءات الثمانية'));
   root.append(list);
 }
 
-function bulletList(items, className = '') {
-  return el('ul', { class: className }, ...items.map(item => el('li', { text: item })));
-}
-
-function renderAnswerParts(parts, mode) {
-  const labels = mode === 'seal'
-    ? { situation: 'فهم الوضع', evaluation: 'التقييم', action: 'الإجراء', leadership_impact: 'الأثر القيادي' }
-    : { situation: 'الموقف', task: 'المهمة ودورك', action: 'الإجراء', result: 'النتيجة', learning: 'التعلّم', action_points: 'الإجراءات' };
-  return el('div', { class: `inline-answer-parts answer-mode-${mode}` },
-    ...Object.entries(parts || {}).filter(([, value]) => value != null).map(([key, value], index) =>
-      el('article', { class: `inline-answer-part part-${index + 1}` },
-        el('strong', { text: labels[key] || key }),
-        el('p', { text: Array.isArray(value) ? value.join(' • ') : value })
-      )
-    )
+function questionLinkCard(question, index) {
+  return el('a', {
+    class: 'smart-question-card question-link-card',
+    href: `#/question/${encodeURIComponent(question.id)}`,
+    dataset: { questionId: question.id }
+  },
+  el('span', { class: 'smart-question-number', text: String(index + 1) }),
+  el('span', { class: 'smart-question-copy' },
+    el('span', { class: 'question-meta' }, tag(formatType(question.type), 'warning'), tag(formatModel(question.rubric_mode), 'accent')),
+    el('strong', { text: question.display_question }),
+    el('small', { text: 'افتح السؤال، راجع المطلوب، ثم ابنِ إجابتك.' })
+  ),
+  el('span', { class: 'question-open-action' }, el('span', { text: 'فتح' }), el('i', { 'aria-hidden': 'true', text: '‹' }))
   );
 }
 
-export function renderInlineQuestion(question, data, index, options = {}) {
-  const guidance = buildAnswerGuidance(question, data);
-  const samples = questionSamples(question);
-  const details = el('details', {
-    class: 'smart-question-card',
-    id: `question-${question.id}`,
-    open: options.open === true
-  });
-  const summary = el('summary', {},
-    el('span', { class: 'smart-question-number', text: String(index + 1) }),
-    el('span', { class: 'smart-question-copy' },
-      el('span', { class: 'question-meta' }, tag(formatType(question.type), 'warning'), tag(formatModel(question.rubric_mode), 'accent')),
-      el('strong', { text: question.display_question })
-    ),
-    el('i', { class: 'accordion-chevron', 'aria-hidden': 'true', text: '⌄' })
-  );
-
-  const required = el('section', { class: 'inline-question-section requirement-section' },
-    el('h4', { text: 'ما الذي يريد المقابل سماعه؟' }),
-    el('p', { text: guidance.intent.instruction }),
-    guidance.points.length ? bulletList(guidance.points, 'guidance-points') : null
-  );
-  const blueprint = el('section', { class: 'inline-question-section blueprint-section' },
-    el('h4', { text: 'خريطة بناء الإجابة' }),
-    el('div', { class: 'inline-blueprint' }, ...guidance.elements.map(item =>
-      el('article', {}, el('b', { text: item.key }), el('div', {}, el('strong', { text: item.title }), el('small', { text: item.prompt })))
-    ))
-  );
-  // alpha-5 (F2): العنوان من questionSamples؛ للسؤال الموقفي: الإجابة الموسّعة ثم «إجابة الدليل كما هي» حرفيًا.
-  const answer = el('section', { class: 'inline-question-section model-answer-section' },
-    ...(samples.length ? samples.map(sample => el('div', { class: `inline-model-block sample-${sample.kind || 'guide'}` },
-      el('div', { class: 'inline-model-heading' },
-        el('div', {}, el('h4', { text: sample.title }), sample.subtitle ? el('small', { text: sample.subtitle }) : el('small', { text: 'لفهم البناء وطريقة التفكير، وليست نصًا للحفظ.' }))
-      ),
-      sample.parts ? renderAnswerParts(sample.parts, question.rubric_mode) : el('p', { class: 'guide-paragraph', text: sample.text })
-    )) : [notice('الإجابة غير متاحة حاليًا.', 'warning')])
-  );
-  const train = button('تدرّب على هذا السؤال', {
-    href: `#/simulation?question=${encodeURIComponent(question.id)}&answer=voice`,
-    className: 'wide inline-train-button'
-  });
-  train.addEventListener('click', () => markTrainingStarted(question.id));
-  // alpha-5 (F6): زر «حفظ السؤال» داخل البطاقة المفتوحة (مدخل صفحة «الأسئلة المحفوظة»).
-  const bookmark = button(isBookmarked(question.id) ? 'إزالة من المحفوظات' : 'حفظ السؤال', {
-    variant: 'secondary',
-    className: 'wide inline-bookmark-button',
-    'aria-pressed': isBookmarked(question.id) ? 'true' : 'false'
-  });
-  bookmark.addEventListener('click', () => {
-    const saved = toggleBookmark(question.id);
-    bookmark.textContent = saved ? 'إزالة من المحفوظات' : 'حفظ السؤال';
-    bookmark.setAttribute('aria-pressed', saved ? 'true' : 'false');
-    toast(saved ? 'حُفظ السؤال في «الأسئلة المحفوظة».' : 'أُزيل السؤال من المحفوظات.');
-  });
-  details.append(summary, el('div', { class: 'smart-question-body' }, required, blueprint, answer, el('div', { class: 'inline-question-actions' }, train, bookmark)));
-  return details;
+export function renderInlineQuestion(question, data, index) {
+  return questionLinkCard(question, index);
 }
 
-function makeTabs(competency) {
-  const panels = {
-    meaning: el('section', { class: 'competency-tab-panel active', 'data-panel': 'meaning' },
-      el('h2', { text: 'معنى الكفاءة' }), el('p', { text: competency.definition })
+function accordionItem(id, iconName, title, body, tone = 'mint', open = false) {
+  return el('details', { class: `competency-explainer-item tone-${tone}`, id, open },
+    el('summary', {},
+      el('span', { class: 'competency-explainer-icon' }, icon(iconName)),
+      el('strong', { text: title }),
+      el('i', { class: 'accordion-chevron', 'aria-hidden': 'true', text: '⌄' })
     ),
-    measure: el('section', { class: 'competency-tab-panel', 'data-panel': 'measure', hidden: true },
-      el('h2', { text: 'ما الذي يقيسه المقابل؟' }),
-      el('div', { class: 'measure-tile-grid' }, ...competency.what_interviewer_measures.map((text, index) =>
-        el('article', { class: `measure-tile tone-${COMPETENCY_TONES[index % COMPETENCY_TONES.length]}` },
-          el('span', {}, icon(index % 2 ? 'target' : 'communication')), el('p', { text })
-        )
-      ))
-    ),
-    show: el('section', { class: 'competency-tab-panel', 'data-panel': 'show', hidden: true },
-      el('h2', { text: 'كيف تظهرها في إجابتك؟' }),
-      el('div', { class: 'behaviour-columns' },
-        el('article', { class: 'supporting-column' }, el('h3', { text: 'سلوكيات تقوّي إجابتك' }), bulletList(competency.supporting_behaviours.map(item => item.text), 'positive-list')),
-        competency.negative_behaviours.length
-          ? el('article', { class: 'negative-column' }, el('h3', { text: 'سلوكيات تضعفها' }), bulletList(competency.negative_behaviours.map(item => item.text), 'negative-list'))
+    el('div', { class: 'competency-explainer-body' }, body)
+  );
+}
+
+function meaningPanel(competency) {
+  const accordion = el('div', { class: 'competency-explainer' },
+    accordionItem('competency-meaning', 'book', 'المعنى الأساسي',
+      el('div', { class: 'step-reading' },
+        el('p', { text: competency.definition }),
+        competency.definition_v1_2025 && competency.definition_v1_2025 !== competency.definition
+          ? el('aside', { class: 'definition-note' }, el('strong', { text: 'بصياغة أبسط' }), el('p', { text: competency.definition_v1_2025 }))
           : null
-      )
-    )
+      ), 'mint', true),
+    accordionItem('competency-measures', 'target', 'ما الذي يبحث عنه المقابل؟',
+      el('div', { class: 'measure-reading-list' }, ...competency.what_interviewer_measures.map((text, index) =>
+        el('article', {}, el('span', { text: String(index + 1) }), el('p', { text }))
+      )), 'sand')
+  );
+  return el('section', { class: 'competency-tab-panel active', 'data-panel': 'understand' },
+    el('header', { class: 'panel-reading-head' },
+      el('small', { text: 'ابدأ من هنا' }),
+      el('h2', { text: 'فهم الكفاءة وما الذي تقيسه' }),
+      el('p', { text: 'اقرأ المعنى أولًا، ثم افتح ما يبحث عنه المقابل. يظهر بند واحد فقط في كل مرة.' })
+    ),
+    bindExclusiveAccordions(accordion, `competency-understand-${competency.id}`)
+  );
+}
+
+function showPanel(competency) {
+  const items = el('div', { class: 'competency-explainer' },
+    accordionItem('competency-positive', 'readiness', 'سلوكيات تقوّي إجابتك',
+      bulletList(competency.supporting_behaviours.map(item => item.text), 'positive-list'), 'blue', true),
+    competency.negative_behaviours.length
+      ? accordionItem('competency-negative', 'problem', 'سلوكيات تضعف إجابتك',
+        bulletList(competency.negative_behaviours.map(item => item.text), 'negative-list'), 'rose')
+      : accordionItem('competency-practical', 'problem', 'حوّلها إلى قصة واضحة',
+        el('ol', { class: 'practical-steps' },
+          el('li', { text: 'اختر موقفًا حقيقيًا واحدًا يثبت الكفاءة.' }),
+          el('li', { text: 'وضّح دورك الشخصي وما فعلته أنت تحديدًا.' }),
+          el('li', { text: 'اختم بالأثر أو النتيجة وما تعلّمته.' })
+        ), 'rose')
+  );
+  return el('section', { class: 'competency-tab-panel', 'data-panel': 'show', hidden: true },
+    el('header', { class: 'panel-reading-head' },
+      el('small', { text: 'حوّل الفهم إلى دليل' }),
+      el('h2', { text: 'كيف تُظهرها في المقابلة؟' }),
+      el('p', { text: 'ركّز على السلوك الذي قمت به، لا على وصف نفسك بصفات عامة.' })
+    ),
+    bindExclusiveAccordions(items, `competency-show-${competency.id}`)
+  );
+}
+
+function questionsPanel(questions) {
+  return el('section', { class: 'competency-tab-panel competency-questions-panel', 'data-panel': 'questions', hidden: true },
+    el('header', { class: 'panel-reading-head' },
+      el('small', { text: `${questions.length} ${questions.length === 1 ? 'سؤالًا' : 'أسئلة'} بإجابات نموذجية كاملة` }),
+      el('h2', { text: 'أسئلة الكفاءة' }),
+      el('p', { text: 'اختر سؤالًا للتركيز على المطلوب وبناء إجابتك خطوة بخطوة.' })
+    ),
+    el('div', { class: 'smart-question-list' }, ...questions.map(questionLinkCard))
+  );
+}
+
+function competencyTabs(competency, questions) {
+  const panels = {
+    understand: meaningPanel(competency),
+    show: showPanel(competency),
+    questions: questionsPanel(questions)
   };
-  const tabs = el('div', { class: 'competency-tabs', role: 'tablist', 'aria-label': 'محتوى الكفاءة' });
+  const tabs = el('div', { class: 'competency-tabs focus-tabs', role: 'tablist', 'aria-label': 'محتوى الكفاءة' });
   const host = el('div', { class: 'competency-tab-content' }, ...Object.values(panels));
-  [['meaning', 'المعنى'], ['measure', 'ما يُقاس'], ['show', 'كيف تُظهرها']].forEach(([id, label], index) => {
-    const tab = el('button', { type: 'button', class: index === 0 ? 'active' : '', role: 'tab', 'aria-selected': index === 0 ? 'true' : 'false', text: label });
+  [['understand', 'فهم الكفاءة'], ['show', 'كيف تُظهرها'], ['questions', 'الأسئلة']].forEach(([id, label], index) => {
+    const tab = el('button', {
+      type: 'button', class: index === 0 ? 'active' : '', role: 'tab',
+      'aria-selected': index === 0 ? 'true' : 'false', text: label
+    });
     tab.addEventListener('click', () => {
-      tabs.querySelectorAll('button').forEach(item => { item.classList.remove('active'); item.setAttribute('aria-selected', 'false'); });
-      tab.classList.add('active'); tab.setAttribute('aria-selected', 'true');
-      Object.entries(panels).forEach(([key, panel]) => { panel.hidden = key !== id; panel.classList.toggle('active', key === id); });
+      tabs.querySelectorAll('button').forEach(item => {
+        item.classList.remove('active');
+        item.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      Object.entries(panels).forEach(([key, panel]) => {
+        panel.hidden = key !== id;
+        panel.classList.toggle('active', key === id);
+      });
+      host.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     tabs.append(tab);
   });
@@ -172,50 +218,187 @@ export async function renderCompetencyDetail(root, data, competencyId, params = 
   }
   clear(root);
   const index = Math.max(0, data.competencies.findIndex(item => item.id === competency.id));
-  const questions = (data.primaryIdsByCompetency.get(competency.id) || []).map(id => data.questionById.get(id)).filter(Boolean);
+  const questions = (data.primaryIdsByCompetency.get(competency.id) || [])
+    .map(id => data.questionById.get(id)).filter(Boolean);
   const trained = trainedIds();
   const trainedCount = questions.filter(question => trained.has(question.id)).length;
   const progress = questions.length ? Math.round(trainedCount / questions.length * 100) : 0;
-  const requestedQuestion = params.get('question');
-  const tabs = makeTabs(competency);
-  const questionList = el('div', { class: 'smart-question-list' },
-    ...questions.map((question, questionIndex) => renderInlineQuestion(question, data, questionIndex, { open: question.id === requestedQuestion }))
-  );
-  questionList.querySelectorAll('details').forEach(item => item.addEventListener('toggle', () => {
-    if (!item.open) return;
-    questionList.querySelectorAll('details[open]').forEach(other => { if (other !== item) other.open = false; });
-  }));
-
   const bookmarked = localStorage.getItem(`lic:competency-bookmark:${competency.id}`) === 'yes';
-  const bookmark = el('button', { class: `competency-bookmark ${bookmarked ? 'active' : ''}`, type: 'button', 'aria-label': 'حفظ الكفاءة' }, icon('bookmark'));
+  const bookmark = el('button', {
+    class: `competency-bookmark ${bookmarked ? 'active' : ''}`, type: 'button', 'aria-label': 'حفظ الكفاءة'
+  }, icon('bookmark'));
   bookmark.addEventListener('click', () => {
     const active = bookmark.classList.toggle('active');
     localStorage.setItem(`lic:competency-bookmark:${competency.id}`, active ? 'yes' : 'no');
     toast(active ? 'تم حفظ الكفاءة.' : 'تمت إزالة الكفاءة من المحفوظات.');
   });
+  const tabs = competencyTabs(competency, questions);
 
-  root.append(el('article', { class: 'competency-workspace' },
-    el('section', { class: `competency-smart-dashboard tone-${COMPETENCY_TONES[index]}` },
-      el('div', { class: 'competency-dashboard-copy' },
+  root.append(el('article', { class: 'competency-focus-page' },
+    el('section', { class: `competency-focus-hero tone-${COMPETENCY_TONES[index]}` },
+      el('span', { class: 'competency-focus-icon' }, icon(COMPETENCY_ICONS[index])),
+      el('div', {},
         el('small', { text: `الكفاءة ${index + 1} من 8` }),
         el('h1', { text: competency.name }),
-        el('p', { text: competency.definition }),
-        el('div', { class: 'dashboard-meta' }, tag(`${questions.length} أسئلة`, 'accent'), tag('تعلّم ثم تدرّب', 'success'))
-      ),
-      el('div', { class: 'competency-progress-ring', style: { '--progress': `${progress * 3.6}deg` } },
-        el('span', {}, el('strong', { text: `${progress}%` }), el('small', { text: 'بدأت تدريبها' }))
+        el('p', { text: 'افهم ما تعنيه الكفاءة، تعرّف إلى السلوك الذي يثبتها، ثم انتقل إلى أسئلتها.' }),
+        el('div', {
+          class: 'competency-focus-progress', role: 'progressbar',
+          'aria-label': 'تقدم التدريب على أسئلة الكفاءة', 'aria-valuemin': '0',
+          'aria-valuemax': '100', 'aria-valuenow': String(progress)
+        },
+        el('span', {}, el('i', { style: { width: `${progress}%` } })),
+        el('small', { text: `بدأت التدريب على ${trainedCount} من ${questions.length}` })
+        )
       ),
       bookmark
     ),
     tabs.tabs,
     tabs.host,
-    el('section', { class: 'competency-training-section' },
-      el('div', { class: 'section-heading smart-section-heading' },
-        el('div', {}, el('small', { text: 'التطبيق العملي' }), el('h2', { text: 'أسئلة الكفاءة' }), el('p', { text: 'افتح سؤالًا واحدًا، راجع بناء الإجابة، ثم تدرّب عليه بصوتك أو كتابتك.' }))
-      ),
-      questionList
-    ),
-    printActions(competency.name)
+    bookActions(data, { type: 'competency', id: competency.id }, competency.name)
   ));
-  if (requestedQuestion) requestAnimationFrame(() => document.querySelector(`#question-${CSS.escape(requestedQuestion)}`)?.scrollIntoView({ block: 'start' }));
+
+  const requestedQuestion = params.get('question');
+  if (params.get('tab') === 'questions' || requestedQuestion) requestAnimationFrame(() => {
+    tabs.tabs.querySelector('button:last-child')?.click();
+    if (!requestedQuestion) return;
+    const card = tabs.host.querySelector(`[data-question-id="${CSS.escape(requestedQuestion)}"]`);
+    card?.classList.add('requested');
+    card?.scrollIntoView({ block: 'center' });
+  });
+}
+
+function focusStepButton(number, label, index) {
+  return el('button', { type: 'button', class: 'question-step', dataset: { step: String(index) } },
+    el('b', { text: String(number) }), el('span', { text: label })
+  );
+}
+
+function questionOrigin(question) {
+  if (['X1', 'X2'].includes(question.id)) return 'أسئلة الذكاء الاصطناعي';
+  return question.competency_name || question.principle_title || 'سؤال قيادي';
+}
+
+export async function renderQuestionFocus(root, data, questionId) {
+  const question = data.questionById.get(questionId);
+  if (!question) {
+    clear(root).append(notice('السؤال المطلوب غير موجود.', 'danger'));
+    return;
+  }
+  clear(root);
+  const guidance = buildAnswerGuidance(question, data);
+  const samples = questionSamples(question);
+  let currentStep = 0;
+  let answerRevealed = false;
+
+  const bookmark = el('button', {
+    class: `question-focus-bookmark ${isBookmarked(question.id) ? 'active' : ''}`,
+    type: 'button', 'aria-label': 'حفظ السؤال'
+  }, icon('bookmark'));
+  bookmark.addEventListener('click', () => {
+    const active = toggleBookmark(question.id);
+    bookmark.classList.toggle('active', active);
+    toast(active ? 'تم حفظ السؤال.' : 'تمت إزالة السؤال من المحفوظات.');
+  });
+
+  const stepper = el('nav', { class: 'question-stepper', 'aria-label': 'مراحل مراجعة السؤال' },
+    focusStepButton(1, 'السؤال', 0),
+    focusStepButton(2, 'المطلوب', 1),
+    focusStepButton(3, 'بناء الإجابة', 2),
+    focusStepButton(4, 'المثال', 3)
+  );
+  const content = el('section', { class: 'question-focus-content', 'aria-live': 'polite' });
+  const previous = button('السابق', { variant: 'secondary', className: 'question-prev' });
+  const next = button('التالي', { className: 'question-next' });
+  const actions = el('footer', { class: 'question-focus-actions' }, previous, next);
+
+  const questionPanel = () => el('div', { class: 'question-focus-panel' },
+    el('div', { class: 'question-focus-meta' }, tag(questionOrigin(question), 'accent'), tag(formatModel(question.rubric_mode), 'warning')),
+    el('h1', { text: question.display_question }),
+    el('aside', { class: 'focus-explanation' },
+      el('span', {}, icon('communication')),
+      el('div', {}, el('strong', { text: guidance.intent.title }), el('p', { text: guidance.intent.instruction }))
+    )
+  );
+
+  const requirementsPanel = () => el('div', { class: 'question-focus-panel' },
+    el('small', { class: 'focus-kicker', text: 'قبل أن تبدأ الإجابة' }),
+    el('h2', { text: 'ما المطلوب في إجابتك؟' }),
+    el('p', { class: 'focus-intro', text: guidance.lead || guidance.intent.instruction }),
+    el('div', { class: 'focus-checklist' }, ...guidance.points.map((point, index) =>
+      el('article', {}, el('span', { text: '✓' }), el('div', {}, el('b', { text: `النقطة ${index + 1}` }), el('p', { text: point })))
+    ))
+  );
+
+  const blueprintPanel = () => el('div', { class: 'question-focus-panel' },
+    el('small', { class: 'focus-kicker', text: `نظّمها وفق ${formatModel(question.rubric_mode)}` }),
+    el('h2', { text: 'ابنِ إجابتك خطوة بخطوة' }),
+    el('p', { class: 'focus-intro', text: guidance.intent.answerPlan }),
+    el('div', { class: 'focus-blueprint' }, ...guidance.elements.map(item =>
+      el('article', {}, el('b', { text: item.key }), el('div', {}, el('strong', { text: item.title }), el('p', { text: item.prompt })))
+    )),
+    el('div', { class: 'focus-training-choices no-print' },
+      button('تدرّب بصوتك', {
+        href: `#/simulation?question=${encodeURIComponent(question.id)}&answer=voice`,
+        onClick: () => markTrainingStarted(question.id)
+      }),
+      button('تدرّب بالكتابة', {
+        href: `#/simulation?question=${encodeURIComponent(question.id)}&answer=text`,
+        variant: 'secondary', onClick: () => markTrainingStarted(question.id)
+      })
+    )
+  );
+
+  const examplePanel = () => {
+    const panel = el('div', { class: 'question-focus-panel' },
+      el('small', { class: 'focus-kicker', text: 'راجع البناء بعد محاولتك' }),
+      el('h2', { text: 'الإجابة النموذجية' }),
+      el('p', { class: 'focus-intro', text: 'استخدم المثال لفهم طريقة التفكير، ولا تحفظه حرفيًا.' })
+    );
+    if (!answerRevealed) {
+      panel.append(el('section', { class: 'answer-gate' },
+        el('span', {}, icon('privacy')),
+        el('h3', { text: 'هل كوّنت إجابتك أولًا؟' }),
+        el('p', { text: 'إخفاء المثال في البداية يساعدك على التفكير من خبرتك بدل تقليد النص.' }),
+        button('إظهار الإجابة النموذجية', {
+          onClick: () => { answerRevealed = true; draw(); }
+        })
+      ));
+    } else if (samples.length) panel.append(el('div', { class: 'focus-answer-samples' },
+      ...samples.map(sample => renderSample(sample, question.rubric_mode))
+    ));
+    else panel.append(notice('الإجابة النموذجية غير متاحة.', 'warning'));
+    panel.append(bookActions(data, { type: 'question', id: question.id }, 'السؤال'));
+    return panel;
+  };
+
+  const panelFactories = [questionPanel, requirementsPanel, blueprintPanel, examplePanel];
+  const draw = () => {
+    content.replaceChildren(panelFactories[currentStep]());
+    [...stepper.querySelectorAll('.question-step')].forEach((item, index) => {
+      item.classList.toggle('active', index === currentStep);
+      item.classList.toggle('complete', index < currentStep);
+      item.setAttribute('aria-current', index === currentStep ? 'step' : 'false');
+    });
+    previous.disabled = currentStep === 0;
+    next.hidden = currentStep === panelFactories.length - 1;
+    next.textContent = currentStep === 0 ? 'التالي: المطلوب' : currentStep === 1 ? 'التالي: بناء الإجابة' : 'التالي: المثال';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  previous.addEventListener('click', () => { if (currentStep > 0) { currentStep -= 1; draw(); } });
+  next.addEventListener('click', () => { if (currentStep < panelFactories.length - 1) { currentStep += 1; draw(); } });
+  stepper.querySelectorAll('.question-step').forEach((item, index) => item.addEventListener('click', () => {
+    currentStep = index;
+    draw();
+  }));
+
+  root.append(el('article', { class: 'question-focus-page' },
+    el('header', { class: 'question-focus-heading' },
+      el('div', {}, el('small', { text: questionOrigin(question) }), el('strong', { text: 'سؤال تدريبي' })),
+      bookmark
+    ),
+    stepper,
+    content,
+    actions
+  ));
+  draw();
 }

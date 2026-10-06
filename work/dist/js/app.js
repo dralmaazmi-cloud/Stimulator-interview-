@@ -1,7 +1,7 @@
 import { loadData } from './data.js';
 import { renderHome } from './home.js';
 import { cleanupLearn, renderLearnIndex, renderLesson } from './learn.js';
-import { renderCompetenciesIndex, renderCompetencyDetail } from './competencies.js';
+import { renderCompetenciesIndex, renderCompetencyDetail, renderQuestionFocus } from './competencies.js';
 import { renderQuickReview, renderAnswerGuide } from './quick-review.js';
 import { renderSelfIntroPage } from './self-intro.js';
 import { renderSearch } from './search.js';
@@ -48,6 +48,7 @@ async function route({ restoreScroll = false } = {}) {
     else if (page === 'coverage') await renderCoverageMap(root, data);
     else if (page === 'competencies' && parts[1]) await renderCompetencyDetail(root, data, parts[1], params);
     else if (page === 'competencies') await renderCompetenciesIndex(root, data);
+    else if (page === 'question' && parts[1]) await renderQuestionFocus(root, data, decodeURIComponent(parts[1]));
     else if (page === 'learn' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'learn') await renderLearnIndex(root, data);
     else if (page === 'bank' || page === 'practice') await renderCompetenciesIndex(root, data);
@@ -80,7 +81,7 @@ async function route({ restoreScroll = false } = {}) {
 }
 
 function navPage(page) {
-  if (page === 'preparation' || page === 'learn' || page === 'competencies' || page === 'bank' || page === 'practice') return 'preparation';
+  if (page === 'preparation' || page === 'learn' || page === 'competencies' || page === 'question' || page === 'bank' || page === 'practice') return 'preparation';
   if (page === 'reports' || page === 'sessions' || page === 'coverage') return 'reports';
   if (page === 'simulation') return 'simulation';
   if (page === 'settings' || page === 'tools' || page === 'search') return 'more';
@@ -96,7 +97,7 @@ function updateChrome(page) {
   backButton.disabled = page === 'home';
   const titles = {
     preparation: 'التحضير للمقابلة', learn: 'التحضير للمقابلة', competencies: 'الكفاءات الثمانية',
-    bank: 'الكفاءات الثمانية', practice: 'التدريب', simulation: 'المحاكاة', reports: 'التقارير',
+    question: 'سؤال تدريبي', bank: 'الكفاءات الثمانية', practice: 'التدريب', simulation: 'المحاكاة', reports: 'التقارير',
     sessions: 'التقارير', coverage: 'خريطة التغطية', settings: 'المزيد', search: 'البحث', tools: 'الأدوات',
     'quick-review': 'المراجعة السريعة', 'answer-guide': 'بناء الإجابة', 'self-intro': 'تقديم الذات'
   };

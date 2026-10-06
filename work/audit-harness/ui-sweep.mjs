@@ -7,7 +7,8 @@ fs.mkdirSync(OUT, { recursive: true });
 
 const ROUTES = [
   '#/home', '#/preparation', '#/preparation/U1', '#/preparation/U2', '#/preparation/U4', '#/preparation/U5',
-  '#/competencies', '#/competencies/C1', '#/competencies/C1?question=C1-S1', '#/preparation/U4?question=M6-S1',
+  '#/competencies', '#/competencies/C1', '#/competencies/C1?tab=questions',
+  '#/question/C1-S1', '#/question/M6-S1', '#/question/X1',
   '#/simulation', '#/reports', '#/coverage', '#/tools', '#/tools/saved', '#/settings', '#/nope',
   // alpha-5 fix: direct-training routes (behavioural, mission behavioural, scenario, general) in text and voice modes
   '#/simulation?question=C2-B3&answer=text', '#/simulation?question=C2-B3&answer=voice',
@@ -109,12 +110,13 @@ async function run(theme) {
   const competencyCount = await page.locator('.competency-card').count();
   note(`#/competencies [${theme}]`, 'COMPETENCIES', `${competencyCount} بطاقات`);
 
-  await page.goto(`${BASE}/#/competencies/C1?question=C1-S1`);
-  await page.waitForSelector('details.smart-question-card[open]');
-  const details = page.locator('details.smart-question-card[open]').first();
-  const parts = await details.locator('.inline-answer-part').count();
-  note(`#/competencies/C1?question=C1-S1 [${theme}]`, 'MODEL-ANSWER', `opened=true parts=${parts}`);
-  await page.screenshot({ path: `${OUT}/${theme}-competency-C1-S1-open.png`, fullPage: true });
+  await page.goto(`${BASE}/#/question/C1-S1`);
+  await page.waitForSelector('.question-focus-page');
+  await page.locator('.question-step').last().click();
+  await page.locator('button:has-text("إظهار الإجابة النموذجية")').click();
+  const parts = await page.locator('.focus-answer-part').count();
+  note(`#/question/C1-S1 [${theme}]`, 'MODEL-ANSWER', `revealed=true parts=${parts}`);
+  await page.screenshot({ path: `${OUT}/${theme}-question-C1-S1-answer.png`, fullPage: true });
 
   await page.goto(`${BASE}/#/simulation`);
   await page.waitForSelector('.simulation-mode-card');

@@ -165,7 +165,12 @@ export function printActions(label = 'المحتوى') {
 export function button(text, options = {}) {
   const { variant = '', href = null, onClick = null, className = '', ...attrs } = options;
   const classes = `button ${variant} ${className}`.trim();
-  if (href) return el('a', { class: classes, href, ...attrs }, text);
+  if (href) return el('a', {
+    class: classes,
+    href,
+    on: onClick ? { click: onClick } : undefined,
+    ...attrs
+  }, text);
   return el('button', { class: classes, type: 'button', on: onClick ? { click: onClick } : undefined, ...attrs }, text);
 }
 

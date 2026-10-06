@@ -383,9 +383,9 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto(BASE + '/#/preparation/U1').catch(e => log('J3 nav offline err', e.message));
   await page.waitForTimeout(1200);
   log('J3 offline learn U1 h1', await text(page, 'h1'));
-  await page.goto(BASE + '/#/competencies/C1?question=C1-B3');
-  await page.waitForTimeout(800);
-  log('J3 offline competency C1 question C1-B3 open', String(await page.locator('#question-C1-B3[open]').count()) + ' :: ' + (await text(page, '#question-C1-B3 summary strong')).slice(0, 60));
+  await page.goto(BASE + '/#/question/C1-B3');
+  await page.waitForSelector('.question-focus-page');
+  log('J3 offline dedicated question C1-B3', String(await page.locator('.question-focus-page').count()) + ' :: ' + (await text(page, '.question-focus-panel h1')).slice(0, 60));
   await page.goto(BASE + '/#/self-intro');
   await page.waitForTimeout(800);
   log('J3 offline self-intro h1', await text(page, 'h1'));
@@ -543,11 +543,11 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 // ---------- Journey 8: settings delete all data ----------
 {
   const { browser, page } = await newPage();
-  await page.goto(BASE + '/#/competencies/C1?question=C1-B3');
-  await page.waitForTimeout(400);
-  await page.locator('#question-C1-B3 .inline-bookmark-button').click();
+  await page.goto(BASE + '/#/question/C1-B3');
+  await page.waitForSelector('.question-focus-page');
+  await page.locator('.question-focus-bookmark').click();
   await page.waitForTimeout(200);
-  log('J8 F6 bookmark button toggles', await text(page, '#question-C1-B3 .inline-bookmark-button') + ' :: ' + JSON.stringify(await page.evaluate(() => localStorage.getItem('lic:bookmarked-questions'))));
+  log('J8 F6 bookmark button toggles', String(await page.locator('.question-focus-bookmark.active').count()) + ' :: ' + JSON.stringify(await page.evaluate(() => localStorage.getItem('lic:bookmarked-questions'))));
   await page.goto(BASE + '/#/tools/saved');
   await page.waitForTimeout(400);
   log('J8 saved questions page lists C1-B3', String(await page.locator('.saved-question-card').count()));
