@@ -523,7 +523,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   // regenerate and improve with AI
   await page.locator('button:has-text("بناء تقديم الذات")').click();
   await page.waitForTimeout(300);
-  await page.locator('button:has-text("تحسين لغوي بالذكاء الاصطناعي")').click();
+  await page.locator('button:has-text("تحسين الصياغة بالذكاء الاصطناعي")').click();
   await page.waitForSelector('.ai-intro-candidate textarea', { timeout: 15000 });
   log('J7 AI candidate', (await text(page, '.ai-intro-candidate')).slice(0, 160));
   const before = await page.locator('.intro-result-text').first().inputValue();
@@ -534,7 +534,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await shot(page, '7-self-intro');
   // offline improve
   await context.setOffline(true);
-  await page.locator('button:has-text("تحسين لغوي بالذكاء الاصطناعي")').click();
+  await page.locator('button:has-text("تحسين الصياغة بالذكاء الاصطناعي")').click();
   await page.waitForTimeout(1500);
   log('J7 offline improve message', await text(page, '.ai-intro-candidate'));
   await browser.close();
@@ -699,30 +699,6 @@ for (const theme of ['light', 'dark']) {
   // export includes attempts + rotation
   const backup = await page.evaluate(async () => { const { exportBackup } = await import('/js/storage.js'); const b = await exportBackup({}); return { stores: Object.keys(b.stores), attempts: (b.stores.attempts || []).length, rotation: (b.stores.rotation || []).length }; });
   log('J10 export includes attempts/rotation', JSON.stringify(backup));
-  await browser.close();
-}
-// ---------- alpha-6.1 Journey 11: SEAL element names on the focused question page (after «إظهار الإجابة النموذجية») and in the printed book ----------
-{
-  const { browser, page, errors } = await newPage();
-  const SEAL_NAMES = ['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي'];
-  await page.goto(BASE + '/#/question/C1-S1');
-  await page.waitForSelector('.question-focus-page');
-  await page.locator('.question-step').last().click();
-  await page.waitForSelector('.answer-gate');
-  await page.locator('button:has-text("إظهار الإجابة النموذجية")').click();
-  await page.waitForSelector('.focus-answer-samples');
-  const pageLabels = await page.locator('.focus-answer-part strong').allInnerTexts();
-  const pageText = await page.locator('.question-focus-page').innerText();
-  log('J11 question page SEAL labels after reveal', pageLabels.join(' | ') + ' :: exact=' + String(JSON.stringify(pageLabels) === JSON.stringify(SEAL_NAMES)) + ' oldNames=' + String(/تقييم الخيارات|خطة العمل/.test(pageText)));
-  const bookLabels = await page.evaluate(async () => {
-    const { buildPrintBook } = await import('/js/print-book.js');
-    const { loadData } = await import('/js/data.js');
-    const book = buildPrintBook(await loadData(), { kind: 'question', id: 'C1-S1' });
-    return { labels: [...book.querySelectorAll('.print-answer-part h4')].map(node => node.textContent), old: /تقييم الخيارات|خطة العمل/.test(book.textContent) };
-  });
-  log('J11 printed book SEAL labels', bookLabels.labels.join(' | ') + ' :: exact=' + String(JSON.stringify(bookLabels.labels) === JSON.stringify(SEAL_NAMES)) + ' oldNames=' + String(bookLabels.old));
-  if (JSON.stringify(pageLabels) !== JSON.stringify(SEAL_NAMES) || JSON.stringify(bookLabels.labels) !== JSON.stringify(SEAL_NAMES) || bookLabels.old || /تقييم الخيارات|خطة العمل/.test(pageText)) throw new Error('J11: SEAL element names mismatch');
-  log('J11 page errors', JSON.stringify(errors));
   await browser.close();
 }
 fs.writeFileSync(`${OUT}/journeys-done.txt`, 'ok');

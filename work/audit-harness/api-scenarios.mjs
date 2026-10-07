@@ -24,7 +24,7 @@ async function evaluate(port, body, headers = {}) {
 {
   const r = await evaluate(4173, { question_id: 'C1-B3', answer: ANSWER });
   const rep = r.payload.report || {};
-  log('alpha-5 report carries elements_complete/elements_total, weights phase2-1.1, prompt evaluation-1.2', Number.isFinite(rep.elements_complete) && rep.elements_total === 5 && rep.weights_version === 'phase2-1.1' && r.payload.meta?.prompt_version === 'evaluation-1.2', `complete=${rep.elements_complete}/${rep.elements_total} weights=${rep.weights_version} prompt=${r.payload.meta?.prompt_version}`);
+  log('report carries elements_complete/elements_total, weights phase2-1.1, prompt evaluation-1.3', Number.isFinite(rep.elements_complete) && rep.elements_total === 5 && rep.weights_version === 'phase2-1.1' && r.payload.meta?.prompt_version === 'evaluation-1.3', `complete=${rep.elements_complete}/${rep.elements_total} weights=${rep.weights_version} prompt=${r.payload.meta?.prompt_version}`);
   log('alpha-5 improve/summary sanitised (no % / «من 100»)', rep.criteria.every(c => typeof c.improve === 'string' && !/%|٪|من 100/.test(c.improve)) && typeof rep.summary === 'string' && !/%|٪|[0-9]|قوية|ضعيفة|متوسطة/.test(rep.summary), `summary="${rep.summary}" improve0="${rep.criteria[0]?.improve}"`);
   const r2 = await evaluate(4173, { question_id: 'C1-B3', answer: ANSWER + ' NOSUMMARY' });
   log('alpha-5 fallback summary when evaluator omits it', /^اكتمل \d من \d عناصر\. ابدأ بـ‹.+›\.$/.test(r2.payload.report?.summary || '') && r2.payload.report?.summary_source === 'fallback', `summary="${r2.payload.report?.summary}"`);

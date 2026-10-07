@@ -171,15 +171,15 @@ const requiredFiles = [
   'dist/js/wake-lock.js', 'dist/js/report.js', 'dist/data/derived/question-audit.json',
   'dist/data/expanded-model-answers.json',
   'dist/js/scoring-rules.js', 'dist/js/retry-plan.js', 'dist/js/rotation.js', 'dist/js/session-plan.js', 'dist/js/coverage.js',
-  'dist/js/print-book.js', 'api/example.js'
+  'dist/js/print-book.js', 'dist/js/questions.js', 'api/example.js'
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(project, file)), `Missing ${file}`));
 assert.ok(read('dist/assets/images/abu-dhabi-sea-hero.jpg').length > 100_000, 'Hero must be a production-quality local image');
 
 const serviceWorkerText = text('dist/sw.js');
-assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-6\.1-/);
-assert.doesNotMatch(serviceWorkerText, /alpha-[45]/, 'only the alpha-6 cache name may remain');
-['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage', 'print-book'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
+assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-10/);
+assert.doesNotMatch(serviceWorkerText, /alpha-(?:[4-9])(?!\d)/, 'only the alpha-10 cache name may remain');
+['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage', 'print-book', 'questions'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
 const cachedPaths = [...serviceWorkerText.matchAll(/'\.\/(.*?)'/g)].map(match => match[1]);
 cachedPaths.filter(Boolean).forEach(file => assert.ok(fs.existsSync(path.join(project, 'dist', file)), `Service worker caches missing file: ${file}`));
 assert.match(serviceWorkerText, /url\.pathname\.startsWith\('\/api\/'\)/, 'API responses must never be cached');
@@ -193,12 +193,14 @@ assert.equal((indexText.match(/data-nav=/g) || []).length, 5);
 ['الرئيسية', 'التحضير', 'المحاكاة', 'التقارير', 'المزيد'].forEach(label => assert.match(indexText, new RegExp(`>${label}<`)));
 assert.match(indexText, /apple-touch-icon-180\.png/);
 assert.match(indexText, /id="back-button"[^>]+aria-label="العودة إلى الصفحة السابقة"/);
+assert.match(indexText, /<path d="m9 18 6-6-6-6"/, 'RTL back arrow must point right');
 assert.match(indexText, /href="#\/settings" data-nav="more"/);
 
 const homeText = text('dist/js/home.js');
 assert.match(homeText, /abu-dhabi-sea-hero\.jpg/);
 assert.match(homeText, /التحضير للمقابلة/);
 assert.match(homeText, /المحاكاة الذكية/);
+assert.match(homeText, /ابدأ المحاكاة/);
 assert.match(homeText, /home-start-grid/);
 assert.match(homeText, /home-path-card/);
 assert.match(homeText, /home-report-card/);
@@ -209,6 +211,8 @@ assert.match(learnText, /bookActions/);
 assert.match(learnText, /part_1_framework\.sections/);
 assert.match(learnText, /part_2_answering\.sections/);
 assert.match(learnText, /#\/competencies/);
+assert.match(learnText, /#\/questions/);
+assert.match(learnText, /تدريب تفاعلي/);
 assert.match(learnText, /renderMission/);
 assert.match(learnText, /renderLesson\(root, data, lessonId, params = new URLSearchParams\(\)\)/,
   'Lesson routes must receive URL parameters before rendering Mission Command');
@@ -224,11 +228,13 @@ assert.match(competencyText, /\['understand', 'فهم الكفاءة'\], \['show
 assert.match(competencyText, /#\/question\/\$\{encodeURIComponent\(question\.id\)\}/);
 assert.match(competencyText, /إظهار الإجابة النموذجية/);
 assert.match(competencyText, /answerRevealed/);
+assert.match(competencyText, /question-focus-close/);
+assert.match(competencyText, /returnHash/);
+assert.match(competencyText, /lic:return-to-context/,
+  'Closing a question must replace the focus route so browser Back cannot reopen it');
+assert.doesNotMatch(competencyText, /bookActions\(data, \{ type: 'question'/,
+  'Question pages must not expose individual print/PDF actions');
 assert.match(text('dist/js/data.js'), /إجابة نموذجية إرشادية/);
-// alpha-6.1: صفحة السؤال تعرض عناصر SEAL بالأسماء المعتمدة فقط (التحقق الحي في journeys J11).
-assert.match(competencyText, /situation: 'فهم الوضع', evaluation: 'التقييم', action: 'الإجراء', leadership_impact: 'الأثر القيادي'/);
-assert.doesNotMatch(competencyText, /تقييم الخيارات|خطة العمل/, 'old SEAL labels must not remain in the question page');
-assert.doesNotMatch(text('dist/js/print-book.js'), /تقييم الخيارات|خطة العمل/, 'old SEAL labels must not remain in the print book');
 // alpha-5 (F2): عناوين صادقة للسؤال الموقفي + «إجابة الدليل كما هي»؛ (F6) زر حفظ السؤال داخل البطاقة.
 assert.match(text('dist/js/data.js'), /إجابة نموذجية موسّعة، مبنية على إجابة الدليل/);
 assert.match(text('dist/js/data.js'), /إجابة الدليل كما هي/);
@@ -238,16 +244,27 @@ assert.match(competencyText, /تدرّب بصوتك/);
 assert.match(competencyText, /تدرّب بالكتابة/);
 
 const appText = text('dist/js/app.js');
+assert.match(appText, /page === 'questions'/);
+assert.match(appText, /questions: 'الأسئلة'/);
 assert.match(appText, /page === 'question' && parts\[1\]/);
 assert.match(appText, /renderQuestionFocus/);
+assert.match(appText, /renderQuestionFocus\(root, data, decodeURIComponent\(parts\[1\]\), params\)/,
+  'Question routes must preserve their return context');
+assert.match(appText, /backButton\.dataset\.returnHash/,
+  'The global back control must share the same contextual return target as the close button');
+assert.match(appText, /navigationStack\.splice\(-1, 1, activeHash\)/,
+  'Context replacement must keep the in-app navigation stack coherent');
 assert.match(appText, /question: 'سؤال تدريبي'/);
 
 const printBookText = text('dist/js/print-book.js');
 ['print-cover', 'print-toc', 'print-question-page', 'print-model-answer', 'print-memory-box']
   .forEach(className => assert.match(printBookText, new RegExp(className)));
-assert.match(printBookText, /هذا السؤال فقط/);
 assert.match(printBookText, /دليل التحضير كاملًا/);
+assert.match(printBookText, /كتاب الأسئلة والإجابات/);
+assert.match(printBookText, /scope\.kind === 'questions'/);
 assert.match(printBookText, /لن تُطبع واجهة الهاتف/);
+assert.doesNotMatch(printBookText, /هذا السؤال فقط/,
+  'Export scope must remain at chapter/competency level, not each question');
 
 const printableData = {
   questions,
@@ -264,6 +281,7 @@ assert.deepEqual(new Set(printBookQuestionIds(printableData)), new Set(questions
 assert.equal(printBookQuestionIds(printableData, { kind: 'competency', id: 'C3' }).length, 13);
 assert.equal(printBookQuestionIds(printableData, { kind: 'lesson', id: 'U4' }).length, 12);
 assert.deepEqual(printBookQuestionIds(printableData, { kind: 'lesson', id: 'U5' }), ['X1', 'X2']);
+assert.equal(printBookQuestionIds(printableData, { kind: 'questions' }).length, 70);
 assert.deepEqual(printBookQuestionIds(printableData, { kind: 'question', id: 'C1-S1' }), ['C1-S1']);
 
 const settingsText = text('dist/js/settings.js');
@@ -284,6 +302,10 @@ assert.match(cssText, /body\[data-page="question"\] \.bottom-nav \{ display: non
   'The dedicated question page must remove navigation distractions');
 assert.match(cssText, /body\.book-printing > \*:not\(#print-book-root\)/,
   'Book export must print an independent document instead of the current screen');
+assert.doesNotMatch(cssText, /\.print-question-page\s*\{[^}]*break-before:\s*page/s,
+  'Printed questions must flow efficiently instead of forcing one page per question');
+assert.match(cssText, /\.print-question-prep\s*\{[^}]*grid-template-columns/s,
+  'Printed answer guidance must use a compact two-column preparation layout');
 
 assert.doesNotMatch(clientText, /استُبعدت الأسئلة|الواجهة جاهزة|تهيئة مفتاح|إعادة النشر/);
 assert.doesNotMatch(settingsText, /الأسئلة المستبعدة|بصمة المرجع|بنك الأسئلة/);
@@ -352,4 +374,19 @@ assert.ok(insights.strengths.every(item => item.text !== 'يجب ألا تُحت
 assert.ok(insights.weaknesses.every(item => item.text !== 'يجب ألا تُحتسب'));
 assert.ok(insights.priorities.length > 0);
 
-console.log(`PASS v0.6 content and UX: ${questions.length} complete-answer questions, ${audit.excluded.length} excluded, 5 preparation sections.`);
+const questionsText = text('dist/js/questions.js');
+['حسب الكفاءة', 'حسب نوع السؤال', 'قيادة المهمة', 'المحفوظة', 'اسحب للتنقل بين الأسئلة', 'أتقنت هذا السؤال']
+  .forEach(label => assert.match(questionsText, new RegExp(label)));
+assert.match(questionsText, /data\.primaryQuestions/,
+  'The interactive question center must use the curated complete-answer list');
+assert.match(questionsText, /view: 'deck'/);
+assert.match(questionsText, /query: state\.query/,
+  'Returning from a focused question must preserve the deck search');
+
+const stylesText = text('dist/css/styles.css');
+['question-hub-hero', 'question-hub-options', 'question-deck-card', 'question-deck-stack', 'question-deck-swipe-hint']
+  .forEach(className => assert.match(stylesText, new RegExp(`\\.${className}`)));
+assert.match(stylesText, /\.home-report-icon[\s\S]*place-content: center/,
+  'The first-simulation report icon must be centered in its container');
+
+console.log(`PASS v0.6 content and UX: ${questions.length} complete-answer questions, ${audit.excluded.length} excluded, 5 preparation sections plus the interactive question center.`);

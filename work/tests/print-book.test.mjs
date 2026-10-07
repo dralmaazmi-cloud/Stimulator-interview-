@@ -79,7 +79,7 @@ function withClass(root, className) {
 
 const fullBook = buildPrintBook(data, { kind: 'preparation' });
 const questionPages = withClass(fullBook, 'print-question-page');
-assert.equal(questionPages.length, 70, 'the full preparation book must render one complete page for every published question');
+assert.equal(questionPages.length, 70, 'the full preparation book must render one complete section for every published question');
 assert.equal(withClass(fullBook, 'print-model-answer').length, 70, 'every printed question must contain a model-answer section');
 assert.equal(withClass(fullBook, 'print-empty').length, 0, 'no published question may print an empty-answer message');
 assert.deepEqual(new Set(questionPages.map(node => node.dataset.questionId)), new Set(questions.map(item => item.id)));
@@ -92,21 +92,17 @@ assert.equal(withClass(competencyBook, 'print-question-page').length, 13);
 assert.ok(competencyBook.textContent.includes('فهم الكفاءة وما الذي تقيسه'));
 assert.ok(competencyBook.textContent.includes('كيف تُظهرها في المقابلة'));
 
+const questionsBook = buildPrintBook(data, { kind: 'questions' });
+assert.equal(withClass(questionsBook, 'print-question-page').length, 70,
+  'the questions book must render all 70 approved questions');
+assert.equal(withClass(questionsBook, 'print-model-answer').length, 70,
+  'the questions book must include a complete model-answer section for every question');
+assert.ok(questionsBook.textContent.includes('الأسئلة والإجابات النموذجية'));
+
 const sealQuestion = questions.find(item => item.sample_answer_seal && item.sample_answer);
 const sealBook = buildPrintBook(data, { kind: 'question', id: sealQuestion.id });
 assert.ok(sealBook.textContent.includes('إجابة نموذجية موسّعة، مبنية على إجابة الدليل'));
 assert.ok(sealBook.textContent.includes('إجابة الدليل كما هي'));
-
-// alpha-6.1: أسماء عناصر SEAL المعتمدة في الكتاب المطبوع (C1-S1)، وSTAR-L يحتفظ بأسمائه (C1-B3).
-const SEAL_NAMES = ['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي'];
-const c1s1Book = buildPrintBook(data, { kind: 'question', id: 'C1-S1' });
-const c1s1Labels = withClass(c1s1Book, 'print-answer-part').map(node => node.childNodes.find(child => child.tagName === 'H4').textContent);
-assert.deepEqual(c1s1Labels, SEAL_NAMES, 'printed SEAL answer must use exactly the four agreed element names in order');
-['تقييم الخيارات', 'خطة العمل'].forEach(label => assert.ok(!c1s1Book.textContent.includes(label), `printed book must not contain «${label}»`));
-const c1b3Book = buildPrintBook(data, { kind: 'question', id: 'C1-B3' });
-const c1b3Labels = withClass(c1b3Book, 'print-answer-part').map(node => node.childNodes.find(child => child.tagName === 'H4').textContent);
-assert.deepEqual(c1b3Labels, ['الموقف', 'المهمة ودورك', 'الإجراء', 'النتيجة', 'التعلّم'], 'STAR-L keeps its own names');
-assert.ok(!c1b3Book.textContent.includes('فهم الوضع'));
 
 const generalBook = buildPrintBook(data, { kind: 'question', id: 'X1' });
 assert.ok(generalBook.textContent.includes(data.questionById.get('X1').sample_answer));

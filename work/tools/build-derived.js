@@ -581,7 +581,7 @@ const manifest = {
   derived_schema_version: '1.0',
   reference_sha256: sourceHash,
   expanded_answers_sha256: crypto.createHash('sha256').update(expandedAnswersBytes).digest('hex'),
-  prompt_version: 'evaluation-1.2+approved-content-audit-1',
+  prompt_version: 'evaluation-1.3+approved-content-audit-1',
   rubric_version: 'phase2-reference-review-4.0',
   config_version: '6.0',
   model_id: null,

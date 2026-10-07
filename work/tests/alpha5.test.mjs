@@ -297,7 +297,7 @@ assert.equal(questions.filter(item => item.rubric_mode === 'general').length, 2)
       const evaluateRes = mockResponse();
       await evaluateHandler(request({ question_id: id, answer: answerText }), evaluateRes);
       assert.equal(evaluateRes.statusCode, 200, JSON.stringify(evaluateRes.payload));
-      assert.equal(evaluateRes.payload.meta.prompt_version, 'evaluation-1.2');
+      assert.equal(evaluateRes.payload.meta.prompt_version, 'evaluation-1.3');
       assert.equal(evaluateRes.payload.report.weights_version, 'phase2-1.1');
       assert.ok('elements_complete' in evaluateRes.payload.report && 'elements_total' in evaluateRes.payload.report);
       assert.equal(evaluateRes.payload.report.summary, 'ملخص');

@@ -84,6 +84,7 @@ const ICON_PATHS = Object.freeze({
   leadership: 'M4 19v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4M9 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0ZM4 9a2 2 0 1 0 0-4M20 9a2 2 0 1 1 0-4',
   decision: 'M4 6h11M12 3l3 3-3 3M20 18H9M12 15l-3 3 3 3M4 6v12',
   communication: 'M4 5h11v8H8l-4 4V5Zm7 11h5l4 4V9h-2',
+  profile: 'M4 21v-1.5A5.5 5.5 0 0 1 9.5 14h3A5.5 5.5 0 0 1 18 19.5V21M11 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm5-6h5v4h-2l-2.5 2V9H16V5Z',
   team: 'M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 20v-2a5 5 0 0 1 10 0v2M12 20v-2a5 5 0 0 1 10 0v2',
   planning: 'M6 3h12v18H6zM9 8l1.5 1.5L13 7M14 9h2M9 14l1.5 1.5L13 13M14 15h2',
   problem: 'M9 18h6M10 22h4M8.5 14.5A7 7 0 1 1 15.5 14.5C14.5 15.3 14 16 14 18h-4c0-2-.5-2.7-1.5-3.5Z',
@@ -178,6 +179,24 @@ export function notice(text, kind = '', icon = 'ⓘ') {
   return el('div', { class: `notice ${kind}`.trim(), role: 'note' },
     el('strong', { 'aria-hidden': 'true', text: icon }),
     el('p', { text })
+  );
+}
+
+export const TRAINING_ANSWER_NOTICE = 'تنبيه: هذا اجتهاد تدريبي وليس إجابة رسمية.';
+export const TRAINING_EVALUATION_NOTICE = 'تنبيه: هذا اجتهاد تدريبي وليس تقييمًا رسميًا.';
+
+export function trainingDisclaimer(kind = 'answer') {
+  const text = kind === 'evaluation' ? TRAINING_EVALUATION_NOTICE : TRAINING_ANSWER_NOTICE;
+  return el('aside', { class: `training-disclaimer training-disclaimer-${kind}`, role: 'note' },
+    el('span', { class: 'training-disclaimer-icon', 'aria-hidden': 'true', text: '!' }),
+    el('strong', { text })
+  );
+}
+
+export function privacyReminder(text = 'لا تُدخل معلومات شخصية أو وظيفية حساسة.') {
+  return el('aside', { class: 'privacy-reminder', role: 'note' },
+    icon('privacy'),
+    el('span', { text })
   );
 }
 

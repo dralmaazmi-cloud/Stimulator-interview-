@@ -9,7 +9,9 @@ import { composeQuestionSet } from './session-plan.js';
 import { applyRecords, shownRecords } from './rotation.js';
 import { retryLockPlan } from './retry-plan.js';
 import { WEIGHTS_VERSION } from './scoring-rules.js';
-import { el, button, clear, formatModel, formatType, icon, notice, pageHead, tag, toast } from './ui.js';
+import {
+  el, button, clear, formatModel, formatType, icon, notice, pageHead, privacyReminder, tag, toast
+} from './ui.js';
 import { acquireWakeLock, releaseAllWakeLocks, releaseWakeLock, wakeLockUnsupportedNoticeOnce } from './wake-lock.js';
 import { modelElements } from './guidance.js';
 
@@ -439,8 +441,81 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     }
     session.responses = Array.isArray(session.responses) ? session.responses : [];
     session.current_index = Math.min(Math.max(0, Number(session.current_index) || 0), questions.length - 1);
+    if (!session.privacy_acknowledged_at) {
+      drawPrivacyGate(session, questions);
+      return;
+    }
     if (session.include_self_intro && !session.intro_response) drawSelfIntroduction(session, questions);
     else drawQuestion(session, questions);
+  };
+
+  const drawPrivacyGate = (session, questions, pendingSession = null) => {
+    cleanupSimulation();
+    clear(root);
+    scrollToTop();
+
+    const acknowledgement = el('input', {
+      type: 'checkbox',
+      id: 'simulation-privacy-acknowledgement'
+    });
+    const continueButton = button('فهمت، متابعة', {
+      className: 'wide simulation-privacy-continue',
+      disabled: true
+    });
+    acknowledgement.addEventListener('change', () => {
+      continueButton.disabled = !acknowledgement.checked;
+    });
+    continueButton.addEventListener('click', async () => {
+      if (!acknowledgement.checked) return;
+      const acknowledgedAt = new Date().toISOString();
+      localStorage.setItem('lic:simulation-privacy-acknowledged-at', acknowledgedAt);
+      if (pendingSession?.id) await remove('sessions', pendingSession.id);
+      session.privacy_acknowledged_at = acknowledgedAt;
+      await set('sessions', { ...session, updated_at: acknowledgedAt });
+      if (session.include_self_intro) drawSelfIntroduction(session, questions);
+      else drawQuestion(session, questions);
+    });
+
+    root.append(el('section', { class: 'simulation-privacy-page' },
+      el('header', { class: 'simulation-privacy-hero' },
+        el('span', { class: 'simulation-privacy-hero-icon' }, icon('privacy')),
+        el('div', {},
+          el('small', { text: 'قبل أن تبدأ' }),
+          el('h1', { text: 'خصوصيتك أولًا' }),
+          el('p', { text: 'راجع هذا التنبيه قبل إرسال أي إجابة للتفريغ أو التقييم.' })
+        )
+      ),
+      el('article', { class: 'simulation-privacy-card', role: 'note' },
+        el('span', { class: 'simulation-privacy-card-icon' }, icon('privacy')),
+        el('div', {},
+          el('strong', { text: 'احمِ معلوماتك' }),
+          el('p', { text: 'تُرسل إجاباتك النصية أو الصوتية إلى خدمة ذكاء اصطناعي لغرض التفريغ والتقييم. تجنّب ذكر الأسماء والبيانات الشخصية والمعلومات الوظيفية السرية أو الحساسة. استخدم أمثلة مجهولة الهوية، مع الإبقاء على تفاصيل الموقف ودورك وإجراءاتك والنتيجة.' })
+        )
+      ),
+      el('article', { class: 'privacy-info-card' },
+        el('span', { 'aria-hidden': 'true', text: 'i' }),
+        el('p', { text: 'يطلب التطبيق من المزود عدم تخزين المحتوى، لكنه يغادر جهازك مؤقتًا للمعالجة.' })
+      ),
+      el('label', { class: 'privacy-acknowledgement', for: 'simulation-privacy-acknowledgement' },
+        acknowledgement,
+        el('span', {},
+          el('strong', { text: 'فهمت تنبيه الخصوصية' }),
+          el('small', { text: 'سأخفي الهوية وأُبقي التفاصيل اللازمة للتقييم.' })
+        )
+      ),
+      el('div', { class: 'simulation-privacy-actions' },
+        continueButton,
+        button('رجوع', {
+          variant: 'ghost wide',
+          onClick: () => {
+            if (session.direct_training) history.back();
+            else drawSetup();
+          }
+        })
+      ),
+      privacyReminder('أخفِ الهوية والمعلومات الحساسة، مع إبقاء تفاصيل الموقف ودورك وإجراءاتك والنتيجة.')
+    ));
+    acknowledgement.focus({ preventScroll: true });
   };
 
   const drawSetup = async () => {
@@ -556,7 +631,6 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       }
       if (pending) {
         if (!window.confirm('لديك جلسة غير مكتملة. بدء جلسة جديدة سيحذفها. هل تريد المتابعة؟')) return;
-        await remove('sessions', pending.id);
       }
       const session = {
         id: sessionId(),
@@ -571,8 +645,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         question_ids: questions.map(item => item.id),
         responses: []
       };
-      if (session.include_self_intro) drawSelfIntroduction(session, questions);
-      else drawQuestion(session, questions);
+      drawPrivacyGate(session, questions, pending);
     };
 
     root.append(el('section', { class: 'card simulation-setup-card section-block' },
@@ -650,6 +723,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     retryButton.addEventListener('click', submitSelfIntro);
 
     root.append(el('section', { class: 'answer-capture section-block' },
+      privacyReminder('أخفِ الهوية والمعلومات الحساسة، مع إبقاء تفاصيل الموقف ودورك وإجراءاتك والنتيجة.'),
       capture,
       session.answer_mode === 'voice'
         ? el('label', { class: 'field transcript-field' }, el('span', { text: 'راجع التفريغ وصححه' }), input)
@@ -809,6 +883,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     retryButton.addEventListener('click', () => submitEvaluation(previousFollowups));
     root.append(el('section', { class: 'answer-capture section-block' },
       answerSwitch,
+      privacyReminder('أخفِ الهوية والمعلومات الحساسة، مع إبقاء تفاصيل الموقف ودورك وإجراءاتك والنتيجة.'),
       capture,
       session.answer_mode === 'voice' ? el('label', { class: 'field transcript-field' },
         el('span', { text: 'راجع التفريغ وصححه' }), answerInput
@@ -875,6 +950,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     resubmit.addEventListener('click', submitFollowup);
     retryButton.addEventListener('click', submitFollowup);
     root.append(el('section', { class: 'answer-capture section-block' },
+      privacyReminder('أخفِ الهوية والمعلومات الحساسة، مع إبقاء تفاصيل الموقف ودورك وإجراءاتك والنتيجة.'),
       capture,
       session.answer_mode === 'voice' ? el('label', { class: 'field transcript-field' }, el('span', { text: 'راجع التفريغ وصححه' }), input) : null,
       status,
@@ -973,6 +1049,6 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       question_ids: [requestedQuestion.id],
       responses: []
     };
-    drawQuestion(session, [requestedQuestion]);
+    drawPrivacyGate(session, [requestedQuestion]);
   } else drawSetup();
 }

@@ -67,7 +67,9 @@ async function inspect(page, route) {
       clipped,
       backHidden: document.querySelector('#back-button')?.hidden,
       navPosition: getComputedStyle(document.querySelector('.bottom-nav')).position,
-      textLength: bodyText.length
+      textLength: bodyText.length,
+      fitsViewport: document.documentElement.scrollHeight <= window.innerHeight + 2,
+      scrollHeight: document.documentElement.scrollHeight
     };
   }, route);
 }
@@ -96,6 +98,7 @@ async function run(theme) {
     if (result.small.length) note(`${route} [${theme}]`, 'SMALL-TARGET', result.small.join(' | '));
     if (result.clipped.length) note(`${route} [${theme}]`, 'CLIPPED', result.clipped.join(' | '));
     if (route !== '#/home' && result.backHidden) note(`${route} [${theme}]`, 'NO-BACK', 'زر الرجوع مخفي');
+    if (route === '#/home' && !result.fitsViewport) note(`${route} [${theme}]`, 'HOME-SCROLL', `${result.scrollHeight}px`);
     if (!['fixed', 'sticky'].includes(result.navPosition)) note(`${route} [${theme}]`, 'NAV', `position=${result.navPosition}`);
     await page.screenshot({ path: `${OUT}/${theme}-${route.replace(/[#\/?=]/g, '_')}.png`, fullPage: true });
   }
@@ -109,6 +112,20 @@ async function run(theme) {
   await page.waitForSelector('.competency-card');
   const competencyCount = await page.locator('.competency-card').count();
   note(`#/competencies [${theme}]`, 'COMPETENCIES', `${competencyCount} بطاقات`);
+
+  await page.goto(`${BASE}/#/competencies/C1?tab=questions`);
+  await page.waitForSelector('.question-link-card');
+  const selectedQuestion = await page.locator('.question-link-card').first().getAttribute('data-question-id');
+  await page.locator('.question-link-card').first().click();
+  await page.waitForSelector('.question-focus-page');
+  const perQuestionExport = await page.locator('.question-focus-page .document-actions').count();
+  if (perQuestionExport) note(`#/question/${selectedQuestion} [${theme}]`, 'PER-QUESTION-EXPORT', `${perQuestionExport} action groups`);
+  await page.locator('.question-focus-close').click();
+  await page.waitForSelector('.competency-questions-panel:not([hidden])');
+  const returnedCard = page.locator(`.question-link-card[data-question-id="${selectedQuestion}"]`);
+  const contextualReturn = await returnedCard.count() === 1 && await returnedCard.evaluate(node => node.classList.contains('requested'));
+  note(`#/competencies/C1?tab=questions [${theme}]`, 'QUESTION-RETURN', `question=${selectedQuestion} contextual=${contextualReturn}`);
+  if (!contextualReturn) note(`#/competencies/C1?tab=questions [${theme}]`, 'QUESTION-RETURN-FAIL', `question=${selectedQuestion}`);
 
   await page.goto(`${BASE}/#/question/C1-S1`);
   await page.waitForSelector('.question-focus-page');
@@ -130,7 +147,7 @@ async function run(theme) {
 
 const light = await run('light');
 const dark = await run('dark');
-const acceptanceFailures = findings.filter(item => ['NULL-TEXT', 'H-OVERFLOW', 'SMALL-TARGET', 'CLIPPED', 'NO-BACK', 'NAV'].includes(item.kind));
+const acceptanceFailures = findings.filter(item => ['NULL-TEXT', 'H-OVERFLOW', 'SMALL-TARGET', 'CLIPPED', 'NO-BACK', 'NAV', 'HOME-SCROLL', 'PER-QUESTION-EXPORT', 'QUESTION-RETURN-FAIL'].includes(item.kind));
 const result = { generated_at: new Date().toISOString(), findings, acceptanceFailures, errors: [...light.errors, ...dark.errors], light: light.summary, dark: dark.summary };
 fs.writeFileSync(`${OUT}/sweep.json`, JSON.stringify(result, null, 2));
 console.log(`SUMMARY routes=${ROUTES.length * 2} failures=${acceptanceFailures.length} consoleErrors=${result.errors.length}`);

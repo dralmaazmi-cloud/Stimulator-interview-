@@ -1,6 +1,8 @@
 import { get, set } from './storage.js';
 import { improveSelfIntroduction } from './evaluate-client.js';
-import { el, button, clear, notice, pageHead, toast } from './ui.js';
+import {
+  bindExclusiveAccordions, el, button, clear, notice, pageHead, privacyReminder, toast, trainingDisclaimer
+} from './ui.js';
 import { acquireWakeLock, releaseWakeLock } from './wake-lock.js';
 
 const WORDS_PER_MINUTE = 115;
@@ -213,10 +215,10 @@ export function renderSelfIntroLauncher() {
   return el('section', { class: 'card intro-launcher no-print' },
     el('div', {},
       el('span', { class: 'eyebrow', text: 'أداة محلية تعمل دون إنترنت' }),
-      el('h2', { text: 'ابنِ تقديمك الذاتي' }),
-      el('p', { text: 'أدخل معلومات مختصرة، ثم أنشئ نسخة مدتها 60 أو 120 ثانية وفق الماضي ثم الحاضر ثم المستقبل.' })
+      el('h2', { text: 'جهّز تعريفك الشخصي' }),
+      el('p', { text: 'أنشئ مقدمة مهنية منظمة مدتها 60 أو 120 ثانية، ثم تدرّب على توقيتها.' })
     ),
-    button('فتح باني تقديم الذات', { href: '#/self-intro' })
+    button('إعداد التعريف الشخصي', { href: '#/self-intro' })
   );
 }
 
@@ -224,8 +226,9 @@ export async function renderSelfIntroPage(root) {
   clear(root);
   const saved = await get('settings', 'self-intro-draft');
   root.append(
-    pageHead('خوارزمية محلية + تحسين اختياري', 'بناء تقديم الذات', 'ابنِ المسودة محليًا أولًا، ثم يمكنك طلب تحسين لغوي بالذكاء الاصطناعي دون إضافة معلومات.'),
-    notice('الترتيب المعتمد: البداية والتدرج، ثم الوضع الحالي والإنجازات، ثم الهدف المستقبلي. تستطيع تعديل النص النهائي بحرية.', '', '✦')
+    pageHead('مسودة محلية + تحسين اختياري', 'إعداد التعريف الشخصي', 'أنشئ مقدمة واضحة ومهنية، ثم تدرّب على تقديمها بثقة.'),
+    notice('المسار الأفضل: من أنت، ثم خبرتك وقيمتك للدور، ثم طموحك المهني.', '', '✦'),
+    privacyReminder('إذا اخترت التحسين بالذكاء الاصطناعي، استخدم تعريفًا مهنيًا عامًا بدل الأسماء أو الجهات، واحتفظ بخبرتك وإنجازاتك غير الحساسة.')
   );
 
   const form = el('section', { class: 'card intro-builder-card' });
@@ -254,8 +257,8 @@ export async function renderSelfIntroPage(root) {
     ['future_goal', 'الهدف المستقبلي', 'ما الأثر الذي تريد تحقيقه؟']
   ];
   const values = { ...(saved?.values || {}) };
-  const fields = el('div', { class: 'intro-question-grid' });
   const inputs = new Map();
+  const fieldNodes = new Map();
   definitions.forEach(([key, label, placeholder], index) => {
     const input = el('textarea', {
       class: 'input',
@@ -265,12 +268,30 @@ export async function renderSelfIntroPage(root) {
     });
     input.addEventListener('input', () => { values[key] = input.value; });
     inputs.set(key, input);
-    fields.append(el('label', { class: 'intro-question' },
+    fieldNodes.set(key, el('label', { class: 'intro-question' },
       el('span', { class: 'intro-step', text: String(index + 1) }),
       el('strong', { text: label }),
       input
     ));
   });
+  const groupDefinitions = [
+    ['intro-who', 'من أنت؟', 'التعريف المهني والتأهيل', ['identity', 'qualification', 'courses']],
+    ['intro-experience', 'مسيرتك وخبرتك', 'البداية والتدرّج ودورك الحالي', ['career_start', 'progression', 'current_role']],
+    ['intro-value', 'قيمتك للدور', 'مسؤولياتك وقيادتك وإنجازاتك', ['current_scope', 'leadership', 'achievements', 'participation']],
+    ['intro-future', 'طموحك المهني', 'الأثر الذي تريد تحقيقه', ['future_goal']]
+  ];
+  const fields = bindExclusiveAccordions(el('div', { class: 'intro-question-groups' },
+    ...groupDefinitions.map(([id, title, subtitle, keys], index) => el('details', {
+      id, class: `intro-question-group tone-${index + 1}`, open: index === 0
+    },
+    el('summary', {},
+      el('span', { class: 'intro-group-number', text: String(index + 1) }),
+      el('div', {}, el('strong', { text: title }), el('small', { text: subtitle })),
+      el('i', { class: 'accordion-chevron', 'aria-hidden': 'true', text: '⌄' })
+    ),
+    el('div', { class: 'intro-group-fields' }, ...keys.map(key => fieldNodes.get(key)))
+    ))
+  ), 'self-intro-fields');
 
   const output = el('section', { class: 'card intro-result', hidden: true });
   const outputText = el('textarea', { class: 'input intro-result-text', rows: 12, 'aria-label': 'نص تقديم الذات' });
@@ -312,7 +333,10 @@ export async function renderSelfIntroPage(root) {
     const missing = required.filter(key => !clean(values[key]));
     if (missing.length) {
       toast('أكمل التعريف المهني والمنصب والتدرج والإنجاز والهدف المستقبلي أولًا.');
-      inputs.get(missing[0])?.focus();
+      const target = inputs.get(missing[0]);
+      const group = target?.closest('details');
+      if (group) group.open = true;
+      target?.focus();
       return;
     }
     const result = buildSelfIntroduction(values, { duration: selectedDuration, variation });
@@ -327,7 +351,7 @@ export async function renderSelfIntroPage(root) {
   };
 
   form.append(el('h2', { text: 'اختر المدة' }), duration, fields,
-    el('div', { class: 'button-row' }, button('بناء تقديم الذات', { onClick: generate }))
+    el('div', { class: 'button-row' }, button('إنشاء المسودة', { onClick: generate }))
   );
 
   const timerValue = el('strong', { class: 'timer-display', text: '00:00' });
@@ -353,7 +377,7 @@ export async function renderSelfIntroPage(root) {
   });
   const resetTimer = button('إيقاف وتصفير', { variant: 'ghost small', onClick: () => { stopTimer(); timerValue.textContent = '00:00'; } });
 
-  const improveButton = button('تحسين لغوي بالذكاء الاصطناعي', { variant: 'secondary small' });
+  const improveButton = button('تحسين الصياغة بالذكاء الاصطناعي — اختياري', { variant: 'secondary small' });
   improveButton.addEventListener('click', async () => {
     const source = outputText.value.trim();
     if (!source) {
@@ -371,6 +395,7 @@ export async function renderSelfIntroPage(root) {
         el('div', { class: 'section-heading' }, el('h3', { text: 'نسخة محسّنة مقترحة' }), el('span', { class: 'tag warning', text: 'تحتاج اعتمادك' })),
         notice('قارن النصين. لن يُستبدل نصك المحلي إلا إذا ضغطت «اعتماد النسخة».', 'warning'),
         candidateText,
+        trainingDisclaimer('answer'),
         result.changes?.length ? el('div', { class: 'ai-change-list' },
           el('strong', { text: 'ما الذي تغيّر؟' }),
           el('ul', {}, ...result.changes.map(item => el('li', { text: item })))
@@ -390,15 +415,16 @@ export async function renderSelfIntroPage(root) {
       aiCandidate.replaceChildren(notice(error.message || 'تعذر تحسين النص الآن.', 'danger'));
     } finally {
       improveButton.disabled = false;
-      improveButton.textContent = 'تحسين لغوي بالذكاء الاصطناعي';
+      improveButton.textContent = 'تحسين الصياغة بالذكاء الاصطناعي — اختياري';
     }
   });
 
   output.append(
-    el('div', { class: 'section-heading' }, el('h2', { text: 'مسودتك المقترحة' }), el('span', { class: 'tag accent', text: 'قابلة للتعديل' })),
+    el('div', { class: 'section-heading' }, el('h2', { text: 'مسودة تعريفك' }), el('span', { class: 'tag accent', text: 'قابلة للتعديل' })),
     outputText,
     metrics,
     warning,
+    trainingDisclaimer('answer'),
     el('div', { class: 'button-row' },
       button('صياغة بديلة', { variant: 'secondary small', onClick: () => {
         if (editedManually && !window.confirm('سيُستبدل نصك المعدّل يدويًا بصياغة جديدة. هل تريد المتابعة؟')) return;
@@ -420,6 +446,6 @@ export async function renderSelfIntroPage(root) {
   }
 
   root.append(form, output,
-    notice('الخوارزمية المحلية تبقى الأساس والبديل دون إنترنت. التحسين المتصل يغيّر الصياغة فقط ويحتاج موافقتك قبل الاعتماد.', 'warning')
+    notice('المسودة الأساسية تُنشأ محليًا. لا يُرسل النص إلى الخدمة إلا عند اختيار «تحسين الصياغة بالذكاء الاصطناعي — اختياري».', 'warning')
   );
 }
