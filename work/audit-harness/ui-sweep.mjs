@@ -14,8 +14,14 @@ const ROUTES = [
   '#/simulation?question=C2-B3&answer=text', '#/simulation?question=C2-B3&answer=voice',
   '#/simulation?question=M1-B1&answer=text', '#/simulation?question=M1-B1&answer=voice',
   '#/simulation?question=C1-S1&answer=text', '#/simulation?question=C1-S1&answer=voice',
-  '#/simulation?question=X1&answer=text', '#/simulation?question=X1&answer=voice'
+  '#/simulation?question=X1&answer=text', '#/simulation?question=X1&answer=voice',
+  // alpha-10.1: question centre routes + self-introduction builder
+  '#/questions', '#/questions?view=competencies', '#/questions?view=deck', '#/questions?view=deck&scope=mission',
+  '#/questions?view=deck&scope=saved', '#/questions?view=deck&scope=competency&competency=C1',
+  '#/questions?view=deck&question=C1-S1', '#/self-intro'
 ];
+// alpha-10.1: direct-training routes land on the privacy screen first; measure it, acknowledge, then measure the training screen too.
+const DIRECT_TRAINING = route => /#\/simulation\?question=/.test(route);
 const findings = [];
 const note = (route, kind, detail) => {
   findings.push({ route, kind, detail });
@@ -67,7 +73,9 @@ async function inspect(page, route) {
       clipped,
       backHidden: document.querySelector('#back-button')?.hidden,
       navPosition: getComputedStyle(document.querySelector('.bottom-nav')).position,
-      textLength: bodyText.length
+      textLength: bodyText.length,
+      fitsViewport: document.documentElement.scrollHeight <= window.innerHeight + 2,
+      scrollHeight: document.documentElement.scrollHeight
     };
   }, route);
 }
@@ -86,18 +94,36 @@ async function run(theme) {
   await page.waitForSelector('.home-dashboard');
 
   const summary = {};
+  const measure = async (route, label) => {
+    const result = await inspect(page, route);
+    summary[label] = result;
+    if (result.bad.length) note(`${label} [${theme}]`, 'NULL-TEXT', result.bad.join(','));
+    if (result.overflow || result.wide.length) note(`${label} [${theme}]`, 'H-OVERFLOW', result.wide.join(','));
+    if (result.small.length) note(`${label} [${theme}]`, 'SMALL-TARGET', result.small.join(' | '));
+    if (result.clipped.length) note(`${label} [${theme}]`, 'CLIPPED', result.clipped.join(' | '));
+    if (route !== '#/home' && result.backHidden) note(`${label} [${theme}]`, 'NO-BACK', 'زر الرجوع مخفي');
+    if (route === '#/home' && !result.fitsViewport) note(`${label} [${theme}]`, 'HOME-SCROLL', `${result.scrollHeight}px`);
+    if (!['fixed', 'sticky'].includes(result.navPosition)) note(`${label} [${theme}]`, 'NAV', `position=${result.navPosition}`);
+    await page.screenshot({ path: `${OUT}/${theme}-${label.replace(/[#\/?=&]/g, '_')}.png`, fullPage: true });
+    return result;
+  };
   for (const route of ROUTES) {
     await page.goto(`${BASE}/${route}`);
     await page.waitForTimeout(350);
-    const result = await inspect(page, route);
-    summary[route] = result;
-    if (result.bad.length) note(`${route} [${theme}]`, 'NULL-TEXT', result.bad.join(','));
-    if (result.overflow || result.wide.length) note(`${route} [${theme}]`, 'H-OVERFLOW', result.wide.join(','));
-    if (result.small.length) note(`${route} [${theme}]`, 'SMALL-TARGET', result.small.join(' | '));
-    if (result.clipped.length) note(`${route} [${theme}]`, 'CLIPPED', result.clipped.join(' | '));
-    if (route !== '#/home' && result.backHidden) note(`${route} [${theme}]`, 'NO-BACK', 'زر الرجوع مخفي');
-    if (!['fixed', 'sticky'].includes(result.navPosition)) note(`${route} [${theme}]`, 'NAV', `position=${result.navPosition}`);
-    await page.screenshot({ path: `${OUT}/${theme}-${route.replace(/[#\/?=]/g, '_')}.png`, fullPage: true });
+    if (DIRECT_TRAINING(route)) {
+      const gate = await page.locator('.simulation-privacy-page').count();
+      if (!gate) { note(`${route} [${theme}]`, 'PRIVACY-GATE-MISSING', 'direct training did not show the privacy screen'); continue; }
+      await measure(route, `${route} (privacy)`);
+      const continueButton = page.locator('.simulation-privacy-continue');
+      if (!(await continueButton.isDisabled())) note(`${route} [${theme}]`, 'PRIVACY-GATE-ENABLED', 'continue enabled before the box was ticked');
+      await page.locator('#simulation-privacy-acknowledgement').check();
+      await continueButton.click();
+      await page.waitForSelector('.ai-question-card', { timeout: 10000 });
+      await page.waitForTimeout(350);
+      await measure(route, `${route} (training)`);
+      continue;
+    }
+    await measure(route, route);
   }
 
   await page.goto(`${BASE}/#/preparation`);
@@ -109,6 +135,20 @@ async function run(theme) {
   await page.waitForSelector('.competency-card');
   const competencyCount = await page.locator('.competency-card').count();
   note(`#/competencies [${theme}]`, 'COMPETENCIES', `${competencyCount} بطاقات`);
+
+  await page.goto(`${BASE}/#/competencies/C1?tab=questions`);
+  await page.waitForSelector('.question-link-card');
+  const selectedQuestion = await page.locator('.question-link-card').first().getAttribute('data-question-id');
+  await page.locator('.question-link-card').first().click();
+  await page.waitForSelector('.question-focus-page');
+  const perQuestionExport = await page.locator('.question-focus-page .document-actions').count();
+  if (perQuestionExport) note(`#/question/${selectedQuestion} [${theme}]`, 'PER-QUESTION-EXPORT', `${perQuestionExport} action groups`);
+  await page.locator('.question-focus-close').click();
+  await page.waitForSelector('.competency-questions-panel:not([hidden])');
+  const returnedCard = page.locator(`.question-link-card[data-question-id="${selectedQuestion}"]`);
+  const contextualReturn = await returnedCard.count() === 1 && await returnedCard.evaluate(node => node.classList.contains('requested'));
+  note(`#/competencies/C1?tab=questions [${theme}]`, 'QUESTION-RETURN', `question=${selectedQuestion} contextual=${contextualReturn}`);
+  if (!contextualReturn) note(`#/competencies/C1?tab=questions [${theme}]`, 'QUESTION-RETURN-FAIL', `question=${selectedQuestion}`);
 
   await page.goto(`${BASE}/#/question/C1-S1`);
   await page.waitForSelector('.question-focus-page');
@@ -130,8 +170,8 @@ async function run(theme) {
 
 const light = await run('light');
 const dark = await run('dark');
-const acceptanceFailures = findings.filter(item => ['NULL-TEXT', 'H-OVERFLOW', 'SMALL-TARGET', 'CLIPPED', 'NO-BACK', 'NAV'].includes(item.kind));
+const acceptanceFailures = findings.filter(item => ['NULL-TEXT', 'H-OVERFLOW', 'SMALL-TARGET', 'CLIPPED', 'NO-BACK', 'NAV', 'HOME-SCROLL', 'PER-QUESTION-EXPORT', 'QUESTION-RETURN-FAIL', 'PRIVACY-GATE-MISSING', 'PRIVACY-GATE-ENABLED'].includes(item.kind));
 const result = { generated_at: new Date().toISOString(), findings, acceptanceFailures, errors: [...light.errors, ...dark.errors], light: light.summary, dark: dark.summary };
 fs.writeFileSync(`${OUT}/sweep.json`, JSON.stringify(result, null, 2));
-console.log(`SUMMARY routes=${ROUTES.length * 2} failures=${acceptanceFailures.length} consoleErrors=${result.errors.length}`);
+console.log(`SUMMARY routes=${ROUTES.length * 2} screens=${Object.keys(light.summary).length + Object.keys(dark.summary).length} failures=${acceptanceFailures.length} consoleErrors=${result.errors.length}`);
 if (acceptanceFailures.length || result.errors.length) process.exitCode = 1;

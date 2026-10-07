@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'leadership-interview-coach-v0.6.0-alpha-6.1-51d413de';
+const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.1-51d413de';
 const APP_SHELL = [
   './',
   './index.html',
@@ -21,6 +21,7 @@ const APP_SHELL = [
   './js/report.js',
   './js/sessions.js',
   './js/competencies.js',
+  './js/questions.js',
   './js/quick-review.js',
   './js/guidance.js',
   './js/print-book.js',

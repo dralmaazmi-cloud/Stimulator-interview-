@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-180.png">
-  <link rel="stylesheet" href="css/styles.css?v=0.6.0-alpha-6">
+  <link rel="stylesheet" href="css/styles.css?v=0.6.0-alpha-10">
   <title>مدرّب المقابلات القيادية</title>
 </head>
 <body>
@@ -19,7 +19,9 @@
 
   <header class="app-header" id="app-header" hidden>
     <div class="header-inner">
-      <button class="icon-button back-button" id="back-button" type="button" aria-label="العودة إلى الصفحة السابقة" title="رجوع" hidden>›</button>
+      <button class="icon-button back-button" id="back-button" type="button" aria-label="العودة إلى الصفحة السابقة" title="رجوع" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
       <a class="route-brand" href="#/home" aria-label="العودة إلى الرئيسية">
         <strong id="route-title">مدرّب المقابلات</strong>
       </a>
@@ -53,6 +55,6 @@
   </dialog>
 
   <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
-  <script type="module" src="js/app.js?v=0.6.0-alpha-6"></script>
+  <script type="module" src="js/app.js?v=0.6.0-alpha-10"></script>
 </body>
 </html>

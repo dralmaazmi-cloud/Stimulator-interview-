@@ -12,8 +12,11 @@ function sessionAverage(session) {
 function startCard(kind, title, subtitle, href, iconName) {
   return el('a', { class: `home-start-card ${kind}`, href, 'aria-label': `${title}: ${subtitle}` },
     el('span', { class: 'home-start-icon' }, icon(iconName)),
-    el('strong', { text: title }),
-    el('span', { text: subtitle }),
+    el('span', { class: 'home-start-copy' },
+      kind === 'simulation' ? el('small', { class: 'home-start-kicker', text: 'تجربة عملية' }) : null,
+      el('strong', { text: title }),
+      el('span', { class: 'home-start-subtitle', text: subtitle })
+    ),
     el('i', { class: 'home-start-arrow', 'aria-hidden': 'true', text: '‹' })
   );
 }
@@ -50,8 +53,9 @@ export async function renderHome(root, data) {
     el('section', { class: 'home-start-section', 'aria-labelledby': 'home-start-title' },
       el('h2', { id: 'home-start-title', text: 'ابدأ من هنا' }),
       el('div', { class: 'home-start-grid' },
-        startCard('simulation', 'المحاكاة', 'اختبر نفسك', '#/simulation', 'microphone'),
-        startCard('preparation', 'التحضير للمقابلة', 'تعلّم وراجع', '#/preparation', 'book')
+        startCard('simulation', 'ابدأ المحاكاة', 'اختبر نفسك في مقابلة قيادية واقعية', '#/simulation', 'microphone'),
+        startCard('preparation', 'التحضير للمقابلة', 'تعلّم، راجع، ثم ادخل المحاكاة بثقة', '#/preparation', 'book'),
+        startCard('self-intro', 'جهّز تعريفك الشخصي', 'أنشئ مقدمة احترافية وتدرّب على توقيتها', '#/self-intro', 'profile')
       )
     ),
 
@@ -78,6 +82,10 @@ export async function renderHome(root, data) {
         el('span', { text: latestAverage == null ? 'سيظهر تحليلك هنا بعد المقابلة.' : 'راجع نقاط القوة وأولويات التطوير.' })
       ),
       el('b', { 'aria-hidden': 'true', text: '‹' })
+    ),
+    el('footer', { class: 'home-disclaimer' },
+      el('p', { text: 'هذا المحتوى اجتهاد شخصي أُعد لأغراض التدريب والتطوير الذاتي فقط، ولا يُعد اختبارًا أو تقييمًا رسميًا.' }),
+      el('strong', { text: 'ولا تنسونا من دعائكم' })
     ),
     el('span', { class: 'sr-only', text: 'المحاكاة الذكية' })
   ));

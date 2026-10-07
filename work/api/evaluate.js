@@ -10,7 +10,7 @@ import { calculateScore, fallbackSummary, WEIGHTS_VERSION } from './_lib/scoring
 import { EXAMPLE_CRITERION_NAMES } from './_lib/prompts.js';
 import { recordUsage } from './_lib/usage.js';
 
-const PROMPT_VERSION = 'evaluation-1.2';
+const PROMPT_VERSION = 'evaluation-1.3';
 const RUBRIC_VERSION = 'reference-rubric-1.0';
 
 function cleanFollowups(value) {

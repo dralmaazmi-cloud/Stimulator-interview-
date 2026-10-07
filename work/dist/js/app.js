@@ -2,6 +2,7 @@ import { loadData } from './data.js';
 import { renderHome } from './home.js';
 import { cleanupLearn, renderLearnIndex, renderLesson } from './learn.js';
 import { renderCompetenciesIndex, renderCompetencyDetail, renderQuestionFocus } from './competencies.js';
+import { renderQuestions } from './questions.js';
 import { renderQuickReview, renderAnswerGuide } from './quick-review.js';
 import { renderSelfIntroPage } from './self-intro.js';
 import { renderSearch } from './search.js';
@@ -22,6 +23,7 @@ const scrollPositions = new Map();
 let activeHash = location.hash || '#/home';
 const navigationStack = [activeHash];
 let goingBack = false;
+let replacingContext = false;
 let data;
 
 function parseRoute() {
@@ -48,7 +50,8 @@ async function route({ restoreScroll = false } = {}) {
     else if (page === 'coverage') await renderCoverageMap(root, data);
     else if (page === 'competencies' && parts[1]) await renderCompetencyDetail(root, data, parts[1], params);
     else if (page === 'competencies') await renderCompetenciesIndex(root, data);
-    else if (page === 'question' && parts[1]) await renderQuestionFocus(root, data, decodeURIComponent(parts[1]));
+    else if (page === 'questions') renderQuestions(root, data, params);
+    else if (page === 'question' && parts[1]) await renderQuestionFocus(root, data, decodeURIComponent(parts[1]), params);
     else if (page === 'learn' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'learn') await renderLearnIndex(root, data);
     else if (page === 'bank' || page === 'practice') await renderCompetenciesIndex(root, data);
@@ -81,7 +84,7 @@ async function route({ restoreScroll = false } = {}) {
 }
 
 function navPage(page) {
-  if (page === 'preparation' || page === 'learn' || page === 'competencies' || page === 'question' || page === 'bank' || page === 'practice') return 'preparation';
+  if (page === 'preparation' || page === 'learn' || page === 'competencies' || page === 'questions' || page === 'question' || page === 'bank' || page === 'practice') return 'preparation';
   if (page === 'reports' || page === 'sessions' || page === 'coverage') return 'reports';
   if (page === 'simulation') return 'simulation';
   if (page === 'settings' || page === 'tools' || page === 'search') return 'more';
@@ -95,11 +98,12 @@ function updateChrome(page) {
   appHeader.hidden = page === 'home';
   backButton.hidden = page === 'home';
   backButton.disabled = page === 'home';
+  delete backButton.dataset.returnHash;
   const titles = {
     preparation: 'التحضير للمقابلة', learn: 'التحضير للمقابلة', competencies: 'الكفاءات الثمانية',
-    question: 'سؤال تدريبي', bank: 'الكفاءات الثمانية', practice: 'التدريب', simulation: 'المحاكاة', reports: 'التقارير',
+    questions: 'الأسئلة', question: 'سؤال تدريبي', bank: 'الكفاءات الثمانية', practice: 'التدريب', simulation: 'المحاكاة', reports: 'التقارير',
     sessions: 'التقارير', coverage: 'خريطة التغطية', settings: 'المزيد', search: 'البحث', tools: 'الأدوات',
-    'quick-review': 'المراجعة السريعة', 'answer-guide': 'بناء الإجابة', 'self-intro': 'تقديم الذات'
+    'quick-review': 'المراجعة السريعة', 'answer-guide': 'بناء الإجابة', 'self-intro': 'إعداد التعريف الشخصي'
   };
   routeTitle.textContent = titles[page] || 'مدرّب المقابلات';
 }
@@ -130,7 +134,27 @@ function setupPreferences() {
 }
 
 function setupBackButton() {
+  const returnToContext = returnHash => {
+    if (!returnHash?.startsWith('#/')) return false;
+    if (navigationStack.at(-2) === returnHash) {
+      goingBack = true;
+      history.back();
+      return true;
+    }
+    replacingContext = true;
+    location.replace(returnHash);
+    return true;
+  };
+  window.addEventListener('lic:route-replaced', event => {
+    const hash = event.detail?.hash;
+    if (!hash?.startsWith('#/') || location.hash !== hash) return;
+    activeHash = hash;
+    navigationStack.splice(-1, 1, hash);
+  });
+  window.addEventListener('lic:return-to-context', event => returnToContext(event.detail?.returnHash));
   backButton.addEventListener('click', () => {
+    const returnHash = backButton.dataset.returnHash;
+    if (returnToContext(returnHash)) return;
     if (navigationStack.length > 1) {
       goingBack = true;
       history.back();
@@ -154,7 +178,10 @@ async function init() {
     window.addEventListener('hashchange', async () => {
       scrollPositions.set(activeHash, window.scrollY);
       activeHash = location.hash || '#/home';
-      if (goingBack) {
+      if (replacingContext) {
+        navigationStack.splice(-1, 1, activeHash);
+        replacingContext = false;
+      } else if (goingBack) {
         navigationStack.pop();
         goingBack = false;
       } else if (navigationStack.at(-1) !== activeHash) navigationStack.push(activeHash);

@@ -33,6 +33,18 @@ function preparationCard(lesson, completed) {
   );
 }
 
+function questionsPreparationCard() {
+  return el('a', { class: 'preparation-card questions-preparation-card card', href: '#/questions' },
+    el('span', { class: 'preparation-icon tone-questions' }, icon('answer')),
+    el('div', { class: 'unit-copy' },
+      el('small', { text: 'تدريب تفاعلي' }),
+      el('h2', { text: 'الأسئلة' }),
+      el('p', { text: 'تصفّح حسب الكفاءة أو النوع، وانتقل بين الأسئلة كبطاقات ذكية.' })
+    ),
+    el('span', { class: 'row-chevron', 'aria-hidden': 'true', text: '‹' })
+  );
+}
+
 export async function renderLearnIndex(root, data) {
   cleanupLearn();
   clear(root);
@@ -41,10 +53,11 @@ export async function renderLearnIndex(root, data) {
     el('div', { class: 'preparation-lead' },
       el('span', { class: 'preparation-lead-icon' }, icon('book')),
       el('h1', { text: 'تعلّم، طبّق، واستعد بثقة' }),
-      el('p', { text: 'خمس محطات عملية تساعدك على اجتياز المقابلة القيادية بنجاح.' })
+      el('p', { text: 'محطات تعليمية واضحة، يليها قسم تفاعلي للتدرّب على الأسئلة.' })
     ),
     el('div', { class: 'preparation-grid' },
-      ...data.lessons.map(lesson => preparationCard(lesson, completed.has(lesson.id)))
+      ...data.lessons.map(lesson => preparationCard(lesson, completed.has(lesson.id))),
+      questionsPreparationCard()
     ),
     bookActions(data, { type: 'preparation' }, 'دليل التحضير الكامل')
   ));
@@ -204,7 +217,9 @@ function renderMission(body, data, lesson, params = new URLSearchParams()) {
     );
     if (questions.length) {
       const list = el('div', { class: 'smart-question-list mission-question-list' },
-        ...questions.map((question, questionIndex) => renderInlineQuestion(question, data, questionIndex, { open: question.id === requestedQuestion }))
+        ...questions.map((question, questionIndex) => renderInlineQuestion(question, data, questionIndex, {
+          returnHash: `#/preparation/U4?question=${encodeURIComponent(question.id)}`
+        }))
       );
       list.querySelectorAll('details').forEach(item => item.addEventListener('toggle', () => {
         if (!item.open) return;
@@ -270,7 +285,9 @@ function renderAiQuestions(data, params = new URLSearchParams()) {
     ),
     el('p', { class: 'section-intro', text: 'افتح كل سؤال في صفحة تركيز مستقلة، ثم راجع إجابة الدليل بعد أن تكوّن إجابتك.' }),
     el('div', { class: 'smart-question-list ai-question-grid' },
-      ...questions.map((question, index) => renderInlineQuestion(question, data, index, { open: question.id === requested }))
+      ...questions.map((question, index) => renderInlineQuestion(question, data, index, {
+        returnHash: `#/preparation/U5?question=${encodeURIComponent(question.id)}`
+      }))
     )
   );
 }
@@ -308,4 +325,10 @@ export async function renderLesson(root, data, lessonId, params = new URLSearchP
   if (lesson.id === 'U5') await renderReadiness(body, data, lesson, params);
   body.append(bookActions(data, { type: 'lesson', id: lesson.id }, lesson.title), finishLesson(lesson));
   root.append(body);
+  const requestedQuestion = params.get('question');
+  if (requestedQuestion) requestAnimationFrame(() => requestAnimationFrame(() => {
+    const card = root.querySelector(`[data-question-id="${CSS.escape(requestedQuestion)}"]`);
+    card?.classList.add('requested');
+    card?.scrollIntoView({ block: 'center' });
+  }));
 }

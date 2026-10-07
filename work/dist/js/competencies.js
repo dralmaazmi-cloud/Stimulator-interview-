@@ -3,7 +3,7 @@ import { questionSamples } from './data.js';
 import { buildAnswerGuidance } from './guidance.js';
 import { bookActions } from './print-book.js';
 import {
-  bindExclusiveAccordions, button, clear, el, formatModel, formatType, icon, notice, tag, toast
+  bindExclusiveAccordions, button, clear, el, formatModel, formatType, icon, notice, tag, toast, trainingDisclaimer
 } from './ui.js';
 
 const COMPETENCY_ICONS = ['leadership', 'decision', 'communication', 'team', 'planning', 'problem', 'resilience', 'results'];
@@ -89,10 +89,25 @@ export async function renderCompetenciesIndex(root, data) {
   root.append(list);
 }
 
-function questionLinkCard(question, index) {
+function defaultQuestionReturn(question) {
+  if (question.owner_type === 'mission_command' || question.principle_id) {
+    return `#/preparation/U4?question=${encodeURIComponent(question.id)}`;
+  }
+  if (['X1', 'X2'].includes(question.id)) {
+    return `#/preparation/U5?question=${encodeURIComponent(question.id)}`;
+  }
+  if (question.competency_id) {
+    return `#/competencies/${encodeURIComponent(question.competency_id)}?tab=questions&question=${encodeURIComponent(question.id)}`;
+  }
+  return '#/preparation';
+}
+
+function questionLinkCard(question, index, options = {}) {
+  const returnHash = options.returnHash || defaultQuestionReturn(question);
   return el('a', {
-    class: 'smart-question-card question-link-card',
-    href: `#/question/${encodeURIComponent(question.id)}`,
+    class: `smart-question-card question-link-card tone-${COMPETENCY_TONES[index % COMPETENCY_TONES.length]}`,
+    href: `#/question/${encodeURIComponent(question.id)}?return=${encodeURIComponent(returnHash)}`,
+    'aria-label': `فتح السؤال ${index + 1}: ${question.display_question}`,
     dataset: { questionId: question.id }
   },
   el('span', { class: 'smart-question-number', text: String(index + 1) }),
@@ -105,8 +120,8 @@ function questionLinkCard(question, index) {
   );
 }
 
-export function renderInlineQuestion(question, data, index) {
-  return questionLinkCard(question, index);
+export function renderInlineQuestion(question, data, index, options = {}) {
+  return questionLinkCard(question, index, options);
 }
 
 function accordionItem(id, iconName, title, body, tone = 'mint', open = false) {
@@ -168,14 +183,16 @@ function showPanel(competency) {
   );
 }
 
-function questionsPanel(questions) {
+function questionsPanel(competency, questions) {
   return el('section', { class: 'competency-tab-panel competency-questions-panel', 'data-panel': 'questions', hidden: true },
     el('header', { class: 'panel-reading-head' },
       el('small', { text: `${questions.length} ${questions.length === 1 ? 'سؤالًا' : 'أسئلة'} بإجابات نموذجية كاملة` }),
       el('h2', { text: 'أسئلة الكفاءة' }),
       el('p', { text: 'اختر سؤالًا للتركيز على المطلوب وبناء إجابتك خطوة بخطوة.' })
     ),
-    el('div', { class: 'smart-question-list' }, ...questions.map(questionLinkCard))
+    el('div', { class: 'smart-question-list' }, ...questions.map((question, index) => questionLinkCard(question, index, {
+      returnHash: `#/competencies/${encodeURIComponent(competency.id)}?tab=questions&question=${encodeURIComponent(question.id)}`
+    })))
   );
 }
 
@@ -183,7 +200,7 @@ function competencyTabs(competency, questions) {
   const panels = {
     understand: meaningPanel(competency),
     show: showPanel(competency),
-    questions: questionsPanel(questions)
+    questions: questionsPanel(competency, questions)
   };
   const tabs = el('div', { class: 'competency-tabs focus-tabs', role: 'tablist', 'aria-label': 'محتوى الكفاءة' });
   const host = el('div', { class: 'competency-tab-content' }, ...Object.values(panels));
@@ -263,7 +280,7 @@ export async function renderCompetencyDetail(root, data, competencyId, params = 
     if (!requestedQuestion) return;
     const card = tabs.host.querySelector(`[data-question-id="${CSS.escape(requestedQuestion)}"]`);
     card?.classList.add('requested');
-    card?.scrollIntoView({ block: 'center' });
+    requestAnimationFrame(() => card?.scrollIntoView({ block: 'center' }));
   });
 }
 
@@ -278,7 +295,7 @@ function questionOrigin(question) {
   return question.competency_name || question.principle_title || 'سؤال قيادي';
 }
 
-export async function renderQuestionFocus(root, data, questionId) {
+export async function renderQuestionFocus(root, data, questionId, params = new URLSearchParams()) {
   const question = data.questionById.get(questionId);
   if (!question) {
     clear(root).append(notice('السؤال المطلوب غير موجود.', 'danger'));
@@ -289,6 +306,18 @@ export async function renderQuestionFocus(root, data, questionId) {
   const samples = questionSamples(question);
   let currentStep = 0;
   let answerRevealed = false;
+  const requestedReturn = params.get('return');
+  const returnHash = requestedReturn?.startsWith('#/') ? requestedReturn : defaultQuestionReturn(question);
+  const globalBack = document.querySelector('#back-button');
+  if (globalBack) globalBack.dataset.returnHash = returnHash;
+
+  const close = el('button', {
+    class: 'question-focus-close', type: 'button',
+    'aria-label': 'إغلاق السؤال والعودة إلى قائمة الأسئلة', title: 'إغلاق السؤال'
+  }, el('span', { 'aria-hidden': 'true', text: '×' }));
+  close.addEventListener('click', () => window.dispatchEvent(new CustomEvent('lic:return-to-context', {
+    detail: { returnHash }
+  })));
 
   const bookmark = el('button', {
     class: `question-focus-bookmark ${isBookmarked(question.id) ? 'active' : ''}`,
@@ -363,11 +392,13 @@ export async function renderQuestionFocus(root, data, questionId) {
           onClick: () => { answerRevealed = true; draw(); }
         })
       ));
-    } else if (samples.length) panel.append(el('div', { class: 'focus-answer-samples' },
-      ...samples.map(sample => renderSample(sample, question.rubric_mode))
-    ));
+    } else if (samples.length) panel.append(
+      el('div', { class: 'focus-answer-samples' },
+        ...samples.map(sample => renderSample(sample, question.rubric_mode))
+      ),
+      trainingDisclaimer('answer')
+    );
     else panel.append(notice('الإجابة النموذجية غير متاحة.', 'warning'));
-    panel.append(bookActions(data, { type: 'question', id: question.id }, 'السؤال'));
     return panel;
   };
 
@@ -393,6 +424,7 @@ export async function renderQuestionFocus(root, data, questionId) {
 
   root.append(el('article', { class: 'question-focus-page' },
     el('header', { class: 'question-focus-heading' },
+      close,
       el('div', {}, el('small', { text: questionOrigin(question) }), el('strong', { text: 'سؤال تدريبي' })),
       bookmark
     ),

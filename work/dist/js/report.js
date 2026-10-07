@@ -1,5 +1,5 @@
 import { questionSamples } from './data.js';
-import { el, button, notice, showDialog, tag, formatType } from './ui.js';
+import { el, button, notice, showDialog, tag, formatType, trainingDisclaimer } from './ui.js';
 import {
   ELEMENT_ORDER, WEIGHTS_VERSION, normalizeReportForDisplay, percentTone, scoreBreakdown
 } from './scoring-rules.js';
@@ -333,7 +333,10 @@ export function renderExamplePanel(example, mode) {
     el('p', { class: 'example-lead', text: 'مثال توضيحي يبيّن كيف تُقال الأجزاء الناقصة. ليس إجابتك، ولا يُقيَّم.' })
   );
   if (!example || example.covered || !example.segments?.length) {
-    panel.append(notice(example?.message || 'إجابتك تغطي العناصر المطلوبة. راجع التعليق على كل معيار لرفعها.', '', '✓'));
+    panel.append(
+      notice(example?.message || 'إجابتك تغطي العناصر المطلوبة. راجع التعليق على كل معيار لرفعها.', '', '✓'),
+      trainingDisclaimer('answer')
+    );
     return panel;
   }
   panel.append(
@@ -357,6 +360,7 @@ export function renderExamplePanel(example, mode) {
       )))
     ));
   }
+  panel.append(trainingDisclaimer('answer'));
   return panel;
 }
 
@@ -407,6 +411,7 @@ function showReferenceAnswer(question) {
     }
     body.append(card);
   });
+  if (samples.length) body.append(trainingDisclaimer('answer'));
   showDialog('المقارنة بالإجابة النموذجية', body);
 }
 
@@ -472,7 +477,7 @@ export function renderEvaluationReport(options) {
   }
   if (onNext) actions.append(button(nextLabel, { onClick: onNext }));
   if (onFinish) actions.append(button('إنهاء وعرض الملخص', { variant: 'ghost', onClick: onFinish }));
-  panel.append(actions);
+  panel.append(trainingDisclaimer(question.id === 'SELF-INTRO' ? 'answer' : 'evaluation'), actions);
   return panel;
 }
 
@@ -683,6 +688,7 @@ export function renderSessionSummary(session, options = {}) {
           el('small', { text: item.question.question })),
         el('span', { class: `session-result-score ${classificationTone(item.report.classification)}`, text: item.report.final_score == null ? '—' : `${item.report.final_score}%` })
       ))),
+    trainingDisclaimer('evaluation'),
     el('div', { class: 'button-row no-print' },
       button('طباعة أو تصدير PDF', { onClick: () => window.print() }),
       button('محاكاة جديدة', { variant: 'secondary', onClick: options.onRestart || (() => { location.hash = '#/simulation'; }) }),

@@ -3,7 +3,7 @@ import { buildAnswerGuidance } from './guidance.js';
 import { button, el, formatModel, formatType, icon, renderBlock, showDialog } from './ui.js';
 
 const BOOK_TITLE = 'مدرّب المقابلات';
-// alpha-6.1: أسماء العناصر تتبع نموذج السؤال؛ SEAL بالأسماء المعتمدة الأربعة وSTAR-L بأسمائه.
+// alpha-6.1 (restored in alpha-10.1): أسماء العناصر تتبع نموذج السؤال؛ SEAL بالأسماء المعتمدة الأربعة وSTAR-L بأسمائه.
 const ANSWER_LABELS = Object.freeze({
   seal: Object.freeze({
     situation: 'فهم الوضع',
@@ -39,6 +39,7 @@ export function printBookQuestionIds(data, scope = { kind: 'preparation' }) {
   if (scope.kind === 'question') return data.questionById.has(scope.id) ? [scope.id] : [];
   if (scope.kind === 'competency') return uniqueIds(competencyIds(scope.id));
   if (scope.kind === 'competencies') return uniqueIds(allCompetencyIds());
+  if (scope.kind === 'questions') return uniqueIds([...allCompetencyIds(), ...missionIds(), ...readinessIds()]);
   if (scope.kind === 'lesson') {
     if (scope.id === 'U3') return uniqueIds(allCompetencyIds());
     if (scope.id === 'U4') return uniqueIds(missionIds());
@@ -66,7 +67,7 @@ function answerParts(parts = {}, mode = 'star_l') {
   const labels = answerLabels(mode);
   return el('div', { class: 'print-answer-parts' },
     ...Object.entries(parts).filter(([, value]) => value != null).map(([key, value]) =>
-      el('section', { class: 'print-answer-part' },
+      el('section', { class: `print-answer-part part-${key.replace(/_/g, '-')}` },
         el('h4', { text: labels[key] || key }),
         el('p', { text: Array.isArray(value) ? value.join(' • ') : value })
       )
@@ -97,25 +98,28 @@ function questionPage(question, data, index) {
       ),
       el('h3', { text: question.display_question })
     ),
-    el('section', { class: 'print-question-section' },
-      el('h4', { text: 'ما المطلوب في الإجابة؟' }),
-      el('p', { text: guidance.intent.instruction }),
-      guidance.points.length
-        ? el('ul', {}, ...guidance.points.map(point => el('li', { text: point })))
-        : null
-    ),
-    el('section', { class: 'print-question-section' },
-      el('h4', { text: `خريطة الإجابة ${formatModel(question.rubric_mode)}` }),
-      el('table', { class: 'print-blueprint-table' },
-        el('tbody', {}, ...guidance.elements.map(item => el('tr', {},
-          el('th', { scope: 'row', text: item.title }),
-          el('td', { text: item.prompt })
-        )))
+    el('div', { class: 'print-question-prep' },
+      el('section', { class: 'print-question-section' },
+        el('h4', { text: 'ما المطلوب في الإجابة؟' }),
+        el('p', { text: guidance.intent.instruction }),
+        guidance.points.length
+          ? el('ul', {}, ...guidance.points.map(point => el('li', { text: point })))
+          : null
+      ),
+      el('section', { class: 'print-question-section' },
+        el('h4', { text: `خريطة الإجابة ${formatModel(question.rubric_mode)}` }),
+        el('table', { class: 'print-blueprint-table' },
+          el('tbody', {}, ...guidance.elements.map(item => el('tr', {},
+            el('th', { scope: 'row', text: item.title }),
+            el('td', { text: item.prompt })
+          )))
+        )
       )
     ),
     el('section', { class: 'print-question-section print-model-answer' },
       el('h4', { text: 'الإجابة النموذجية' }),
       el('p', { class: 'print-answer-note', text: 'مثال لفهم البناء وطريقة التفكير، وليس نصًا للحفظ.' }),
+      el('p', { class: 'print-training-disclaimer', text: 'تنبيه: هذا اجتهاد تدريبي وليس إجابة رسمية.' }),
       answerSamples(question)
     ),
     el('aside', { class: 'print-memory-box' },
@@ -265,6 +269,22 @@ function contentsFor(scope, data) {
       chapters: data.competencies.map((competency, index) => competencyChapter(competency, data, index + 1))
     };
   }
+  if (scope.kind === 'questions') {
+    return {
+      title: 'الأسئلة والإجابات النموذجية',
+      subtitle: 'سبعون سؤالًا مع شرح المطلوب، وخريطة الإجابة، والنموذج الإرشادي الكامل',
+      entries: [
+        ...data.competencies.map((competency, index) => `${index + 1}. أسئلة ${competency.name}`),
+        '9. أسئلة قيادة المهمة',
+        '10. أسئلة الجاهزية النهائية'
+      ],
+      chapters: [
+        ...data.competencies.map((competency, index) => competencyChapter(competency, data, index + 1)),
+        missionChapter(data, 9),
+        readinessChapter(data, 10)
+      ]
+    };
+  }
   if (scope.kind === 'lesson') {
     const lesson = data.lessonById.get(scope.id);
     return {
@@ -295,7 +315,8 @@ export function buildPrintBook(data, scope = { kind: 'preparation' }) {
       el('h1', { text: content.title }),
       el('p', { class: 'print-cover-subtitle', text: content.subtitle }),
       el('div', { class: 'print-cover-rule' }),
-      el('p', { class: 'print-cover-note', text: 'مرجع تدريبي منظم للقراءة والطباعة' })
+      el('p', { class: 'print-cover-note', text: 'مرجع تدريبي منظم للقراءة والطباعة' }),
+      el('p', { class: 'print-cover-disclaimer', text: 'هذا المحتوى اجتهاد تدريبي، ولا يُعد اختبارًا أو تقييمًا رسميًا.' })
     ),
     el('section', { class: 'print-toc' },
       el('h2', { text: 'محتويات الكتاب' }),
@@ -330,24 +351,15 @@ function scopesFor(context, data) {
     { kind: 'competencies', label: 'الكفاءات الثمانية', description: 'شرح الكفاءات وأسئلتها وإجاباتها النموذجية.' },
     full
   ];
+  if (context.type === 'questions') return [
+    { kind: 'questions', label: 'كتاب الأسئلة والإجابات', description: 'جميع الأسئلة السبعين المعتمدة، مرتبة في عشرة فصول مع الإجابات النموذجية.' },
+    full
+  ];
   if (context.type === 'competency') {
     const competency = data.competencyById.get(context.id);
     return [
       { kind: 'competency', id: context.id, label: `هذه الكفاءة: ${competency?.name || ''}`, description: 'الشرح الكامل وأسئلة هذه الكفاءة وإجاباتها.' },
       { kind: 'competencies', label: 'الكفاءات الثمانية', description: 'جميع الكفاءات وأسئلتها وإجاباتها.' },
-      full
-    ];
-  }
-  if (context.type === 'question') {
-    const question = data.questionById.get(context.id);
-    const parent = question?.competency_id
-      ? { kind: 'competency', id: question.competency_id, label: 'الكفاءة كاملة', description: 'شرح الكفاءة وجميع أسئلتها وإجاباتها.' }
-      : question?.principle_id
-        ? { kind: 'lesson', id: 'U4', label: 'فصل قيادة المهمة', description: 'المبادئ الستة وأسئلتها وإجاباتها.' }
-        : { kind: 'lesson', id: 'U5', label: 'فصل الجاهزية النهائية', description: 'محتوى الجاهزية وأسئلته وإجابات الدليل.' };
-    return [
-      { kind: 'question', id: context.id, label: 'هذا السؤال فقط', description: 'السؤال، المطلوب، خريطة الإجابة والمثال النموذجي.' },
-      parent,
       full
     ];
   }

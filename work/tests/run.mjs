@@ -4,3 +4,4 @@ await import('./resilience.test.mjs');
 await import('./wake-lock.test.mjs');
 await import('./alpha5.test.mjs');
 await import('./print-book.test.mjs');
+await import('./alpha9.test.mjs');
