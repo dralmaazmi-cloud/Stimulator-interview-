@@ -104,6 +104,25 @@ const sealBook = buildPrintBook(data, { kind: 'question', id: sealQuestion.id })
 assert.ok(sealBook.textContent.includes('إجابة نموذجية موسّعة، مبنية على إجابة الدليل'));
 assert.ok(sealBook.textContent.includes('إجابة الدليل كما هي'));
 
+// alpha-6.1 (restored): أسماء عناصر SEAL المعتمدة في الكتاب المطبوع (C1-S1) وفي كتاب الأسئلة، وSTAR-L يحتفظ بأسمائه (C1-B3).
+const SEAL_NAMES = ['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي'];
+const partLabels = root => withClass(root, 'print-answer-part').map(node => node.childNodes.find(child => child.tagName === 'H4').textContent);
+const c1s1Book = buildPrintBook(data, { kind: 'question', id: 'C1-S1' });
+assert.deepEqual(partLabels(c1s1Book), SEAL_NAMES, 'printed SEAL answer must use exactly the four agreed element names in order');
+['تقييم الخيارات', 'خطة العمل'].forEach(label => assert.ok(!c1s1Book.textContent.includes(label), `printed book must not contain «${label}»`));
+const c1b3Book = buildPrintBook(data, { kind: 'question', id: 'C1-B3' });
+assert.deepEqual(partLabels(c1b3Book), ['الموقف', 'المهمة ودورك', 'الإجراء', 'النتيجة', 'التعلّم'], 'STAR-L keeps its own names');
+assert.ok(!c1b3Book.textContent.includes('فهم الوضع'));
+// نص الدليل نفسه يحوي «تقييم الخيارات» في تعريف كفاءة (محتوى مرجعي ثابت)، لذا الفحص هنا على تسميات عناصر الإجابة لا على نص الكتاب كله.
+const questionsBookLabels = partLabels(questionsBook);
+['تقييم الخيارات', 'خطة العمل'].forEach(label => assert.ok(!questionsBookLabels.includes(label), `questions book answer labels must not contain «${label}»`));
+const questionsBookC1S1 = withClass(questionsBook, 'print-question-page').find(node => node.dataset.questionId === 'C1-S1');
+assert.ok(questionsBookC1S1, 'questions book must contain C1-S1');
+assert.deepEqual(partLabels(questionsBookC1S1), SEAL_NAMES, 'questions book prints the four agreed SEAL names for C1-S1');
+const sealPages = withClass(questionsBook, 'print-question-page').filter(node => data.questionById.get(node.dataset.questionId)?.rubric_mode === 'seal');
+assert.equal(sealPages.length, 22);
+sealPages.forEach(node => assert.deepEqual(partLabels(node), SEAL_NAMES, `questions book SEAL page ${node.dataset.questionId} must use the four agreed names`));
+
 const generalBook = buildPrintBook(data, { kind: 'question', id: 'X1' });
 assert.ok(generalBook.textContent.includes(data.questionById.get('X1').sample_answer));
 

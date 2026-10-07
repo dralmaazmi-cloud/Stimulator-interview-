@@ -66,7 +66,7 @@ assert.match(index, /<path d="m9 18 6-6-6-6"/);
 assert.equal(JSON.parse(text('package.json')).version, '0.6.0-alpha-10');
 assert.match(text('dist/js/config.js'), /appVersion: '0\.6\.0-alpha-10'/);
 assert.match(text('dist/js/config.js'), /promptVersion: 'evaluation-1\.3'/);
-assert.match(text('dist/sw.js'), /leadership-interview-coach-v0\.6\.0-alpha-10-51d413de/);
+assert.match(text('dist/sw.js'), /leadership-interview-coach-v0\.6\.0-alpha-10\.1-51d413de/);
 
 const prompts = text('api/_lib/prompts.js');
 assert.match(prompts, /لا تخفض الدرجة، ولا تستخدم العلم generic، لمجرد أن المستخدم أخفى أسماء الأشخاص أو الجهات أو المشاريع/);

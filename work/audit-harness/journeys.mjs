@@ -20,6 +20,27 @@ async function newPage(opts = {}) {
 const text = async (page, sel) => (await page.locator(sel).first().innerText().catch(() => '')).replace(/\s+/g, ' ');
 const shot = (page, name) => page.screenshot({ path: `${OUT}/j-${name}.png`, fullPage: true });
 const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/home'); await page.waitForTimeout(250); await page.goto(url); await page.waitForTimeout(250); };
+// alpha-10: every simulation starts with the privacy screen; tick the box, then «فهمت، متابعة». The continue button must stay disabled until the box is ticked.
+let privacyGateChecked = false;
+const passPrivacyGate = async (page, label = '') => {
+  await page.waitForSelector('.simulation-privacy-page', { timeout: 10000 });
+  const continueButton = page.locator('.simulation-privacy-continue');
+  const disabledBefore = await continueButton.isDisabled();
+  await page.locator('#simulation-privacy-acknowledgement').check();
+  const enabledAfter = await continueButton.isEnabled();
+  if (!privacyGateChecked || label) {
+    log(`${label || 'privacy'} continue disabled until ticked`, `before=${disabledBefore} after=${enabledAfter}`);
+    privacyGateChecked = true;
+  }
+  if (!disabledBefore || !enabledAfter) throw new Error('privacy gate: continue button state is wrong');
+  await continueButton.click();
+};
+// Opening a question from the coverage map or «أعد الإجابة وقارن» may also land on the privacy screen.
+const passPrivacyGateIfShown = async page => {
+  const shown = await page.waitForSelector('.simulation-privacy-page', { timeout: 3000 }).then(() => true).catch(() => false);
+  if (shown) await passPrivacyGate(page);
+  return shown;
+};
 
 // ---------- Journey 1: single question, text answer, follow-up, finish, saved, print ----------
 {
@@ -33,6 +54,9 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   log('J1 default mode', await page.locator('.simulation-mode-card.selected strong').innerText());
   log('J1 default answer mode', await page.locator('.simulation-answer-switch button.active').innerText());
   await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-privacy-page');
+  log('J1 privacy screen shown before the first question', (await text(page, '.simulation-privacy-page h1')) + ' :: tick=' + String(await page.locator('#simulation-privacy-acknowledgement').count()));
+  await passPrivacyGate(page, 'J1 privacy');
   await page.waitForSelector('.ai-question-card');
   log('J1 question header', await text(page, '.page-head h1'));
   const qid = await text(page, '.ai-question-card .question-id');
@@ -103,6 +127,7 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   await gotoHash(page, BASE + '/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' نحن كفريق أنجزنا ذلك.');
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -116,6 +141,7 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   await gotoHash(page, BASE + '/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill('مسودة غير مرسلة');
   await page.locator('button:has-text("حفظ والخروج إلى الرئيسية")').click();
@@ -155,6 +181,7 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   await page.goto(BASE + '/#/simulation?answer=voice');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.voice-answer-panel');
   log('J2 voice panel', (await text(page, '.voice-answer-panel')).slice(0, 200));
   log('J2 textarea hidden before recording', String(await page.locator('textarea.simulation-answer-input').isHidden()));
@@ -193,6 +220,7 @@ const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/h
   await page.goto('http://localhost:4176/#/simulation?answer=voice');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.voice-answer-panel');
   await page.locator('.privacy-consent input').check();
   await page.locator('.record-start').click();
@@ -240,6 +268,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto(BASE + '/#/simulation?answer=voice');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.voice-answer-panel');
   await page.locator('.privacy-consent input').check();
   await page.locator('.record-start').click();
@@ -299,6 +328,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
     await gotoHash(page, BASE + '/#/simulation?answer=voice');
     await page.waitForSelector('.simulation-start');
     await page.locator('.simulation-start').click();
+    await passPrivacyGate(page);
     await page.waitForSelector('.voice-answer-panel');
     await page.goto(BASE + '/#/home');
     await page.waitForTimeout(300);
@@ -313,6 +343,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto(BASE + '/#/simulation?mode=realistic');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   const q1 = await text(page, '.ai-question-card .question-id');
   await page.locator('textarea.simulation-answer-input').fill('مسودة السؤال الأول ' + ANSWER + ' BADQUOTES');
@@ -342,6 +373,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto('http://localhost:4178/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   const submit = page.locator('button:has-text("إرسال الإجابة للتقييم")');
@@ -360,6 +392,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto('http://localhost:4179/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -394,6 +427,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('J3 offline simulation notice', await text(page, '.ai-health-host'));
   log('J3 offline start button enabled?', String(await page.locator('.simulation-start').isEnabled()));
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -414,6 +448,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.waitForTimeout(600);
   log('J4 unconfigured notice', await text(page, '.ai-health-host'));
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -429,6 +464,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await gotoHash(page, 'http://localhost:4176/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -439,6 +475,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await gotoHash(page, BASE + '/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' BADQUOTES');
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -448,6 +485,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await gotoHash(page, BASE + '/#/simulation');
   await page.waitForSelector('.simulation-start');
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' BADJSON');
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').click();
@@ -466,6 +504,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
     await page.waitForTimeout(300);
     if (mode !== 'full') await page.locator('.simulation-intro-options input[type=checkbox]').check();
     await page.locator('.simulation-start').click();
+    await passPrivacyGate(page);
     await page.waitForTimeout(600);
     log(`J6 ${mode}/${scope || 'random'} first screen`, await text(page, '.page-head h1'));
     await page.locator('textarea.simulation-answer-input').fill('أنا مدير فريق العمليات. بدأت مسيرتي مشرف عمليات ثم تدرجت إلى إدارة وحدة. من أبرز ما حققته خفض زمن الإنجاز. وأتطلع مستقبلًا إلى توسيع أثر التحسين.');
@@ -494,19 +533,26 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await browser.close();
 }
 
-// ---------- Journey 7: self-intro builder local + AI improve ----------
+// ---------- Journey 7: self-intro builder (four expandable steps, «إنشاء المسودة») local + AI improve ----------
 {
   const { browser, page, context } = await newPage();
   await page.goto(BASE + '/#/self-intro');
   await page.waitForSelector('.intro-builder-card');
-  await page.locator('button:has-text("بناء تقديم الذات")').click();
+  const groups = page.locator('.intro-question-group');
+  log('J7 builder steps', String(await groups.count()) + ' :: ' + (await page.locator('.intro-question-group summary strong').allInnerTexts()).join(' | '));
+  await page.locator('button:has-text("إنشاء المسودة")').click();
   await page.waitForTimeout(300);
   log('J7 missing fields toast', await text(page, '.toast'));
+  // fill the required fields across the four groups (open each group before typing; closed <details> hide their fields)
   const vals = { 0: 'قائد عمليات', 1: 'بكالوريوس إدارة', 3: 'مشرف عمليات', 4: 'الإشراف ثم إدارة وحدة ثم قيادة الفريق الحالي', 5: 'مدير فريق العمليات', 8: 'خفض زمن إنجاز المعاملات بنسبة عشرين بالمئة', 10: 'توسيع أثر التحسين ورفع جودة الخدمة' };
   const areas = page.locator('.intro-question textarea');
-  for (const [i, v] of Object.entries(vals)) await areas.nth(Number(i)).fill(v);
-  await page.locator('button:has-text("بناء تقديم الذات")').click();
-  await page.waitForTimeout(400);
+  for (const [i, v] of Object.entries(vals)) {
+    const area = areas.nth(Number(i));
+    await area.evaluate(node => { const details = node.closest('details'); if (details && !details.open) details.querySelector('summary').click(); });
+    await area.fill(v);
+  }
+  await page.locator('button:has-text("إنشاء المسودة")').click();
+  await page.waitForSelector('.intro-result:not([hidden])');
   const draft1 = await page.locator('.intro-result-text').first().inputValue();
   log('J7 draft', draft1.slice(0, 160));
   log('J7 metrics', await text(page, '.intro-metrics') + ' :: ' + (await text(page, '.intro-result .notice')));
@@ -521,7 +567,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const afterReload = await page.locator('.intro-result-text').first().inputValue().catch(() => '');
   log('J7 manual edit persisted after leaving page?', String(afterReload.includes('تعديل يدوي')) + ` (result visible=${!(await page.locator('.intro-result').isHidden())})`);
   // regenerate and improve with AI
-  await page.locator('button:has-text("بناء تقديم الذات")').click();
+  await page.locator('button:has-text("إنشاء المسودة")').click();
   await page.waitForTimeout(300);
   await page.locator('button:has-text("تحسين الصياغة بالذكاء الاصطناعي")').click();
   await page.waitForSelector('.ai-intro-candidate textarea', { timeout: 15000 });
@@ -573,6 +619,7 @@ for (const theme of ['light', 'dark']) {
   await page.waitForSelector('.simulation-start');
   log(`J9[${theme}] full card description (F7/D1)`, (await page.locator('.simulation-mode-card').nth(3).innerText()).replace(/\n/g, ' / '));
   await page.locator('.simulation-start').click();
+  await passPrivacyGate(page);
   await page.waitForSelector('textarea.simulation-answer-input');
   await page.locator('textarea.simulation-answer-input').fill('أنا مدير فريق العمليات. بدأت مسيرتي مشرف عمليات ثم تدرجت إلى إدارة وحدة. من أبرز ما حققته خفض زمن الإنجاز. وأتطلع مستقبلًا إلى توسيع أثر التحسين.');
   await page.locator('button:has-text("تقييم تقديم الذات")').click();
@@ -620,6 +667,7 @@ for (const theme of ['light', 'dark']) {
   log(`J9[${theme}] coverage not linked from home`, String(await page.evaluate(() => !document.querySelector('.home-dashboard a[href="#/coverage"]'))));
   await shot(page, `9-${theme}-coverage`);
   await page.locator('.coverage-cell:not([disabled])').first().click();
+  log(`J9[${theme}] coverage cell → privacy screen first`, String(await passPrivacyGateIfShown(page)));
   await page.waitForSelector('.ai-question-card', { timeout: 10000 });
   log(`J9[${theme}] coverage cell opens a question`, await text(page, '.ai-question-card .question-id'));
   // print one answer report from the saved session: open saved session, expand first answer report, print to PDF
@@ -682,12 +730,14 @@ for (const theme of ['light', 'dark']) {
   log('J10 old saved report recomputed at display (R1: 5 present, all 2/5 → 0 complete, ضعيفة)', await text(page, 'details.saved-report .elements-complete-line') + ' :: ' + await text(page, 'details.saved-report .score-badge'));
   // R5: retry & compare from the live report
   await gotoHash(page, BASE + '/#/simulation?question=C1-B3&answer=text');
+  await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' LOWSCORE');
   await page.locator('button:has-text("إرسال الإجابة للتقييم")').dispatchEvent('click');
   await page.waitForSelector('.evaluation-report', { timeout: 20000 });
   log('J10 R5 first attempt: no comparison yet', String(await page.locator('.attempt-comparison').count()));
   await page.locator('.retry-question').click();
+  await passPrivacyGateIfShown(page);
   await page.waitForSelector('.ai-question-card');
   log('J10 R5 retry reopens the same question', await text(page, '.ai-question-card .question-id'));
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' NOFOLLOWUP');
@@ -699,6 +749,41 @@ for (const theme of ['light', 'dark']) {
   // export includes attempts + rotation
   const backup = await page.evaluate(async () => { const { exportBackup } = await import('/js/storage.js'); const b = await exportBackup({}); return { stores: Object.keys(b.stores), attempts: (b.stores.attempts || []).length, rotation: (b.stores.rotation || []).length }; });
   log('J10 export includes attempts/rotation', JSON.stringify(backup));
+  await browser.close();
+}
+// ---------- alpha-6.1 Journey 11 (restored): SEAL element names on the focused question page (after «إظهار الإجابة النموذجية»), in the printed question book and in the questions book ----------
+{
+  const { browser, page, errors } = await newPage();
+  const SEAL_NAMES = ['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي'];
+  const same = list => JSON.stringify(list) === JSON.stringify(SEAL_NAMES);
+  await page.goto(BASE + '/#/question/C1-S1');
+  await page.waitForSelector('.question-focus-page');
+  await page.locator('.question-step').last().click();
+  await page.waitForSelector('.answer-gate');
+  await page.locator('button:has-text("إظهار الإجابة النموذجية")').click();
+  await page.waitForSelector('.focus-answer-samples');
+  const pageLabels = await page.locator('.focus-answer-part strong').allInnerTexts();
+  const pageText = await page.locator('.question-focus-page').innerText();
+  log('J11 question page SEAL labels after reveal', pageLabels.join(' | ') + ' :: exact=' + String(same(pageLabels)) + ' oldNames=' + String(/تقييم الخيارات|خطة العمل/.test(pageText)));
+  const books = await page.evaluate(async () => {
+    const { buildPrintBook } = await import('/js/print-book.js');
+    const { loadData } = await import('/js/data.js');
+    const data = await loadData();
+    const labelsOf = root => [...root.querySelectorAll('.print-answer-part h4')].map(node => node.textContent);
+    const single = buildPrintBook(data, { kind: 'question', id: 'C1-S1' });
+    const all = buildPrintBook(data, { kind: 'questions' });
+    const c1s1 = [...all.querySelectorAll('.print-question-page')].find(node => node.dataset.questionId === 'C1-S1');
+    const sealPages = [...all.querySelectorAll('.print-question-page')].filter(node => data.questionById.get(node.dataset.questionId)?.rubric_mode === 'seal');
+    return {
+      single: labelsOf(single), singleOld: /تقييم الخيارات|خطة العمل/.test(single.textContent),
+      questionsC1S1: labelsOf(c1s1), questionsOldLabels: labelsOf(all).some(label => /تقييم الخيارات|خطة العمل/.test(label)),
+      sealPages: sealPages.length, sealPagesOk: sealPages.every(node => JSON.stringify(labelsOf(node)) === JSON.stringify(['فهم الوضع', 'التقييم', 'الإجراء', 'الأثر القيادي']))
+    };
+  });
+  log('J11 printed question book SEAL labels', books.single.join(' | ') + ' :: exact=' + String(same(books.single)) + ' oldNames=' + String(books.singleOld));
+  log('J11 questions book SEAL labels (C1-S1 + all 22 SEAL pages)', books.questionsC1S1.join(' | ') + ' :: exact=' + String(same(books.questionsC1S1)) + ' sealPages=' + books.sealPages + ' allOk=' + String(books.sealPagesOk) + ' oldLabels=' + String(books.questionsOldLabels));
+  if (!same(pageLabels) || /تقييم الخيارات|خطة العمل/.test(pageText) || !same(books.single) || books.singleOld || !same(books.questionsC1S1) || !books.sealPagesOk || books.questionsOldLabels || books.sealPages !== 22) throw new Error('J11: SEAL element names mismatch');
+  log('J11 page errors', JSON.stringify(errors));
   await browser.close();
 }
 fs.writeFileSync(`${OUT}/journeys-done.txt`, 'ok');

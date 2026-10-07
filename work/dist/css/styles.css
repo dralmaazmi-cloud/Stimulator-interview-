@@ -3061,7 +3061,7 @@ body[data-page="questions"] .app-main {
   color: var(--muted);
 }
 .question-deck-search svg { inline-size: 21px; block-size: 21px; flex: 0 0 auto; }
-.question-deck-search-input { min-width: 0; inline-size: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: .88rem; }
+.question-deck-search-input { min-width: 0; inline-size: 100%; min-block-size: 44px; padding-block: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: .88rem; } /* alpha-10.1 (F3): ارتفاع لمس 44px */
 .question-deck-search-input::placeholder { color: color-mix(in srgb, var(--muted) 72%, transparent); }
 .question-deck-filters { display: flex; gap: 7px; overflow-x: auto; padding: 2px 1px 4px; scrollbar-width: none; }
 .question-deck-filters::-webkit-scrollbar { display: none; }
@@ -3375,7 +3375,12 @@ body[data-page="questions"] .app-main {
   background: color-mix(in srgb, var(--soft-mint) 52%, var(--paper));
   cursor: pointer;
 }
-.privacy-acknowledgement input { inline-size: 23px; block-size: 23px; accent-color: var(--petrol-800); }
+/* alpha-10.1 (F2): هدف لمس 44×44 لخانة الإقرار مع إبقاء المربع المرئي 23px */
+.privacy-acknowledgement { grid-template-columns: 44px minmax(0, 1fr); gap: 8px; padding-inline: 8px 14px; }
+.privacy-acknowledgement input { appearance: none; -webkit-appearance: none; inline-size: 44px; block-size: 44px; margin: 0; display: grid; place-items: center; cursor: pointer; background: transparent; border: 0; }
+.privacy-acknowledgement input::before { content: ""; inline-size: 23px; block-size: 23px; border: 2px solid var(--petrol-700); border-radius: 7px; background: var(--paper-strong); display: grid; place-items: center; font-size: .9rem; line-height: 1; color: #fff; }
+.privacy-acknowledgement input:checked::before { content: "✓"; background: var(--petrol-800); border-color: var(--petrol-800); }
+.privacy-acknowledgement input:focus-visible::before { outline: 3px solid color-mix(in srgb, var(--petrol-700) 40%, transparent); outline-offset: 2px; }
 .privacy-acknowledgement strong, .privacy-acknowledgement small { display: block; }
 .privacy-acknowledgement small { margin-block-start: 2px; color: var(--muted); font-size: .72rem; }
 .simulation-privacy-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, .38fr); gap: 9px; }
