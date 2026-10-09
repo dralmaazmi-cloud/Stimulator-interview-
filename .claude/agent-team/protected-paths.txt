@@ -1,0 +1,88 @@
+# ai-dev-team protected paths for THIS project.
+#
+# Team subagents are blocked (at tool level) from writing any file that
+# matches a glob below. Use it for approved features, approved designs,
+# question banks, answer keys and scoring algorithms.
+#
+# Syntax: one glob per line, relative to the repository root.
+#   **  matches across folders, *  matches inside one folder.
+#   A pattern without "/" matches the file name anywhere.
+#
+# Changing a protected file requires your explicit approval; the
+# orchestrator (main session) then makes or applies the change itself.
+#
+# ---------------------------------------------------------------------------
+# Leadership Interview Coach (application lives in work/)
+#
+# Already protected by the team policy (policy.json), not repeated here:
+#   .env, .env.*, *.pem, *.key, vercel.json (any folder), .vercel/**,
+#   .claude/**, CLAUDE.md, .mcp.json, .github/**, .git/**
+#
+# How an authorized change works:
+#   1. The user approves a specific change to a specific protected file.
+#   2. On a development branch, the orchestrator either makes that change
+#      itself, or comments out the matching line below in its own commit so
+#      the assigned agent can work, then restores the line afterwards.
+#   3. The commit message names the approval. Never unlock on main.
+#
+# Agent write areas that stay OPEN (outside work/, never deployed):
+#   docs/design/**     ui-ux-designer proposals and visual comparisons
+#   docs/education/**  educational-architect research and proposals
+#   docs/qa/**         qa-engineer reports
+#   tests/**           qa-engineer new tests (use tests/agent-qa/)
+# ---------------------------------------------------------------------------
+
+# 1. Approved question banks and answer keys
+work/dist/data/reference.json
+work/dist/data/expanded-model-answers.json
+work/dist/data/exercises.json
+work/tools/exercise-overrides.json
+
+# 2. Approved educational content (derived from the bank) and answer models
+work/dist/data/derived/**
+work/dist/js/guidance.js
+
+# 3. Evaluation algorithms, scoring rubrics and evaluation configuration
+work/dist/js/scoring-rules.js
+work/dist/js/config.js
+work/api/_lib/scoring.js
+work/api/_lib/prompts.js
+work/api/_lib/schemas.js
+work/api/_lib/validation.js
+
+# 4. Existing reference tests, fixtures and approved test runners
+work/tests/**
+work/audit-harness/*.mjs
+work/audit-harness/*.sh
+work/audit-harness/README.md
+work/audit-harness/shots/.gitignore
+
+# 5. No test files inside deployed folders (dist is served, api/*.js are functions)
+work/dist/**/*.test.*
+work/dist/**/*.spec.*
+work/dist/**/__tests__/**
+work/api/**/*.test.*
+work/api/**/*.spec.*
+work/api/**/__tests__/**
+
+# 6. Original reference documents and release records (not the whole docs folder)
+work/docs/ACCEPTANCE_REPORT_v0.6.0.md
+work/docs/PHASE_1_DELIVERY.md
+work/docs/PHASE_2_DELIVERY.md
+work/docs/QUESTION_AUDIT_v0.6.0.md
+work/INTERVIEW_COACH_MASTER_PLAN_AR.md
+work/Interview_Coach_Master_Plan_AR.docx
+work/HANDOFF.md
+work/CHANGELOG_v0.5.1.md
+work/CHANGELOG_v0.6.0.md
+work/LICENSE
+work/THIRD_PARTY_NOTICES.md
+Leadership_Interview_Coach_*.zip
+
+# 7. Approved visual design and brand assets
+work/dist/css/styles.css
+work/dist/assets/**
+work/dist/manifest.webmanifest
+
+# 8. Production configuration
+work/package.json

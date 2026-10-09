@@ -1,0 +1,176 @@
+{
+  "_comment": "Tool-level policy enforced by guard.py for ai-dev-team subagents. Write/Edit are checked exactly before the call; Bash is checked by pattern before the call and by a git working-tree snapshot after it (changes outside the agent's write area are reverted). Edit protected paths per project in .claude/agent-team/protected-paths.txt.",
+  "version": 2,
+  "always_protected": [
+    ".claude/**",
+    ".mcp.json",
+    "CLAUDE.md",
+    "CLAUDE.local.md",
+    ".env",
+    ".env.*",
+    "*.pem",
+    "*.key",
+    "id_rsa*",
+    ".github/**",
+    ".git/**",
+    "vercel.json",
+    ".vercel/**",
+    "netlify.toml",
+    "firebase.json",
+    ".firebaserc"
+  ],
+  "temp_dirs": [
+    "/tmp",
+    "/var/tmp"
+  ],
+  "agents": {
+    "software-engineer": {
+      "write": "project",
+      "bash": "dev"
+    },
+    "ai-engineer": {
+      "write": "project",
+      "bash": "dev"
+    },
+    "ui-ux-designer": {
+      "write": [
+        "docs/design/**"
+      ],
+      "bash": "dev"
+    },
+    "qa-engineer": {
+      "write": [
+        "tests/**",
+        "test/**",
+        "e2e/**",
+        "__tests__/**",
+        "**/__tests__/**",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/test_*.py",
+        "**/*_test.py",
+        "**/*_test.go",
+        "docs/qa/**"
+      ],
+      "bash": "dev"
+    },
+    "security-engineer": {
+      "write": [],
+      "bash": "readonly"
+    },
+    "educational-architect": {
+      "write": [
+        "docs/education/**"
+      ],
+      "bash": "readonly"
+    }
+  },
+  "bash_blocked_all": [
+    {
+      "pattern": "(^|[;&|(\\s])git(?:\\s+(?:-C|-c)\\s+\\S+|\\s+--[A-Za-z-]+(?:=\\S+)?)*\\s+push\\b",
+      "reason": "git push is reserved for the orchestrator after user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])git(?:\\s+(?:-C|-c)\\s+\\S+|\\s+--[A-Za-z-]+(?:=\\S+)?)*\\s+(commit|merge|rebase|tag|cherry-pick|revert|am|filter-branch|filter-repo)\\b",
+      "reason": "history-changing git commands are reserved for the orchestrator"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])git(?:\\s+(?:-C|-c)\\s+\\S+|\\s+--[A-Za-z-]+(?:=\\S+)?)*\\s+(checkout|switch|restore|reset|clean|stash|pull|worktree|update-ref|config|filter-branch|gc|prune)\\b",
+      "reason": "subagents may not change branches, reset, discard, stash, pull or reconfigure git; the orchestrator does this"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])git(?:\\s+(?:-C|-c)\\s+\\S+|\\s+--[A-Za-z-]+(?:=\\S+)?)*\\s+branch\\s+-[dDmMcC]\\b",
+      "reason": "subagents may not delete, rename or copy branches"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npx\\s+|pnpm\\s+dlx\\s+|bunx\\s+)?vercel(\\s|$)",
+      "reason": "Vercel CLI can deploy; deployment requires explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npx\\s+)?netlify\\s+deploy\\b",
+      "reason": "deployment requires explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npx\\s+)?firebase\\s+deploy\\b",
+      "reason": "deployment requires explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npx\\s+)?wrangler\\s+(deploy|publish)\\b",
+      "reason": "deployment requires explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(fly|flyctl)\\s+deploy\\b",
+      "reason": "deployment requires explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npx\\s+)?supabase\\s+(db\\s+push|functions\\s+deploy|link)\\b",
+      "reason": "remote database or function changes require explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npm|pnpm|yarn)\\s+publish\\b",
+      "reason": "publishing requires explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(twine\\s+upload|gh\\s+release|gh\\s+pr\\s+merge|gh\\s+repo\\s+delete)\\b",
+      "reason": "publishing or repository changes require explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(terraform|tofu)\\s+(apply|destroy)\\b",
+      "reason": "infrastructure changes require explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])kubectl\\s+(apply|delete|replace|rollout)\\b",
+      "reason": "infrastructure changes require explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])aws\\s+s3\\s+(sync|rm|cp)\\b",
+      "reason": "cloud storage changes require explicit user approval"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])rm\\s+-[a-zA-Z]*r[a-zA-Z]*f?\\s+(/|~|\\$HOME|\\.|\\*)(\\s|$)",
+      "reason": "recursive delete of a root, home or project directory"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(curl|wget)\\b[^|]*\\|\\s*(sh|bash|zsh)\\b",
+      "reason": "piping a download into a shell"
+    }
+  ],
+  "bash_blocked_readonly": [
+    {
+      "pattern": "(^|[^0-9&<>=\\-])>{1,2}\\s*(?!/dev/null|&|/tmp/|/var/tmp/)[^\\s]",
+      "reason": "read-only agent: output redirection to a file is not allowed (use /tmp)"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(rm|mv|cp|rmdir|mkdir|touch|chmod|chown|truncate|dd|ln|install)\\s",
+      "reason": "read-only agent: file-system modification is not allowed"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])sed\\s+(-[a-zA-Z]*i|--in-place)",
+      "reason": "read-only agent: in-place edits are not allowed"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])perl\\s+-[a-zA-Z]*i",
+      "reason": "read-only agent: in-place edits are not allowed"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])tee\\s+(?!/tmp/|/var/tmp/|/dev/null)",
+      "reason": "read-only agent: tee to a project file is not allowed"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])git(?:\\s+(?:-C|-c)\\s+\\S+|\\s+--[A-Za-z-]+(?:=\\S+)?)*\\s+(checkout|switch|restore|stash|apply|pull|fetch|add|rm|mv)\\b",
+      "reason": "read-only agent: git working-tree changes are not allowed"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(npm|pnpm|yarn|bun)\\s+(install|i|add|remove|uninstall|update|upgrade|ci|audit\\s+fix|dedupe|link)\\b",
+      "reason": "read-only agent: dependency changes are not allowed (npm audit without fix is fine)"
+    },
+    {
+      "pattern": "(^|[;&|(\\s])(pip|pip3|uv|poetry)\\s+(install|uninstall|add|remove|sync|lock)\\b",
+      "reason": "read-only agent: dependency changes are not allowed"
+    },
+    {
+      "pattern": "\\.write_text\\(|\\.write_bytes\\(|open\\([^)]*['\"][wax]\\+?['\"]|writeFileSync|appendFileSync|fs\\.writeFile",
+      "reason": "read-only agent: inline scripts that write files are not allowed"
+    }
+  ]
+}
