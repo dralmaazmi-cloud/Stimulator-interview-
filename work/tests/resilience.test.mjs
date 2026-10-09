@@ -1,10 +1,12 @@
 // alpha-4 — اختبارات الصمود (B1–B13): مزود وهمي، ساعة وهمية، sleep وrandom محقونان. لا شبكة ولا انتظار حقيقي.
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import evaluateHandler from '../api/evaluate.js';
 import transcribeHandler from '../api/transcribe.js';
 import { getQuestionContext } from '../api/_lib/data.js';
 import {
-  HANDLER_BUDGET_MS, MIN_REMAINING_TO_START_MS, RETRY_DELAYS_MS, RETRY_JITTER,
+  HANDLER_BUDGET_MS, MAX_CALL_TIMEOUT_MS, MIN_REMAINING_FOR_TIMEOUT_FALLBACK_MS, MIN_REMAINING_TO_START_MS, RETRY_DELAYS_MS, RETRY_JITTER,
+  THINKING_LEVELS, evaluationThinkingLevel,
   callWithRetry, configureProviderDeps, createBudget, fallbackModelId, jitteredDelay, resetProviderDeps, complete, transcribe
 } from '../api/_lib/provider.js';
 
@@ -194,11 +196,105 @@ const allBodiesSafe = calls => calls.every(call => call.body.store === false && 
   assert.equal(result.statusCode, 504);
   assert.equal(result.payload.code, 'AI_TIMEOUT');
 }
-// 8. استنفاد deadline → لا نداء بعد الموعد؛ ومهلة كل نداء = الأصغر من 28 ثانية والمتبقي ناقص ثانية.
+// 7b (fix/evaluate-timeout). مهلة الأساسي + احتياطي معرّف ووقت كافٍ → نداء احتياطي واحد ينجح (200).
 {
+  // المعالج يثبّت بداية الميزانية على Date.now() الحقيقي؛ لذلك تُقاس المهلة المحاكاة من بداية الطلب الحقيقية.
+  let requestStart = 0;
+  const abortAfter = ms => ({ clock: c }) => {
+    if (!requestStart) requestStart = Date.now();
+    c.set(Math.max(c.now(), requestStart) + ms);
+    throw Object.assign(new Error('aborted'), { name: 'AbortError' });
+  };
+  const fresh = run => async (...args) => { requestStart = 0; return run(...args); };
+  const { result, calls } = await withProvider([abortAfter(MAX_CALL_TIMEOUT_MS), ok(JSON.stringify(goodReport))], fresh(async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }), { env: { GEMINI_EVALUATION_FALLBACK_MODEL: 'fallback-eval-model' } });
+  assert.equal(calls.length, 2, 'timeout on the primary model → exactly one fallback call');
+  assert.equal(calls[0].body.model, 'gemini-3.8-flash');
+  assert.equal(calls[1].body.model, 'fallback-eval-model');
+  assert.equal(result.statusCode, 200, JSON.stringify(result.payload));
+  assert.equal(result.payload.report.trusted, true);
+  assert.ok(allBodiesSafe(calls), 'store:false and no previous_interaction_id on both calls');
+  assert.ok(calls.every(call => call.body.generation_config?.thinking_level === 'low'), 'evaluation calls carry thinking_level=low');
+  // الاحتياطي ينتهي مهله أيضًا → 504 AI_TIMEOUT بنداءين فقط، دون نداء ثالث.
+  const both = await withProvider([abortAfter(MAX_CALL_TIMEOUT_MS), abortAfter(20_000), ok(JSON.stringify(goodReport))], fresh(async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }), { env: { GEMINI_EVALUATION_FALLBACK_MODEL: 'fallback-eval-model' } });
+  assert.equal(both.calls.length, 2);
+  assert.equal(both.result.statusCode, 504);
+  assert.equal(both.result.payload.code, 'AI_TIMEOUT');
+  // لم يبقَ وقت كافٍ بعد مهلة الأساسي → لا احتياطي.
+  const late = await withProvider([abortAfter(HANDLER_BUDGET_MS - MIN_REMAINING_FOR_TIMEOUT_FALLBACK_MS + 500), ok(JSON.stringify(goodReport))], fresh(async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }), { env: { GEMINI_EVALUATION_FALLBACK_MODEL: 'fallback-eval-model' } });
+  assert.equal(late.calls.length, 1, 'no fallback when less than MIN_REMAINING_FOR_TIMEOUT_FALLBACK_MS remains');
+  assert.equal(late.result.statusCode, 504);
+  assert.equal(late.result.payload.code, 'AI_TIMEOUT');
+  // بلا احتياطي معرّف → نداء واحد و504 (الحالة 7 نفسها مع مرور الوقت فعليًا).
+  const none = await withProvider([abortAfter(MAX_CALL_TIMEOUT_MS), ok(JSON.stringify(goodReport))], fresh(async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }));
+  assert.equal(none.calls.length, 1);
+  assert.equal(none.result.payload.code, 'AI_TIMEOUT');
+}
+// 7c. مهلة التفريغ الصوتي لا تفعّل احتياطيًا (لم يُطلب لها)، ولا thinking_level في طلب التفريغ.
+{
+  const webm = Buffer.concat([Buffer.from([0x1a, 0x45, 0xdf, 0xa3]), Buffer.alloc(3000, 1)]);
+  const abort = Object.assign(new Error('aborted'), { name: 'AbortError' });
+  const { result, calls } = await withProvider([abort, ok('نص')], async () => {
+    const res = mockResponse();
+    await transcribeHandler({ method: 'POST', headers: { 'x-client-id': 'resilience-tr-timeout', 'x-forwarded-for': nextIp(), 'content-type': 'audio/webm', 'x-audio-duration': '3.5', 'content-length': String(webm.length) }, socket: { remoteAddress: '127.0.0.1' }, body: webm }, res);
+    return res;
+  }, { env: { GEMINI_TRANSCRIBE_FALLBACK_MODEL: 'fallback-audio-model' } });
+  assert.equal(calls.length, 1);
+  assert.equal(result.statusCode, 504);
+  assert.ok(!('generation_config' in calls[0].body), 'transcription request is unchanged (no thinking_level)');
+}
+// 7d. thinking_level: القيمة الافتراضية low، وقيم البيئة المسموحة فقط، و«off» يحذف الحقل من طلب التقييم.
+{
+  assert.deepEqual([...THINKING_LEVELS], ['minimal', 'low', 'medium', 'high']);
+  const saved = process.env.GEMINI_EVALUATION_THINKING_LEVEL;
+  delete process.env.GEMINI_EVALUATION_THINKING_LEVEL;
+  assert.equal(evaluationThinkingLevel(), 'low');
+  process.env.GEMINI_EVALUATION_THINKING_LEVEL = 'MINIMAL';
+  assert.equal(evaluationThinkingLevel(), 'minimal');
+  process.env.GEMINI_EVALUATION_THINKING_LEVEL = 'unbounded';
+  assert.equal(evaluationThinkingLevel(), 'low', 'unknown values fall back to low');
+  if (saved === undefined) delete process.env.GEMINI_EVALUATION_THINKING_LEVEL; else process.env.GEMINI_EVALUATION_THINKING_LEVEL = saved;
+  const off = await withProvider([ok(JSON.stringify(goodReport))], async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  }, { env: { GEMINI_EVALUATION_THINKING_LEVEL: 'off' } });
+  assert.equal(off.result.statusCode, 200);
+  assert.ok(!('generation_config' in off.calls[0].body), 'off omits generation_config');
+  const plain = await withProvider([ok(JSON.stringify(goodReport))], async () => {
+    const res = mockResponse(); await evaluateHandler(evaluateRequest(nextIp()), res); return res;
+  });
+  assert.deepEqual(plain.calls[0].body.generation_config, { thinking_level: 'low' });
+  assert.equal(plain.calls[0].body.store, false);
+}
+// 8. استنفاد deadline → لا نداء بعد الموعد؛ ومهلة كل نداء = الأصغر من 75 ثانية والمتبقي ناقص ثانية.
+{
+  // القيم الجديدة (fix/evaluate-timeout) ومواءمتها مع maxDuration في vercel.json ومهلة الواجهة.
+  assert.equal(MAX_CALL_TIMEOUT_MS, 75_000);
+  assert.equal(HANDLER_BUDGET_MS, 110_000);
+  const vercel = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+  const maxDurationMs = vercel.functions['api/*.js'].maxDuration * 1000;
+  assert.equal(maxDurationMs, 120_000);
+  assert.ok(HANDLER_BUDGET_MS < maxDurationMs, 'handler budget must end before the platform kills the function');
+  assert.ok(MAX_CALL_TIMEOUT_MS <= HANDLER_BUDGET_MS - 3_000);
+  const clientText = fs.readFileSync(new URL('../dist/js/evaluate-client.js', import.meta.url), 'utf8');
+  const serverMax = Number((clientText.match(/SERVER_MAX_DURATION_MS = ([\d_]+)/) || [])[1]?.replace(/_/g, ''));
+  assert.equal(serverMax, maxDurationMs, 'client mirrors the server maxDuration');
+  assert.match(clientText, /LONG_TIMEOUT = SERVER_MAX_DURATION_MS \+ 5_000/, 'client timeout is server maxDuration + 5 s');
+  assert.match(clientText, /إجابتك محفوظة، ويمكنك إعادة الإرسال/, '504 message says the answer is saved and can be resent');
+  assert.match(clientText, /response\.status === 504/);
+  for (const call of ['/evaluate', '/transcribe', '/example', '/self-intro']) {
+    const block = clientText.slice(clientText.indexOf(`'${call}'`), clientText.indexOf(`'${call}'`) + 400);
+    assert.match(block, /timeout: LONG_TIMEOUT/, `${call} must use the long client timeout`);
+  }
   const { result, calls, clock } = await withProvider([ok(JSON.stringify(goodReport))], async ({ clock: c }) => {
     const budget = createBudget({ startedAt: c.now(), maxCalls: 5 });
-    assert.equal(budget.callTimeoutMs(), 28_000);
+    assert.equal(budget.callTimeoutMs(), 75_000);
     c.advance(HANDLER_BUDGET_MS - 10_000);
     assert.equal(budget.callTimeoutMs(), 9_000, 'remaining minus one second');
     c.advance(10_000 - MIN_REMAINING_TO_START_MS + 1);

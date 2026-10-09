@@ -27,15 +27,23 @@ function modelId(override, kind = 'evaluation') {
 // ---------------------------------------------------------------------------
 // النقل (alpha-4 — B2/B3): إعادة محاولة عند 5xx/فشل الاتصال فقط، بتأخير مع jitter،
 // ثم نداء احتياطي واحد إن عُرّف نموذج احتياطي للدور نفسه. ميزانية واحدة لكل طلب:
-// deadline بعد 50 ثانية من بداية المعالج، وسقف نداءات إجمالي، ومهلة لكل نداء.
+// deadline بعد 110 ثوانٍ من بداية المعالج (maxDuration = 120 في vercel.json)، وسقف نداءات إجمالي،
+// ومهلة لكل نداء 75 ثانية كحد أقصى.
 // الساعة وsleep وrandom وfetch قابلة للحقن للاختبارات.
 // ---------------------------------------------------------------------------
 export const RETRY_DELAYS_MS = Object.freeze([1500, 4000]);
 export const RETRY_JITTER = 0.25;
 export const MAX_PRIMARY_ATTEMPTS = 3;
-export const MAX_CALL_TIMEOUT_MS = 28_000;
+// fix/evaluate-timeout: كان 28 ثانية/50 ثانية فانقطع تقييم evaluation-1.3 الطويل بـAI_TIMEOUT.
+export const MAX_CALL_TIMEOUT_MS = 75_000;
 export const MIN_REMAINING_TO_START_MS = 5_000;
-export const HANDLER_BUDGET_MS = 50_000;
+export const HANDLER_BUDGET_MS = 110_000;
+// بعد انتهاء مهلة النموذج الأساسي لا يُجرَّب الاحتياطي إلا إن بقي من الميزانية ما يكفي لنداء مفيد.
+export const MIN_REMAINING_FOR_TIMEOUT_FALLBACK_MS = 20_000;
+// مستوى التفكير لنداءات التقييم (Interactions API: generation_config.thinking_level).
+// القيم المدعومة في نوع ThinkingLevel الرسمي: minimal | low | medium | high. «off» يحذف الحقل.
+export const THINKING_LEVELS = Object.freeze(['minimal', 'low', 'medium', 'high']);
+export const DEFAULT_EVALUATION_THINKING_LEVEL = 'low';
 export const OVERLOADED_MESSAGE = 'خدمة الذكاء الاصطناعي مزدحمة الآن. إجابتك محفوظة؛ أعد الإرسال بعد دقيقة.';
 const RETRYABLE_STATUSES = new Set([500, 502, 503, 504]);
 
@@ -66,6 +74,12 @@ export function fallbackModelId(role) {
   // لا احتياطي إذا كان فارغًا أو مساويًا للنموذج الأساسي.
   if (!fallback || fallback === primary) return null;
   return fallback;
+}
+
+export function evaluationThinkingLevel() {
+  const configured = String(process.env.GEMINI_EVALUATION_THINKING_LEVEL || '').trim().toLowerCase();
+  if (configured === 'off') return null;
+  return THINKING_LEVELS.includes(configured) ? configured : DEFAULT_EVALUATION_THINKING_LEVEL;
 }
 
 export function createBudget(options = {}) {
@@ -156,7 +170,7 @@ async function singleCall(body, budget) {
 }
 
 // bodyForModel(model) يبني جسم الطلب؛ تُعاد المحاولة تسلسليًا (لا توازي ولا hedging).
-export async function callWithRetry(bodyForModel, { budget, primaryModel, fallbackModel = null }) {
+export async function callWithRetry(bodyForModel, { budget, primaryModel, fallbackModel = null, fallbackOnTimeout = false }) {
   let lastError = null;
   for (let attempt = 0; attempt < MAX_PRIMARY_ATTEMPTS; attempt += 1) {
     if (attempt > 0) await deps.sleep(jitteredDelay(RETRY_DELAYS_MS[attempt - 1]));
@@ -177,6 +191,21 @@ export async function callWithRetry(bodyForModel, { budget, primaryModel, fallba
             }
             if (!fallbackError?.retryable) throw fallbackError;
             throw error;
+          }
+        }
+        throw error;
+      }
+      // fix/evaluate-timeout: انتهاء مهلة الأساسي لا يُعاد على النموذج نفسه؛ يُجرَّب الاحتياطي مرة واحدة
+      // إن طلبه المستدعي وكان معرّفًا ومختلفًا وبقي وقت كافٍ. إن فشل الاحتياطي يُعاد خطأ المهلة الأصلي.
+      if (error?.code === 'AI_TIMEOUT') {
+        if (fallbackOnTimeout && fallbackModel && fallbackModel !== primaryModel
+          && budget.canStart() && budget.remainingMs() >= MIN_REMAINING_FOR_TIMEOUT_FALLBACK_MS) {
+          budget.fallbackUsed = true;
+          try {
+            return { payload: await singleCall(bodyForModel(fallbackModel), budget), model: fallbackModel, fallbackUsed: true };
+          } catch (fallbackError) {
+            if (fallbackError?.code === 'AI_TIMEOUT' || fallbackError?.retryable) throw error;
+            throw fallbackError;
           }
         }
         throw error;
@@ -234,9 +263,12 @@ function extractJsonObject(text) {
   return text.slice(start, end + 1);
 }
 
+// options.thinkingLevel: يضيف generation_config.thinking_level (Interactions API) — يمرّره التقييم فقط.
+// options.fallbackOnTimeout: يسمح بتجربة النموذج الاحتياطي مرة واحدة بعد انتهاء مهلة الأساسي — التقييم فقط.
 export async function complete(prompt, schema, options = {}) {
   const budget = options.budget || createBudget({ maxCalls: MAX_PRIMARY_ATTEMPTS + 1 });
   const primaryModel = modelId(options.model);
+  const thinkingLevel = THINKING_LEVELS.includes(options.thinkingLevel) ? options.thinkingLevel : null;
   const { payload, model } = await callWithRetry(candidate => ({
     model: candidate,
     input: prompt,
@@ -245,8 +277,14 @@ export async function complete(prompt, schema, options = {}) {
       type: 'text',
       mime_type: 'application/json',
       schema
-    }
-  }), { budget, primaryModel, fallbackModel: options.model ? null : fallbackModelId('evaluation') });
+    },
+    ...(thinkingLevel ? { generation_config: { thinking_level: thinkingLevel } } : {})
+  }), {
+    budget,
+    primaryModel,
+    fallbackModel: options.model ? null : fallbackModelId('evaluation'),
+    fallbackOnTimeout: options.fallbackOnTimeout === true
+  });
   const text = outputText(payload);
   let data;
   try {

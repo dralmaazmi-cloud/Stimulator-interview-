@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { complete, createBudget } from './_lib/provider.js';
+import { complete, createBudget, evaluationThinkingLevel } from './_lib/provider.js';
 import { getQuestionContext, sampleAnswerTexts } from './_lib/data.js';
 import { evaluationSchema } from './_lib/schemas.js';
 import { buildEvaluationPrompt } from './_lib/prompts.js';
@@ -22,7 +22,10 @@ function cleanFollowups(value) {
 }
 
 async function runEvaluation(context, answer, followups, model, budget) {
-  const response = await complete(buildEvaluationPrompt(context, answer, followups), evaluationSchema, { model, budget });
+  // fix/evaluate-timeout: تفكير منخفض لتقرير evaluation-1.3 الطويل، واحتياطي مرة واحدة عند انتهاء المهلة.
+  const response = await complete(buildEvaluationPrompt(context, answer, followups), evaluationSchema, {
+    model, budget, thinkingLevel: evaluationThinkingLevel() || undefined, fallbackOnTimeout: true
+  });
   const errors = shapeErrors(response.data, context.question.id, context.question.rubric_mode);
   if (errors.length) {
     const error = httpError(502, `Schema validation failed: ${errors.join(', ')}`, 'AI_SCHEMA_FAILED');
@@ -38,7 +41,7 @@ async function runEvaluation(context, answer, followups, model, budget) {
 export default async function handler(req, res) {
   const started = Date.now();
   if (!methodAllowed(req, res, ['POST'])) return;
-  // ميزانية واحدة للطلب كله: 50 ثانية من بداية المعالج وخمسة نداءات كحد أقصى (نقل + احتياطي + إصلاح مخطط).
+  // ميزانية واحدة للطلب كله: 110 ثوانٍ من بداية المعالج وخمسة نداءات كحد أقصى (نقل + احتياطي + إصلاح مخطط).
   const budget = createBudget({ startedAt: started, maxCalls: 5 });
   try {
     const scopes = rateLimitScopes(req, 'evaluate');

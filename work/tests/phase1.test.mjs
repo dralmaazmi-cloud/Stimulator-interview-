@@ -177,7 +177,8 @@ requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(project, file)),
 assert.ok(read('dist/assets/images/abu-dhabi-sea-hero.jpg').length > 100_000, 'Hero must be a production-quality local image');
 
 const serviceWorkerText = text('dist/sw.js');
-assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-10\.1-/);
+assert.match(serviceWorkerText, /leadership-interview-coach-v0\.6\.0-alpha-10\.2-/);
+assert.doesNotMatch(serviceWorkerText, /alpha-10\.1-/, 'only the alpha-10.2 cache name may remain');
 assert.doesNotMatch(serviceWorkerText, /alpha-(?:[4-9])(?!\d)/, 'only the alpha-10 cache name may remain');
 ['scoring-rules', 'retry-plan', 'rotation', 'session-plan', 'coverage', 'print-book', 'questions'].forEach(name => assert.match(serviceWorkerText, new RegExp(`'\\./js/${name}\\.js'`), `APP_SHELL must include ${name}.js`));
 const cachedPaths = [...serviceWorkerText.matchAll(/'\.\/(.*?)'/g)].map(match => match[1]);
