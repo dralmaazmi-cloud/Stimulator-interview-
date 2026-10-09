@@ -93,7 +93,8 @@ npm test
 
 - `GEMINI_MODEL`: نموذج التقييم الأساسي.
 - `GEMINI_RETRY_MODEL`: نموذج إصلاح مخطط التقييم.
-- `GEMINI_EVALUATION_FALLBACK_MODEL`: احتياطي التقييم عند الازدحام.
+- `GEMINI_EVALUATION_FALLBACK_MODEL`: احتياطي التقييم عند الازدحام، وعند انتهاء مهلة النموذج الأساسي إن بقي 20 ثانية على الأقل من ميزانية الطلب.
+- `GEMINI_EVALUATION_THINKING_LEVEL` (اختياري): مستوى التفكير لنداءات التقييم عبر `generation_config.thinking_level`؛ القيم `minimal` أو `low` (الافتراضي) أو `medium` أو `high`، و`off` لحذف الحقل إن كان النموذج لا يدعمه.
 - `GEMINI_TRANSCRIBE_MODEL`: نموذج التفريغ.
 - `GEMINI_TRANSCRIBE_FALLBACK_MODEL`: احتياطي التفريغ عند الازدحام.
 

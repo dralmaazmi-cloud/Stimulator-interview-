@@ -1,7 +1,10 @@
 const API_BASE = '/api';
 const DEFAULT_TIMEOUT = 45_000;
-// alpha-4 (B5): مهلة 70 ثانية للتقييم والتفريغ، وتنبيه «ما زلنا نحاول الاتصال…» بعد 8 ثوانٍ.
-const LONG_TIMEOUT = 70_000;
+// fix/evaluate-timeout: مهلة الواجهة أطول من أقصى مدة للدالة على الخادم (maxDuration = 120 ثانية) بخمس ثوانٍ،
+// كي لا تقطع الواجهة طلبًا ما زال الخادم يعالجه. التنبيه «ما زلنا نحاول الاتصال…» بعد 8 ثوانٍ كما هو.
+export const SERVER_MAX_DURATION_MS = 120_000;
+export const LONG_TIMEOUT = SERVER_MAX_DURATION_MS + 5_000;
+export const TIMEOUT_MESSAGE = 'استغرق الطلب وقتًا أطول من المعتاد. إجابتك محفوظة، ويمكنك إعادة الإرسال.';
 export const SLOW_NOTICE_MS = 8_000;
 export const SLOW_NOTICE_TEXT = 'ما زلنا نحاول الاتصال…';
 
@@ -33,15 +36,17 @@ async function apiRequest(path, options = {}) {
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = new Error(payload.error || 'تعذّر إكمال الطلب.');
+      // 504 من الخادم (AI_TIMEOUT) أو من المنصة نفسها: رسالة ثابتة تؤكد أن الإجابة محفوظة ويمكن إعادة الإرسال.
+      const timedOut = response.status === 504 || payload.code === 'AI_TIMEOUT';
+      const error = new Error(timedOut ? TIMEOUT_MESSAGE : (payload.error || 'تعذّر إكمال الطلب.'));
       error.status = response.status;
-      error.code = payload.code || '';
+      error.code = timedOut ? 'AI_TIMEOUT' : (payload.code || '');
       if (Number.isFinite(Number(payload.retry_after)) && Number(payload.retry_after) > 0) error.retryAfter = Number(payload.retry_after);
       throw error;
     }
     return payload;
   } catch (error) {
-    if (error?.name === 'AbortError') throw new Error('استغرق الطلب وقتًا أطول من المتوقع. حاول مرة أخرى.');
+    if (error?.name === 'AbortError') throw Object.assign(new Error(TIMEOUT_MESSAGE), { code: 'AI_TIMEOUT', status: 504 });
     if (error instanceof TypeError) throw new Error('تعذّر الاتصال بالخدمة. تحقق من الإنترنت ثم أعد المحاولة.');
     throw error;
   } finally {
@@ -77,5 +82,5 @@ export async function requestWorkedExample(payload, options = {}) {
 }
 
 export async function improveSelfIntroduction(payload) {
-  return apiRequest('/self-intro', { method: 'POST', body: payload });
+  return apiRequest('/self-intro', { method: 'POST', body: payload, timeout: LONG_TIMEOUT });
 }

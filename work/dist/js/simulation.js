@@ -71,7 +71,8 @@ function applyRetryLock(retryButton, error, host) {
   tick();
 }
 
-const RETRYABLE_CLIENT_CODES = new Set(['AI_OVERLOADED', 'AI_RATE_LIMITED']);
+// fix/evaluate-timeout: انتهاء المهلة يُظهر زر «إعادة الإرسال» مع بقاء النص أو التسجيل كما هو.
+const RETRYABLE_CLIENT_CODES = new Set(['AI_OVERLOADED', 'AI_RATE_LIMITED', 'AI_TIMEOUT']);
 
 // مشغّل تقييم واحد: يمنع الطلب المزدوج، يحمل قفل الشاشة أثناء الطلب، ويعرض «ما زلنا نحاول الاتصال…» بعد 8 ثوانٍ.
 function createEvaluationRunner({ status, submit, retryButton, workingText, workingHint }) {
