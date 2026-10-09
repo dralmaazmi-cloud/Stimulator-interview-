@@ -37,6 +37,20 @@ An Arabic RTL progressive web app for leadership interview preparation and simul
 - If a change to the existing test infrastructure is needed, the qa-engineer reports it and the orchestrator asks the user.
 - The main session is not governed by the guard. It must follow the same rules by choice: no deploys, no Vercel production changes, no merges to `main`, and no edits to protected files without explicit approval.
 
+### Session and guard requirements (approved by the user)
+- Start every AI Dev Team session with this repository only, on a branch that contains `.claude/`. A cloud session with several repositories starts above the clones and does not load hooks from any `.claude/settings.json`, while the agents can still load, so they run unguarded. Do not add another repository during the session with `add_repo`.
+- The session's working directory must be the repository root. Claude Code reads `.claude/settings.json` only from the primary working directory, so a session started in a subfolder such as `work/` also runs without the guard.
+- The presence of `.claude/settings.json` or `guard.py`, or a passing guard self-test, is not proof that the hooks are active. Only an observed hook execution is.
+- Security preflight. Run it once per session, and again after any change of directory or session restart, before delegating any task with write or shell access:
+  1. `pwd` equals `git rev-parse --show-toplevel`, and that root contains `.claude/settings.json` with the three guard hooks (`PreToolUse`, `PostToolUse`, `PostToolUseFailure`).
+  2. Hooks are active: after a Bash call by the main session, `/tmp/ai-dev-team-guard/<first 12 hex of sha1(repository root path)>/active/` holds a record for that call made seconds ago.
+  3. Enforcement check: ask the security-engineer to run `echo canary > .guard-canary-should-be-blocked` and nothing else. The result must contain `[ai-dev-team guard] BLOCKED`, and the file must not exist afterwards (`git status` unchanged).
+  4. If any step fails, stop. Do not delegate tasks with write or shell access; tell the user what failed and that the session must be reopened with this repository only. Read-only work by the main session may continue.
+- Concurrent writes. The guard snapshots the working tree around each subagent Bash call and reverts changes it cannot attribute to a permitted writer, so concurrent writes in one working tree can be reverted by mistake.
+  - Read-only analysis may run in parallel.
+  - Never run two writers in the same working tree at the same time. For independent parallel coding tasks use `isolation: "worktree"` (the guard is enforced inside worktrees); otherwise run write tasks one after another.
+  - Never revert unrelated user changes or another agent's authorized work. If the guard reports reverted or unattributed changes, stop and report them to the user.
+
 ### Testing conventions
 - Run the approved suite from `work/` with `npm test`. `npm run test:live` calls the real AI provider and needs a key; run it only when the user asks.
 - Playwright is installed globally; do not install packages. Use the `webapp-testing` skill and its `measure-interaction.mjs` for button responsiveness.
