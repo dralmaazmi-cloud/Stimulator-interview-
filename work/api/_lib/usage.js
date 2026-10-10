@@ -12,6 +12,14 @@ export function recordUsage(event) {
     fallback_used: Boolean(event.fallback_used),
     final_provider_status: event.final_provider_status == null ? null : Number(event.final_provider_status) || null,
     error_code: event.error_code ? String(event.error_code) : null,
+    // تشخيص زمن المزود: مجموع زمن النداءات وقائمة (نموذج، حالة، زمن، نتيجة) لكل نداء. لا نصوص.
+    provider_ms: Number(event.provider_ms) || 0,
+    calls: Array.isArray(event.calls) ? event.calls.slice(0, 6).map(call => ({
+      model: String(call?.model || '').slice(0, 60),
+      status: call?.status == null ? null : Number(call.status) || null,
+      ms: Number(call?.ms) || 0,
+      outcome: String(call?.outcome || '').slice(0, 20)
+    })) : [],
     validation: String(event.validation || 'unknown'),
     success: Boolean(event.success)
   };

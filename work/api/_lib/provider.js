@@ -82,6 +82,44 @@ export function evaluationThinkingLevel() {
   return THINKING_LEVELS.includes(configured) ? configured : DEFAULT_EVALUATION_THINKING_LEVEL;
 }
 
+// سقف رموز المخرجات وتفكير التفريغ: اختياريان عبر البيئة ومعطّلان افتراضيًا (لا تغيير في جسم الطلب).
+// تحذير: لم يُتحقق من قبول generation_config.max_output_tokens في Interactions API من الوثائق الرسمية
+// (تعذّر الوصول إلى ai.google.dev أثناء التدقيق)؛ فعّله في معاينة واختبر قبل الإنتاج.
+function positiveInt(value, min, max) {
+  const number = Math.floor(Number(String(value || '').trim()));
+  return Number.isFinite(number) && number >= min && number <= max ? number : null;
+}
+
+export function evaluationMaxOutputTokens() {
+  return positiveInt(process.env.GEMINI_EVALUATION_MAX_OUTPUT_TOKENS, 512, 65_536);
+}
+
+export function transcriptionMaxOutputTokens() {
+  return positiveInt(process.env.GEMINI_TRANSCRIBE_MAX_OUTPUT_TOKENS, 256, 65_536);
+}
+
+export function transcriptionThinkingLevel() {
+  const configured = String(process.env.GEMINI_TRANSCRIBE_THINKING_LEVEL || '').trim().toLowerCase();
+  return THINKING_LEVELS.includes(configured) ? configured : null;
+}
+
+function generationConfig({ thinkingLevel, maxOutputTokens }) {
+  const config = {
+    ...(thinkingLevel ? { thinking_level: thinkingLevel } : {}),
+    ...(maxOutputTokens ? { max_output_tokens: maxOutputTokens } : {})
+  };
+  return Object.keys(config).length ? { generation_config: config } : {};
+}
+
+// ملخص آمن لنداءات المزود (نماذج وحالات وأزمنة فقط، لا نصوص) للتشخيص في سجل الاستعمال.
+export function callSummary(budget) {
+  const calls = Array.isArray(budget?.callLog) ? budget.callLog : [];
+  return {
+    provider_ms: calls.reduce((sum, call) => sum + (call.ms || 0), 0),
+    calls: calls.map(call => ({ model: call.model, status: call.status, ms: call.ms, outcome: call.outcome }))
+  };
+}
+
 export function createBudget(options = {}) {
   const startedAt = Number.isFinite(options.startedAt) ? options.startedAt : deps.now();
   const totalMs = Number.isFinite(options.totalMs) ? options.totalMs : HANDLER_BUDGET_MS;
@@ -90,6 +128,7 @@ export function createBudget(options = {}) {
     deadline: startedAt + totalMs,
     maxCalls: Number.isFinite(options.maxCalls) ? options.maxCalls : 4,
     calls: 0,
+    callLog: [],
     fallbackUsed: false,
     lastProviderStatus: null,
     remainingMs() { return this.deadline - deps.now(); },
@@ -120,6 +159,8 @@ async function singleCall(body, budget) {
   const key = apiKey();
   if (!key) throw httpError(503, 'Gemini API is not configured.', 'AI_NOT_CONFIGURED');
   budget.calls += 1;
+  const callStartedAt = deps.now();
+  const logCall = (status, outcome) => budget.callLog.push({ model: String(body?.model || '').slice(0, 60), status, ms: Math.max(0, deps.now() - callStartedAt), outcome });
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), budget.callTimeoutMs());
   let response;
@@ -135,10 +176,12 @@ async function singleCall(body, budget) {
     });
   } catch (error) {
     if (error?.name === 'AbortError') {
+      logCall(null, 'timeout');
       const timeoutError = httpError(504, 'انتهت مهلة مزود الذكاء الاصطناعي.', 'AI_TIMEOUT');
       timeoutError.retryable = false;
       throw timeoutError;
     }
+    logCall(null, 'network');
     const connectionError = httpError(502, 'تعذر الاتصال بمزود الذكاء الاصطناعي.', 'AI_CONNECTION_FAILED');
     connectionError.retryable = true;
     throw connectionError;
@@ -148,6 +191,7 @@ async function singleCall(body, budget) {
 
   const payload = await response.json().catch(() => ({}));
   budget.lastProviderStatus = response.status;
+  logCall(response.status, response.ok ? 'ok' : 'error');
   if (!response.ok) {
     // لا نسجل رسالة المزود الخام؛ قد تتضمن تفاصيل لا حاجة لها. الحالة والرمز فقط.
     console.error('[provider]', JSON.stringify({
@@ -269,6 +313,7 @@ export async function complete(prompt, schema, options = {}) {
   const budget = options.budget || createBudget({ maxCalls: MAX_PRIMARY_ATTEMPTS + 1 });
   const primaryModel = modelId(options.model);
   const thinkingLevel = THINKING_LEVELS.includes(options.thinkingLevel) ? options.thinkingLevel : null;
+  const maxOutputTokens = positiveInt(options.maxOutputTokens, 512, 65_536);
   const { payload, model } = await callWithRetry(candidate => ({
     model: candidate,
     input: prompt,
@@ -278,7 +323,7 @@ export async function complete(prompt, schema, options = {}) {
       mime_type: 'application/json',
       schema
     },
-    ...(thinkingLevel ? { generation_config: { thinking_level: thinkingLevel } } : {})
+    ...generationConfig({ thinkingLevel, maxOutputTokens })
   }), {
     budget,
     primaryModel,
@@ -316,7 +361,8 @@ export async function transcribe(audio, mime, options = {}) {
         text: 'فرّغ الكلام العربي حرفيًا فقط. احتفظ باللهجة والكلمات الإنجليزية كما نُطقت. لا تصحح اللغة، لا تلخص، لا تضف ولا تكمل. ضع [غير واضح] لأي مقطع غير مفهوم. أخرج نص التفريغ فقط دون مقدمة أو ملاحظات.'
       },
       { type: 'audio', data: audioBase64, mime_type: providerMime }
-    ]
+    ],
+    ...generationConfig({ thinkingLevel: transcriptionThinkingLevel(), maxOutputTokens: transcriptionMaxOutputTokens() })
   }), { budget, primaryModel: modelId(null, 'transcription'), fallbackModel: fallbackModelId('transcription') });
   return { transcript: outputText(payload), usage: usage(payload), model };
 }

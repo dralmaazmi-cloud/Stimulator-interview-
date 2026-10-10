@@ -4,7 +4,7 @@
 import crypto from 'node:crypto';
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { complete, createBudget } from './_lib/provider.js';
+import { complete, createBudget, callSummary } from './_lib/provider.js';
 import { getQuestionContext } from './_lib/data.js';
 import { exampleSchema } from './_lib/schemas.js';
 import { buildExamplePrompt } from './_lib/prompts.js';
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       duration_ms: Date.now() - started,
       ...usage,
       attempts,
-      provider_call_count: budget.calls,
+      provider_call_count: budget.calls, ...callSummary(budget),
       fallback_used: budget.fallbackUsed,
       final_provider_status: budget.lastProviderStatus,
       validation: result.example.covered ? 'covered' : 'passed',
@@ -95,7 +95,7 @@ export default async function handler(req, res) {
       }
     });
   } catch (error) {
-    recordUsage({ type: 'example', duration_ms: Date.now() - started, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
+    recordUsage({ type: 'example', duration_ms: Date.now() - started, provider_call_count: budget.calls, ...callSummary(budget), fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
     handleApiError(res, error);
   }
 }
