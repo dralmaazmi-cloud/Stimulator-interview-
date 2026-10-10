@@ -4421,6 +4421,16 @@ body[data-page="questions"] .app-main {
   .mini-check-option.wrong { border-color: var(--danger); background: var(--danger-soft); border-style: dashed; border-width: 2px; }
   .mini-check-option.wrong:disabled { color: var(--danger-ink); }
 }
+@layer screens {
+  /* V2 visual QA re-check R1–R3 */
+  .aggregate-metric strong, .structure-coverage-grid bdi { color: var(--brand-text); }
+  .structure-coverage-grid article:last-child:nth-child(even) { grid-column: auto; }
+  @media (max-height: 700px) {
+    .ai-question-card .question-id { display: none; }
+    .ai-question-card h2 { font-size: 1.25rem; line-height: 1.6; }
+  }
+}
+
 @layer themes {
   [data-theme="dark"] .home-photo-hero { box-shadow: none; }
   /* M4: dark contrast */

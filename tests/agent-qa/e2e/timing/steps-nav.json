@@ -1,0 +1,6 @@
+[
+  { "action": "wait", "ms": 1500 },
+  { "name": "bottom-nav tap: preparation", "action": "tap", "selector": ".bottom-nav a[data-nav=\"preparation\"]", "feedback": ".bottom-nav a[data-nav=\"preparation\"][aria-current=\"page\"]" },
+  { "action": "wait", "ms": 800 },
+  { "name": "bottom-nav tap: reports", "action": "tap", "selector": ".bottom-nav a[data-nav=\"reports\"]", "feedback": ".bottom-nav a[data-nav=\"reports\"][aria-current=\"page\"]" }
+]

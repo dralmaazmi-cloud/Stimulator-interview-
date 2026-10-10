@@ -1,0 +1,6 @@
+[
+  { "action": "wait", "ms": 1500 },
+  { "action": "goto", "url": "#/practice/a5?deck=due" },
+  { "action": "wait", "ms": 1500 },
+  { "name": "A5 card flip (reveal)", "action": "tap", "selector": "button:has-text(\"أظهر الإجابة\")", "feedback": ".flashcard-back" }
+]

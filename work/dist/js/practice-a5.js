@@ -2,6 +2,9 @@
 import { button, clear, el } from './ui.js';
 import { FRAMEWORKS, elementPrompts, fill, practiceShell, readStore, shuffle, writeStore } from './practice-core.js';
 
+// يتجنّب الأقواس المتداخلة «…«…»…» عندما يحتوي النص على اقتباس أصلًا.
+const quoted = text => (/[«»]/.test(text) ? text : `«${text}»`);
+
 const DAY = 24 * 60 * 60 * 1000;
 // فواصل المراجعة بالأيام لكل صندوق [تقدير].
 const INTERVAL_DAYS = Object.freeze({ 1: 1, 2: 3, 3: 7 });
@@ -65,7 +68,7 @@ export function buildCards(data) {
   referenceTable(data, '2.4').forEach((row, index) => {
     cards.push({
       key: `mistakes:${index + 1}`, deck: 'mistakes',
-      front: `لماذا يُعدّ «${cellText(row[0])}» خطأً شائعًا في الإجابة؟`,
+      front: `لماذا يُعدّ ${quoted(cellText(row[0]))} خطأً شائعًا في الإجابة؟`,
       back: [cellText(row[0]), cellText(row[1])]
     });
   });

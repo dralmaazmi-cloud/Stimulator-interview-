@@ -256,7 +256,7 @@ export function miniCheck({ storeName, title, questions }) {
         el('span', { class: 'practice-feedback-glyph', 'aria-hidden': 'true', text: passed ? '✓' : 'ⓘ' }),
         el('div', { class: 'practice-feedback-body' },
           el('strong', {}, 'أجبت إجابة صحيحة عن ', el('bdi', { text: String(right) }), ' من ', el('bdi', { text: String(total) }), '.'),
-          p(passed ? 'ممتاز. انتقل إلى الخطوة التالية.' : 'راجع الشرح تحت كل سؤال في الدرس، ثم أعد التحقق متى شئت.'))),
+          p(passed ? 'ممتاز. انتقل إلى الخطوة التالية.' : 'راجع شرح هذه المحطة أعلاه، ثم أعد التحقق متى شئت.'))),
       el('div', { class: 'practice-actions' }, button('أعد التحقق', { variant: 'secondary', onClick: () => { answers = []; drawQuestion(0); } })),
       el('p', { class: 'practice-disclaimer', text: 'تمرين للتعلّم، وليس تقييمًا.' })
     );

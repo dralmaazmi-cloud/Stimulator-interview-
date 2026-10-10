@@ -1,0 +1,6 @@
+[
+  { "action": "wait", "ms": 1500 },
+  { "action": "goto", "url": "#/settings" },
+  { "action": "wait", "ms": 1200 },
+  { "name": "accordion open (settings-data)", "action": "tap", "selector": "#settings-data > summary", "feedback": "#settings-data[open] .settings-item-body" }
+]
