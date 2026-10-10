@@ -12,6 +12,7 @@ import { renderSavedQuestions } from './bookmarks.js';
 import { cleanupSimulation, renderSimulation } from './simulation.js';
 import { renderSavedSession, renderSessions } from './sessions.js';
 import { renderCoverageMap } from './coverage.js';
+import { renderPractice } from './practice.js';
 import { el, clear, notice } from './ui.js';
 import { purgeExpiredRecordings } from './storage.js';
 
@@ -43,6 +44,7 @@ async function route({ restoreScroll = false } = {}) {
   root.setAttribute('aria-busy', 'true');
   try {
     if (page === 'home') await renderHome(root, data);
+    else if (page === 'preparation' && parts[1] === 'review') await renderPractice(root, data, 'a5', params);
     else if (page === 'preparation' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'preparation') await renderLearnIndex(root, data);
     else if (page === 'reports' && parts[1]) await renderSavedSession(root, parts[1]);
@@ -54,7 +56,8 @@ async function route({ restoreScroll = false } = {}) {
     else if (page === 'question' && parts[1]) await renderQuestionFocus(root, data, decodeURIComponent(parts[1]), params);
     else if (page === 'learn' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'learn') await renderLearnIndex(root, data);
-    else if (page === 'bank' || page === 'practice') await renderCompetenciesIndex(root, data);
+    else if (page === 'practice') await renderPractice(root, data, parts[1], params);
+    else if (page === 'bank') await renderCompetenciesIndex(root, data);
     else if (page === 'quick-review') renderQuickReview(root);
     else if (page === 'answer-guide') renderAnswerGuide(root);
     else if (page === 'self-intro') await renderSelfIntroPage(root);
@@ -106,7 +109,7 @@ function updateChrome(page) {
   delete backButton.dataset.returnHash;
   const titles = {
     preparation: 'التحضير للمقابلة', learn: 'التحضير للمقابلة', competencies: 'الكفاءات الثمانية',
-    questions: 'الأسئلة', question: 'سؤال تدريبي', bank: 'الكفاءات الثمانية', practice: 'التدريب', simulation: 'المحاكاة', reports: 'التقارير',
+    questions: 'الأسئلة', question: 'سؤال تدريبي', bank: 'الكفاءات الثمانية', practice: 'تمارين التعلّم', simulation: 'المحاكاة', reports: 'التقارير',
     sessions: 'التقارير', coverage: 'خريطة التغطية', settings: 'المزيد', search: 'البحث', tools: 'الأدوات',
     'quick-review': 'المراجعة السريعة', 'answer-guide': 'بناء الإجابة', 'self-intro': 'إعداد التعريف الشخصي'
   };

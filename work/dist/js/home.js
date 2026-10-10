@@ -1,5 +1,6 @@
 import { completedLessons, getAll } from './storage.js';
 import { clear, el, icon } from './ui.js';
+import { reviewStatus } from './practice-a5.js';
 
 function sessionAverage(session) {
   const responses = [session.intro_response, ...(session.responses || [])]
@@ -37,6 +38,7 @@ export async function renderHome(root, data) {
     .filter(item => item.status === 'completed')
     .sort((a, b) => String(b.completed_at || '').localeCompare(String(a.completed_at || '')));
   const latestAverage = sessions.length ? sessionAverage(sessions[0]) : null;
+  const review = reviewStatus(data);
 
   root.append(el('section', { class: 'home-dashboard' },
     el('section', { class: 'home-photo-hero', 'aria-label': 'مدرّب المقابلات القيادية' },
@@ -63,6 +65,9 @@ export async function renderHome(root, data) {
       el('div', { class: 'home-path-copy' },
         el('h2', { text: 'مسارك التدريبي' }),
         el('small', { class: 'path-caption', text: done ? `${done} من ${data.lessons.length} دروس` : 'ابدأ من درس التحضير' }),
+        review.started && review.due > 0
+          ? el('a', { class: 'path-due', href: '#/practice/a5?deck=due', text: `لديك ${review.due} بطاقة للمراجعة اليوم.` })
+          : null,
         el('div', { class: 'path-nodes' },
           pathNode('book', 'المعرفة', done >= 1),
           pathNode('competencies', 'المهارات', done >= 3),

@@ -5,7 +5,7 @@ import {
 } from './ui.js';
 import { acquireWakeLock, releaseWakeLock } from './wake-lock.js';
 
-const WORDS_PER_MINUTE = 115;
+export const WORDS_PER_MINUTE = 115;
 
 const PHRASES = Object.freeze({
   opening: [
@@ -228,6 +228,7 @@ export async function renderSelfIntroPage(root) {
   root.append(
     pageHead('مسودة محلية + تحسين اختياري', 'إعداد التعريف الشخصي', 'أنشئ مقدمة واضحة ومهنية، ثم تدرّب على تقديمها بثقة.'),
     notice('المسار الأفضل: من أنت، ثم خبرتك وقيمتك للدور، ثم طموحك المهني.', '', '✦'),
+    el('a', { class: 'practice-link no-print', href: '#/practice/a4', text: 'خطّط لوقت تعريفك قبل أن تكتب' }),
     privacyReminder('إذا اخترت التحسين بالذكاء الاصطناعي، استخدم تعريفًا مهنيًا عامًا بدل الأسماء أو الجهات، واحتفظ بخبرتك وإنجازاتك غير الحساسة.')
   );
 

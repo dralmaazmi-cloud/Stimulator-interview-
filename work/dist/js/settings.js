@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { clearAll, exportBackup, importBackup } from './storage.js';
+import { BACKUP_MAX_BYTES, clearAll, exportBackup, importBackup } from './storage.js';
 import {
   bindExclusiveAccordions, button, clear, downloadJson, el, icon, notice, toast
 } from './ui.js';
@@ -21,7 +21,7 @@ export function renderSettings(root, data) {
 
   const accordion = el('section', { class: 'settings-accordion smart-accordion' });
   accordion.append(
-    settingsItem('settings-appearance', 'palette', 'المظهر والقراءة', 'الألوان، الخلفية، الخط والحركة', appearancePanel(), true),
+    settingsItem('settings-appearance', 'palette', 'المظهر والقراءة', 'الألوان، الخلفية، الخط والحركة', appearancePanel()),
     settingsItem('settings-simulation', 'microphone', 'الصوت والمحاكاة', 'اختبار الميكروفون وأسئلة المتابعة', simulationPanel()),
     settingsItem('settings-data', 'database', 'البيانات والنسخة الاحتياطية', 'تصدير بياناتك أو استعادتها', backupPanel()),
     settingsItem('settings-privacy', 'privacy', 'الخصوصية والتحكم', 'كيف تُستخدم بياناتك وخيار الحذف', privacyPanel()),
@@ -123,25 +123,44 @@ function simulationPanel() {
 }
 
 function backupPanel() {
-  const file = el('input', { class: 'sr-only', type: 'file', accept: 'application/json,.json' });
+  const file = el('input', { class: 'sr-only', type: 'file', accept: 'application/json,.json', 'aria-label': 'ملف النسخة الاحتياطية' });
+  const includeAnswers = el('input', { type: 'checkbox', checked: true, id: 'backup-include-answers' });
+  const answersNote = el('div', { class: 'backup-answers-note', role: 'status' });
+  const refreshNote = () => answersNote.replaceChildren(includeAnswers.checked
+    ? notice('يحتوي الملف على إجاباتك الشخصية وأسئلة المتابعة وتقاريرك. احفظه في مكان آمن ولا تشاركه مع أحد.', 'warning', '!')
+    : notice('لن يتضمن الملف نصوص إجاباتك ولا أسئلة المتابعة ولا اقتباسات التقارير، وتبقى الدرجات والتقدم.', '', 'ⓘ'));
+  includeAnswers.addEventListener('change', refreshNote);
+  refreshNote();
   const exportButton = button('تصدير البيانات', {
     onClick: async () => {
-      const backup = await exportBackup({ app_version: CONFIG.appVersion, reference_sha256: CONFIG.referenceSha256 });
-      downloadJson(`interview-coach-backup-${new Date().toISOString().slice(0, 10)}.json`, backup);
+      try {
+        const backup = await exportBackup(
+          { app_version: CONFIG.appVersion, reference_sha256: CONFIG.referenceSha256 },
+          { includeAnswers: includeAnswers.checked }
+        );
+        downloadJson(`interview-coach-backup-${new Date().toISOString().slice(0, 10)}.json`, backup);
+        toast('تم تجهيز ملف النسخة الاحتياطية.');
+      } catch (error) { toast(error.message || 'تعذر تصدير البيانات.', 5000, 'error'); }
     }
   });
   const importButton = button('استيراد نسخة', { variant: 'secondary', onClick: () => file.click() });
   file.addEventListener('change', async () => {
     try {
       if (!file.files?.[0]) return;
+      if (file.files[0].size > BACKUP_MAX_BYTES) throw new Error('حجم ملف النسخة الاحتياطية أكبر من الحد المسموح (5 ميغابايت). لم تتغير بياناتك.');
       const text = await file.files[0].text();
-      await importBackup(JSON.parse(text));
+      let parsed;
+      try { parsed = JSON.parse(text); } catch { throw new Error('ملف النسخة الاحتياطية غير صالح أو غير مدعوم. لم تتغير بياناتك.'); }
+      await importBackup(parsed);
       toast('اكتمل استيراد البيانات بنجاح.');
-    } catch (error) { toast(error.message || 'تعذر استيراد الملف.'); }
+    } catch (error) { toast(error.message || 'تعذر استيراد الملف.', 6000, 'error'); }
     file.value = '';
   });
   return el('div', { class: 'settings-panel' },
-    el('p', { text: 'تتضمن النسخة تقدم التحضير، والأسئلة المحفوظة، والجلسات، والتقارير وقوائم الجاهزية، وسجل المحاولات وتدوير الأسئلة. التسجيلات الصوتية ونصوص الإجابات في سجل المحاولات لا تدخل في التصدير.' }),
+    el('p', { text: 'تتضمن النسخة تقدم التحضير، والأسئلة المحفوظة، وتمارين التعلّم، والجلسات والتقارير وقوائم الجاهزية، وسجل المحاولات وتدوير الأسئلة. يمكنك اختيار تضمين نصوص إجاباتك وأسئلة المتابعة أو استبعادها. التسجيلات الصوتية لا تدخل في التصدير.' }),
+    el('label', { class: 'toggle-row' }, includeAnswers,
+      el('span', {}, el('strong', { text: 'تضمين نصوص إجاباتك' }), el('small', { text: 'الإجابات المكتوبة أو المفرّغة، وأسئلة المتابعة، واقتباسات التقارير' }))),
+    answersNote,
     el('div', { class: 'document-actions' }, exportButton, importButton, file)
   );
 }
@@ -188,9 +207,16 @@ function preferenceGroup(label, key, options, selected) {
   const group = el('div', { class: 'preference-row' }, el('strong', { text: label }));
   const choices = el('div', { class: 'segmented', role: 'group', 'aria-label': label });
   options.forEach(([value, text]) => {
-    const choice = el('button', { type: 'button', class: value === selected ? 'active' : '', text });
+    const choice = el('button', {
+      type: 'button', class: value === selected ? 'active' : '', text,
+      'aria-pressed': String(value === selected),
+      'data-swatch': key === 'theme' || key === 'accent' ? value : null
+    });
     choice.addEventListener('click', () => {
-      [...choices.children].forEach(item => item.classList.toggle('active', item === choice));
+      [...choices.children].forEach(item => {
+        item.classList.toggle('active', item === choice);
+        item.setAttribute('aria-pressed', String(item === choice));
+      });
       localStorage.setItem(preferenceStorageKey(key), value);
       window.dispatchEvent(new CustomEvent('lic:preferences', { detail: { [key]: value } }));
     });

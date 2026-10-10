@@ -6,13 +6,14 @@ export function renderQuickReview(root) {
   const cards = el('div', { class: 'quick-review-list' },
     reviewCard('★', 'القاعدة الذهبية', 'قدّم أمثلة واقعية من خبرتك، لا أفكارًا نظرية فقط.', 'gold'),
     reviewCard('▤', 'قبل الإجابة', 'افهم السؤال، وحدّد الكفاءة، وخذ لحظة لترتيب الفكرة.', 'blue'),
-    reviewCard('⚙', 'أثناء الإجابة', 'استخدم STAR-L للسؤال السلوكي وSEAL للسيناريو، وركّز على دورك وإجراءك.', 'purple'),
+    reviewCard('⚙', 'أثناء الإجابة', 'استخدم STAR-L للسؤال السلوكي وSEAL للسيناريو، وركّز على دورك وإجراءك. الإجراء هو الجزء الأكبر.', 'purple'),
     reviewCard('▥', 'تذكّر دائمًا', 'أنا فعلت — النتيجة — ما تعلّمت.', 'cyan')
   );
   root.append(cards,
     notice('هذه الصفحة أداة تذكّر سريعة. التفاصيل الكاملة موجودة في دروس المرجع.', '', 'ⓘ'),
     el('div', { class: 'button-row' },
       button('بناء الإجابة', { href: '#/answer-guide' }),
+      button('بطاقات المراجعة', { href: '#/practice/a5', variant: 'secondary' }),
       button('استعراض الكفاءات وأسئلتها', { href: '#/competencies', variant: 'secondary' })
     )
   );
