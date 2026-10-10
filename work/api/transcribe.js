@@ -1,6 +1,6 @@
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readBuffer, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { createBudget, transcribe } from './_lib/provider.js';
+import { createBudget, transcribe, callSummary } from './_lib/provider.js';
 import { recordUsage } from './_lib/usage.js';
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024;
@@ -59,14 +59,14 @@ export default async function handler(req, res) {
     const result = await transcribe(audio, mime, { budget });
     const transcript = String(result.transcript || '').trim();
     if (!transcript) throw httpError(502, 'تعذر استخراج نص من التسجيل.', 'AI_EMPTY_TRANSCRIPT');
-    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, ...result.usage, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: budget.lastProviderStatus, validation: 'passed', success: true });
+    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, ...result.usage, provider_call_count: budget.calls, ...callSummary(budget), fallback_used: budget.fallbackUsed, final_provider_status: budget.lastProviderStatus, validation: 'passed', success: true });
     sendJson(res, 200, {
       transcript,
       duration_seconds: duration || null,
       word_count: transcript.split(/\s+/).filter(Boolean).length
     });
   } catch (error) {
-    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
+    recordUsage({ type: 'transcribe', duration_ms: Date.now() - started, provider_call_count: budget.calls, ...callSummary(budget), fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
     handleApiError(res, error);
   } finally {
     if (Buffer.isBuffer(audio)) audio.fill(0);

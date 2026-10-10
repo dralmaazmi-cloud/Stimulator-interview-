@@ -1,6 +1,7 @@
-import { el, clear, normalizeArabic, pageHead, tag } from './ui.js';
+import { el, clear, normalizeArabic, pageHead, tag, notice } from './ui.js';
+import { loadSearchIndex } from './data.js';
 
-export function renderSearch(root, data, params = new URLSearchParams()) {
+export async function renderSearch(root, data, params = new URLSearchParams()) {
   clear(root);
   root.append(pageHead('بحث شامل', 'ابحث في المرجع والأسئلة', 'ابحث بكلمة أو عبارة داخل الشروحات والكفاءات والأسئلة.'));
   const input = el('input', { class: 'input', type: 'search', value: params.get('q') || '', placeholder: 'مثال: تحمل المسؤولية، النتيجة، التفويض…', autofocus: true });
@@ -8,9 +9,22 @@ export function renderSearch(root, data, params = new URLSearchParams()) {
   const results = el('div', { class: 'question-list' });
   root.append(el('section', { class: 'card toolbar-card' }, el('label', { class: 'field' }, el('span', { text: 'عبارة البحث' }), input)), summary, results);
 
+  // الفهرس (≈260KB) لا يُحمَّل عند الإقلاع بل عند فتح صفحة البحث فقط.
+  let searchIndex = null;
+  let loadFailed = false;
+
   const draw = () => {
     const query = normalizeArabic(input.value);
     results.replaceChildren();
+    if (loadFailed) {
+      summary.textContent = '';
+      results.append(notice('تعذر تحميل فهرس البحث. تحقق من الاتصال ثم أعد فتح الصفحة.', 'danger'));
+      return;
+    }
+    if (!searchIndex) {
+      summary.textContent = 'جارٍ تحميل فهرس البحث…';
+      return;
+    }
     if (query.length < 2) {
       summary.textContent = 'اكتب حرفين على الأقل.';
       results.append(el('div', { class: 'card empty-state' }, el('strong', { text: 'ابدأ بكلمة من الموضوع الذي تراجعه' }), el('p', { text: 'سيظهر لك مكانها في الدروس والأسئلة والكفاءات.' })));
@@ -18,7 +32,7 @@ export function renderSearch(root, data, params = new URLSearchParams()) {
     }
     const words = query.split(/\s+/).filter(Boolean);
     const primaryIds = new Set(data.curation.primary_ids);
-    const matches = data.searchIndex
+    const matches = searchIndex
       .filter(item => item.kind !== 'question' || primaryIds.has(item.id))
       .map(item => {
         const haystack = normalizeArabic(`${item.title} ${item.text} ${(item.tags || []).join(' ')}`);
@@ -43,6 +57,13 @@ export function renderSearch(root, data, params = new URLSearchParams()) {
     history.replaceState(null, '', `#/search?q=${encodeURIComponent(input.value)}`);
     draw();
   });
+  draw();
+  try {
+    searchIndex = await loadSearchIndex();
+  } catch (error) {
+    console.error(error);
+    loadFailed = true;
+  }
   draw();
 }
 

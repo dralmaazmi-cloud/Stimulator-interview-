@@ -1,5 +1,5 @@
 import { getBookmarkedIds, isBookmarked, toggleBookmark } from './bookmarks.js';
-import { bookActions } from './print-book.js';
+import { bookActions } from './print-actions.js';
 import {
   button, clear, el, formatModel, formatType, icon, normalizeArabic, notice, toast
 } from './ui.js';
@@ -241,11 +241,13 @@ function renderQuestionDeck(root, data, params) {
 
     const bookmark = el('button', {
       type: 'button', class: `question-deck-bookmark ${isBookmarked(question.id) ? 'active' : ''}`,
-      'aria-label': isBookmarked(question.id) ? 'إزالة السؤال من المحفوظة' : 'حفظ السؤال'
+      'aria-label': isBookmarked(question.id) ? 'إزالة السؤال من المحفوظة' : 'حفظ السؤال',
+      'aria-pressed': String(isBookmarked(question.id))
     }, icon('bookmark'));
     bookmark.addEventListener('click', () => {
       const active = toggleBookmark(question.id);
       bookmark.classList.toggle('active', active);
+      bookmark.setAttribute('aria-pressed', String(active));
       bookmark.setAttribute('aria-label', active ? 'إزالة السؤال من المحفوظة' : 'حفظ السؤال');
       toast(active ? 'تم حفظ السؤال.' : 'تمت إزالة السؤال من المحفوظة.');
       if (scope === 'saved' && !active) {
@@ -270,7 +272,7 @@ function renderQuestionDeck(root, data, params) {
       el('header', { class: 'question-deck-card-head' },
         bookmark,
         el('div', { class: 'question-deck-position' },
-          el('span', { text: `السؤال ${state.index + 1} من ${list.length}` }),
+          el('span', {}, 'السؤال ', el('bdi', { text: String(state.index + 1) }), ' من ', el('bdi', { text: String(list.length) })),
           el('i', {}, el('b', { style: { width: `${((state.index + 1) / list.length) * 100}%` } }))
         ),
         el('span', { class: 'question-deck-model', text: formatModel(question.rubric_mode) })

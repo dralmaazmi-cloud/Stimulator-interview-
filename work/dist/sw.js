@@ -1,12 +1,13 @@
 'use strict';
 
-const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.2-51d413de';
+const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.2-51d413de-v2g';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/styles.css',
   './js/app.js',
+  './js/boot.js',
   './js/config.js',
   './js/ui.js',
   './js/data.js',
@@ -25,6 +26,8 @@ const APP_SHELL = [
   './js/quick-review.js',
   './js/guidance.js',
   './js/print-book.js',
+  './js/print-actions.js',
+  './js/lazy-load.js',
   './js/self-intro.js',
   './js/search.js',
   './js/settings.js',
@@ -35,6 +38,14 @@ const APP_SHELL = [
   './js/rotation.js',
   './js/session-plan.js',
   './js/coverage.js',
+  './js/practice.js',
+  './js/practice-core.js',
+  './js/practice-a1.js',
+  './js/practice-a2.js',
+  './js/practice-a3.js',
+  './js/practice-a4.js',
+  './js/practice-a5.js',
+  './js/practice-selfcheck.js',
   './data/reference.json',
   './data/expanded-model-answers.json',
   './data/derived/questions.json',
@@ -77,8 +88,11 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(request)
         .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE).then(cache => cache.put('./index.html', copy));
+          // لا نستبدل الصفحة المخزّنة بصفحة خطأ.
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE).then(cache => cache.put('./index.html', copy));
+          }
           return response;
         })
         .catch(() => caches.match('./index.html'))

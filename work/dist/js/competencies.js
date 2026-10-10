@@ -1,7 +1,8 @@
 import { isBookmarked, toggleBookmark } from './bookmarks.js';
 import { questionSamples } from './data.js';
 import { buildAnswerGuidance } from './guidance.js';
-import { bookActions } from './print-book.js';
+import { bookActions } from './print-actions.js';
+import { renderSelfCheck } from './practice-selfcheck.js';
 import {
   bindExclusiveAccordions, button, clear, el, formatModel, formatType, icon, notice, tag, toast, trainingDisclaimer
 } from './ui.js';
@@ -137,13 +138,14 @@ function accordionItem(id, iconName, title, body, tone = 'mint', open = false) {
 
 function meaningPanel(competency) {
   const accordion = el('div', { class: 'competency-explainer' },
-    accordionItem('competency-meaning', 'book', 'المعنى الأساسي',
+    accordionItem('competency-meaning', 'book', 'تعريف الكفاءة',
       el('div', { class: 'step-reading' },
-        el('p', { text: competency.definition }),
-        competency.definition_v1_2025 && competency.definition_v1_2025 !== competency.definition
-          ? el('aside', { class: 'definition-note' }, el('strong', { text: 'بصياغة أبسط' }), el('p', { text: competency.definition_v1_2025 }))
-          : null
+        el('p', { text: competency.definition_v1_2025 || competency.definition })
       ), 'mint', true),
+    competency.definition_v1_2025 && competency.definition_v1_2025 !== competency.definition
+      ? accordionItem('competency-formal', 'competencies', 'صياغة أخرى في الدليل',
+        el('div', { class: 'step-reading' }, el('p', { text: competency.definition })), 'blue')
+      : null,
     accordionItem('competency-measures', 'target', 'ما الذي يبحث عنه المقابل؟',
       el('div', { class: 'measure-reading-list' }, ...competency.what_interviewer_measures.map((text, index) =>
         el('article', {}, el('span', { text: String(index + 1) }), el('p', { text }))
@@ -153,7 +155,7 @@ function meaningPanel(competency) {
     el('header', { class: 'panel-reading-head' },
       el('small', { text: 'ابدأ من هنا' }),
       el('h2', { text: 'فهم الكفاءة وما الذي تقيسه' }),
-      el('p', { text: 'اقرأ المعنى أولًا، ثم افتح ما يبحث عنه المقابل. يظهر بند واحد فقط في كل مرة.' })
+      el('p', { text: 'اقرأ المعنى أولًا، ثم افتح ما يبحث عنه المقابِل. يظهر بند واحد في كل مرة.' })
     ),
     bindExclusiveAccordions(accordion, `competency-understand-${competency.id}`)
   );
@@ -168,9 +170,9 @@ function showPanel(competency) {
         bulletList(competency.negative_behaviours.map(item => item.text), 'negative-list'), 'rose')
       : accordionItem('competency-practical', 'problem', 'حوّلها إلى قصة واضحة',
         el('ol', { class: 'practical-steps' },
-          el('li', { text: 'اختر موقفًا حقيقيًا واحدًا يثبت الكفاءة.' }),
-          el('li', { text: 'وضّح دورك الشخصي وما فعلته أنت تحديدًا.' }),
-          el('li', { text: 'اختم بالأثر أو النتيجة وما تعلّمته.' })
+          el('li', { text: 'في مقابلتك: اختر موقفًا حقيقيًا واحدًا يثبت الكفاءة.' }),
+          el('li', { text: 'في مقابلتك: وضّح دورك الشخصي وما فعلته أنت تحديدًا.' }),
+          el('li', { text: 'في مقابلتك: اختم بالأثر أو النتيجة وما تعلّمته.' })
         ), 'rose')
   );
   return el('section', { class: 'competency-tab-panel', 'data-panel': 'show', hidden: true },
@@ -179,7 +181,8 @@ function showPanel(competency) {
       el('h2', { text: 'كيف تُظهرها في المقابلة؟' }),
       el('p', { text: 'ركّز على السلوك الذي قمت به، لا على وصف نفسك بصفات عامة.' })
     ),
-    bindExclusiveAccordions(items, `competency-show-${competency.id}`)
+    bindExclusiveAccordions(items, `competency-show-${competency.id}`),
+    el('a', { class: 'practice-link', href: `#/practice/a5?only=${encodeURIComponent(`comp:${competency.id}`)}` }, 'راجع بطاقات هذه الكفاءة')
   );
 }
 
@@ -242,10 +245,11 @@ export async function renderCompetencyDetail(root, data, competencyId, params = 
   const progress = questions.length ? Math.round(trainedCount / questions.length * 100) : 0;
   const bookmarked = localStorage.getItem(`lic:competency-bookmark:${competency.id}`) === 'yes';
   const bookmark = el('button', {
-    class: `competency-bookmark ${bookmarked ? 'active' : ''}`, type: 'button', 'aria-label': 'حفظ الكفاءة'
+    class: `competency-bookmark ${bookmarked ? 'active' : ''}`, type: 'button', 'aria-label': 'حفظ الكفاءة', 'aria-pressed': String(bookmarked)
   }, icon('bookmark'));
   bookmark.addEventListener('click', () => {
     const active = bookmark.classList.toggle('active');
+    bookmark.setAttribute('aria-pressed', String(active));
     localStorage.setItem(`lic:competency-bookmark:${competency.id}`, active ? 'yes' : 'no');
     toast(active ? 'تم حفظ الكفاءة.' : 'تمت إزالة الكفاءة من المحفوظات.');
   });
@@ -321,11 +325,12 @@ export async function renderQuestionFocus(root, data, questionId, params = new U
 
   const bookmark = el('button', {
     class: `question-focus-bookmark ${isBookmarked(question.id) ? 'active' : ''}`,
-    type: 'button', 'aria-label': 'حفظ السؤال'
+    type: 'button', 'aria-label': 'حفظ السؤال', 'aria-pressed': String(isBookmarked(question.id))
   }, icon('bookmark'));
   bookmark.addEventListener('click', () => {
     const active = toggleBookmark(question.id);
     bookmark.classList.toggle('active', active);
+    bookmark.setAttribute('aria-pressed', String(active));
     toast(active ? 'تم حفظ السؤال.' : 'تمت إزالة السؤال من المحفوظات.');
   });
 
@@ -396,7 +401,8 @@ export async function renderQuestionFocus(root, data, questionId, params = new U
       el('div', { class: 'focus-answer-samples' },
         ...samples.map(sample => renderSample(sample, question.rubric_mode))
       ),
-      trainingDisclaimer('answer')
+      trainingDisclaimer('answer'),
+      renderSelfCheck(question)
     );
     else panel.append(notice('الإجابة النموذجية غير متاحة.', 'warning'));
     return panel;

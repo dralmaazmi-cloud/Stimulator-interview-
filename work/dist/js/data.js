@@ -4,14 +4,20 @@ const FILES = Object.freeze({
   competencies: 'data/derived/competencies.json',
   missionMap: 'data/derived/mission-map.json',
   lessons: 'data/derived/lessons.json',
-  searchIndex: 'data/derived/search-index.json',
-  variants: 'data/derived/variants.json',
   curation: 'data/derived/curation.json',
-  questionAudit: 'data/derived/question-audit.json',
   manifest: 'data/derived/manifest.json'
 });
 
+// Files that are not needed to render the first screen. They are fetched on demand
+// (and stay in the service-worker APP_SHELL, so they also work offline).
+// variants.json is not read by any module; it is deliberately not loaded at startup.
+const LAZY_FILES = Object.freeze({
+  searchIndex: 'data/derived/search-index.json',
+  questionAudit: 'data/derived/question-audit.json'
+});
+
 let cache = null;
+const lazyPromises = new Map();
 
 async function fetchJson(url) {
   const response = await fetch(url, { cache: 'no-cache' });
@@ -35,6 +41,26 @@ export async function loadData() {
   cache.competencyById = new Map(cache.competencies.map(competency => [competency.id, competency]));
   cache.lessonById = new Map(cache.lessons.map(lesson => [lesson.id, lesson]));
   return cache;
+}
+
+async function loadLazy(key) {
+  const data = await loadData();
+  if (data[key]) return data[key];
+  if (!lazyPromises.has(key)) {
+    const promise = fetchJson(LAZY_FILES[key])
+      .then(value => { data[key] = value; return value; })
+      .catch(error => { lazyPromises.delete(key); throw error; });
+    lazyPromises.set(key, promise);
+  }
+  return lazyPromises.get(key);
+}
+
+export function loadSearchIndex() {
+  return loadLazy('searchIndex');
+}
+
+export function loadQuestionAudit() {
+  return loadLazy('questionAudit');
 }
 
 export function getCachedData() {

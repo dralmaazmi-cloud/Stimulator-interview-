@@ -1,0 +1,8 @@
+[
+  { "action": "wait", "ms": 1500 },
+  { "action": "goto", "url": "#/simulation" },
+  { "action": "wait", "ms": 1500 },
+  { "name": "simulation mode select (2nd card, realistic)", "action": "tap", "selector": ".simulation-mode-card >> nth=1", "feedback": ".simulation-mode-card:nth-child(2).selected" },
+  { "action": "wait", "ms": 400 },
+  { "name": "answer-method toggle (voice)", "action": "tap", "selector": ".simulation-answer-switch button >> nth=1", "feedback": ".simulation-answer-switch button:nth-child(2).active" }
+]

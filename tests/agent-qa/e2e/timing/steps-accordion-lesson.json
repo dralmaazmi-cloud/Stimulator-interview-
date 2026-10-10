@@ -1,0 +1,6 @@
+[
+  { "action": "wait", "ms": 1500 },
+  { "action": "goto", "url": "#/preparation/U1" },
+  { "action": "wait", "ms": 1500 },
+  { "name": "lesson accordion open (U1, 2nd item)", "action": "tap", "selector": ".smart-accordion-item >> nth=1 >> summary", "feedback": ".smart-accordion-item:nth-child(2)[open] .smart-accordion-body" }
+]

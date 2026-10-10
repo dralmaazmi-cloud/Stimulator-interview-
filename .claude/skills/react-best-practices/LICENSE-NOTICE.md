@@ -1,0 +1,34 @@
+# License notice
+
+The files in `upstream/` come from https://github.com/vercel-labs/agent-skills at commit
+063bee94c3f4df8453406c830b0a7df0f2860278 (`skills/react-best-practices/SKILL.md` and `rules/*.md`).
+The skill's frontmatter states `license: MIT`, and the repository README states MIT. The repository contains
+no LICENSE file at that commit, so the standard MIT terms are reproduced below. The author named in the
+files is Vercel (Vercel Engineering).
+
+The upstream files are unmodified. Not included: `AGENTS.md` (a compiled copy of the rules), `README.md`,
+`metadata.json`, `rules/_template.md` and `rules/_sections.md`. `SKILL.md` is original to ai-dev-team.
+
+```
+MIT License
+
+Copyright (c) Vercel
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

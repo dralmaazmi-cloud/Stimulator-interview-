@@ -45,7 +45,7 @@ export async function renderSessions(root) {
     .sort((a, b) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || '')));
   root.append(
     pageHead('محفوظ محليًا', 'سجل الجلسات', 'تقاريرك السابقة موجودة على هذا الجهاز فقط.'),
-    notice('لا تُخزن التسجيلات الصوتية. يمكنك طباعة أي تقرير أو حفظه PDF من شاشة التقرير.', '', '▣'),
+    notice('لا تُخزن التسجيلات الصوتية. يمكنك طباعة أي تقرير أو حفظه PDF من شاشة التقرير.', '', 'ⓘ'),
     // alpha-5 (D3): رابط خريطة التغطية من «التقارير».
     el('a', { class: 'card coverage-link-card', href: '#/coverage' },
       el('div', {}, el('strong', { text: 'خريطة التغطية' }), el('small', { text: 'ما جرّبته من الكفاءات والمبادئ وما لم تجرّبه بعد.' })),
@@ -87,7 +87,7 @@ export async function renderSessions(root) {
     ),
     el('section', { class: 'session-history-list section-block' }, ...sessions.map(session => {
       const average = averageOf(session);
-      return el('a', { class: 'card session-history-card', href: `#/sessions/${session.id}` },
+      return el('a', { class: 'card session-history-card', href: `#/sessions/${encodeURIComponent(session.id)}` },
         el('div', { class: 'session-history-head' },
           tag(MODE_LABELS[session.mode] || 'محاكاة', 'accent'),
           tag(session.answer_mode === 'voice' ? 'صوتي' : 'نصي'),
@@ -105,9 +105,14 @@ export async function renderSessions(root) {
   );
 }
 
+// معرّف الجلسة يُرمَّز في الرابط (encodeURIComponent)؛ المسار لا يفكّه، لذا يُفكّ هنا.
+function decodeSessionId(id) {
+  try { return decodeURIComponent(id); } catch { return id; }
+}
+
 export async function renderSavedSession(root, id) {
   clear(root);
-  const session = await get('sessions', id);
+  const session = await get('sessions', decodeSessionId(id));
   if (!session || session.status !== 'completed') {
     root.append(notice('تعذر العثور على هذا التقرير على جهازك.', 'danger'));
     return;

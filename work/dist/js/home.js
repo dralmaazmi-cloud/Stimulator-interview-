@@ -1,5 +1,6 @@
 import { completedLessons, getAll } from './storage.js';
 import { clear, el, icon } from './ui.js';
+import { reviewStatus } from './practice-a5.js';
 
 function sessionAverage(session) {
   const responses = [session.intro_response, ...(session.responses || [])]
@@ -37,11 +38,14 @@ export async function renderHome(root, data) {
     .filter(item => item.status === 'completed')
     .sort((a, b) => String(b.completed_at || '').localeCompare(String(a.completed_at || '')));
   const latestAverage = sessions.length ? sessionAverage(sessions[0]) : null;
+  const review = reviewStatus(data);
 
   root.append(el('section', { class: 'home-dashboard' },
     el('section', { class: 'home-photo-hero', 'aria-label': 'مدرّب المقابلات القيادية' },
       el('img', {
         src: 'assets/images/abu-dhabi-sea-hero.jpg',
+        decoding: 'async',
+        fetchpriority: 'high',
         alt: 'أفق مدينة أبوظبي كما يبدو من البحر'
       }),
       el('div', { class: 'home-photo-overlay' },
@@ -51,7 +55,7 @@ export async function renderHome(root, data) {
     ),
 
     el('section', { class: 'home-start-section', 'aria-labelledby': 'home-start-title' },
-      el('h2', { id: 'home-start-title', text: 'ابدأ من هنا' }),
+      el('h2', { id: 'home-start-title', class: 'sr-only', text: 'ابدأ من هنا' }),
       el('div', { class: 'home-start-grid' },
         startCard('simulation', 'ابدأ المحاكاة', 'اختبر نفسك في مقابلة قيادية واقعية', '#/simulation', 'microphone'),
         startCard('preparation', 'التحضير للمقابلة', 'تعلّم، راجع، ثم ادخل المحاكاة بثقة', '#/preparation', 'book'),
@@ -62,6 +66,10 @@ export async function renderHome(root, data) {
     el('section', { class: 'home-path-card card', 'aria-label': `اكتمل ${percent}% من مسار التحضير` },
       el('div', { class: 'home-path-copy' },
         el('h2', { text: 'مسارك التدريبي' }),
+        el('small', { class: 'path-caption', text: done ? `${done} من ${data.lessons.length} دروس` : 'ابدأ من درس التحضير' }),
+        review.started && review.due > 0
+          ? el('a', { class: 'path-due', href: '#/practice/a5?deck=due', text: `لديك ${review.due} بطاقة للمراجعة اليوم.` })
+          : null,
         el('div', { class: 'path-nodes' },
           pathNode('book', 'المعرفة', done >= 1),
           pathNode('competencies', 'المهارات', done >= 3),

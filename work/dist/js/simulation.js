@@ -10,7 +10,7 @@ import { applyRecords, shownRecords } from './rotation.js';
 import { retryLockPlan } from './retry-plan.js';
 import { WEIGHTS_VERSION } from './scoring-rules.js';
 import {
-  el, button, clear, formatModel, formatType, icon, notice, pageHead, privacyReminder, tag, toast
+  createAiWaiting, setBusy as markBusy, el, button, clear, formatModel, formatType, icon, notice, pageHead, privacyReminder, tag, toast
 } from './ui.js';
 import { acquireWakeLock, releaseAllWakeLocks, releaseWakeLock, wakeLockUnsupportedNoticeOnce } from './wake-lock.js';
 import { modelElements } from './guidance.js';
@@ -72,7 +72,10 @@ function applyRetryLock(retryButton, error, host) {
 }
 
 // fix/evaluate-timeout: انتهاء المهلة يُظهر زر «إعادة الإرسال» مع بقاء النص أو التسجيل كما هو.
-const RETRYABLE_CLIENT_CODES = new Set(['AI_OVERLOADED', 'AI_RATE_LIMITED', 'AI_TIMEOUT']);
+const RETRYABLE_CLIENT_CODES = new Set([
+  'AI_OVERLOADED', 'AI_RATE_LIMITED', 'AI_TIMEOUT', 'AI_INVALID_JSON', 'AI_SCHEMA_FAILED',
+  'AI_EVIDENCE_FAILED', 'AI_EMPTY_RESPONSE', 'AI_PROVIDER_ERROR', 'NETWORK'
+]);
 
 // مشغّل تقييم واحد: يمنع الطلب المزدوج، يحمل قفل الشاشة أثناء الطلب، ويعرض «ما زلنا نحاول الاتصال…» بعد 8 ثوانٍ.
 function createEvaluationRunner({ status, submit, retryButton, workingText, workingHint }) {
@@ -81,19 +84,23 @@ function createEvaluationRunner({ status, submit, retryButton, workingText, work
     if (inFlight) return;
     inFlight = true;
     submit.disabled = true;
+    markBusy(submit, true);
     retryButton.disabled = true;
-    const working = el('div', { class: 'card ai-working' },
-      el('span', { class: 'loader' }),
-      el('strong', { text: workingText }),
-      workingHint ? el('small', { text: workingHint }) : null
-    );
-    status.replaceChildren(working);
+    const waiting = createAiWaiting({ title: workingText, hint: workingHint });
+    status.replaceChildren(waiting.node);
+    waiting.node.scrollIntoView?.({ block: 'center', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     acquireWakeLock('evaluating');
     try {
-      const response = await evaluateWithAi(request, { onSlow: text => working.append(el('small', { class: 'slow-notice', text })) });
+      const response = await evaluateWithAi(request, waiting.options);
       await onSuccess(response);
     } catch (error) {
-      if (RETRYABLE_CLIENT_CODES.has(error?.code)) {
+      if (error?.code === 'ABORTED') {
+        // الإلغاء يُبقي الإجابة كما هي ويعيد الشاشة إلى حالة التحرير.
+        status.replaceChildren(notice('أُلغي الطلب. إجابتك ما زالت محفوظة؛ يمكنك تعديلها وإرسالها متى شئت.', 'warning', '!'));
+        submit.hidden = false;
+        submit.disabled = false;
+        retryButton.hidden = true;
+      } else if (RETRYABLE_CLIENT_CODES.has(error?.code)) {
         submit.hidden = true;
         applyRetryLock(retryButton, error, status);
       } else {
@@ -102,6 +109,7 @@ function createEvaluationRunner({ status, submit, retryButton, workingText, work
       }
     } finally {
       inFlight = false;
+      markBusy(submit, false);
       releaseWakeLock('evaluating');
     }
   };
@@ -227,8 +235,22 @@ function createVoicePanel(transcriptArea, setAnswer, options = {}) {
   const transcribeRecording = async recording => {
     stateText.textContent = 'جارٍ تحويل الصوت إلى نص…';
     acquireWakeLock('transcribing');
+    const controller = new AbortController();
+    const cancelTranscription = button('إلغاء الانتظار', {
+      variant: 'ghost', className: 'ai-cancel',
+      onClick: () => { cancelTranscription.disabled = true; controller.abort(); }
+    });
+    warning.replaceChildren(cancelTranscription);
+    const showProgress = ({ label, elapsedMs }) => {
+      stateText.textContent = `${label} · ${Math.floor((elapsedMs || 0) / 1000)} ث`;
+    };
     try {
-      const response = await transcribeWithAi(recording.blob, recording.duration, { onSlow: text => { stateText.textContent = text; } });
+      const response = await transcribeWithAi(recording.blob, recording.duration, {
+        onSlow: text => { stateText.textContent = text; },
+        onPhase: showProgress,
+        onProgress: showProgress,
+        signal: controller.signal
+      });
       await discardPending();
       interruptedHost.replaceChildren();
       transcriptArea.value = response.transcript;
@@ -241,10 +263,17 @@ function createVoicePanel(transcriptArea, setAnswer, options = {}) {
     } catch (error) {
       await persistPending(recording);
       resend.hidden = false;
-      stateText.textContent = 'تعذر التفريغ';
       transcriptArea.hidden = false;
-      if (RETRYABLE_CLIENT_CODES.has(error?.code)) applyRetryLock(resend, error, warning);
-      else warning.replaceChildren(notice(`${error.message || 'تعذر تحويل التسجيل إلى نص.'} يمكنك إعادة إرسال التسجيل نفسه أو إعادة التسجيل.`, 'danger'));
+      if (error?.code === 'ABORTED') {
+        stateText.textContent = 'أُلغي التفريغ؛ التسجيل محفوظ';
+        warning.replaceChildren(notice('أُلغي التفريغ. تسجيلك محفوظ؛ يمكنك إعادة إرساله أو إعادة التسجيل.', 'warning', '!'));
+      } else if (RETRYABLE_CLIENT_CODES.has(error?.code)) {
+        stateText.textContent = 'تعذر التفريغ';
+        applyRetryLock(resend, error, warning);
+      } else {
+        stateText.textContent = 'تعذر التفريغ';
+        warning.replaceChildren(notice(`${error.message || 'تعذر تحويل التسجيل إلى نص.'} يمكنك إعادة إرسال التسجيل نفسه أو إعادة التسجيل.`, 'danger'));
+      }
     } finally {
       releaseWakeLock('transcribing');
     }
@@ -461,10 +490,14 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     });
     const continueButton = button('فهمت، متابعة', {
       className: 'wide simulation-privacy-continue',
-      disabled: true
+      disabled: true,
+      'aria-describedby': 'simulation-privacy-hint'
     });
+    // سطر مساعد يشرح سبب تعطيل الزر ويختفي عند التأكيد.
+    const continueHint = el('small', { class: 'hint', id: 'simulation-privacy-hint', text: 'أكّد التنبيه للمتابعة' });
     acknowledgement.addEventListener('change', () => {
       continueButton.disabled = !acknowledgement.checked;
+      continueHint.hidden = acknowledgement.checked;
     });
     continueButton.addEventListener('click', async () => {
       if (!acknowledgement.checked) return;
@@ -504,6 +537,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
           el('small', { text: 'سأخفي الهوية وأُبقي التفاصيل اللازمة للتقييم.' })
         )
       ),
+      continueHint,
       el('div', { class: 'simulation-privacy-actions' },
         continueButton,
         button('رجوع', {
@@ -587,6 +621,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       ].map(([id, icon, label]) => el('button', {
         type: 'button',
         class: answerMode === id ? 'active' : '',
+        'aria-pressed': String(answerMode === id),
         on: { click: () => { answerMode = id; drawAnswerSwitch(); drawReadiness(); } }
       }, el('span', { text: icon }), document.createTextNode(label))));
     };
@@ -814,18 +849,29 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     answerInput.addEventListener('input', () => { answer = answerInput.value; scheduleDraft(); syncSubmitState(); });
     if (session.answer_mode === 'voice') answerInput.hidden = !answer;
 
+    const answerCount = el('small', { class: 'answer-count', 'aria-live': 'off' });
+    const updateAnswerCount = () => {
+      const words = answerInput.value.trim().split(/\s+/).filter(Boolean).length;
+      answerCount.textContent = `${words} كلمة`;
+    };
+    answerInput.addEventListener('input', updateAnswerCount);
+    updateAnswerCount();
     const capture = session.answer_mode === 'voice'
       ? createVoicePanel(answerInput, value => { answer = value; scheduleDraft(); syncSubmitState(); }, { sessionId: session.id, questionId: question.id, onPersistSession: () => set('sessions', { ...session, updated_at: new Date().toISOString() }) })
       : el('label', { class: 'field card text-answer-card' },
         el('span', { text: 'إجابتك' }), answerInput,
+        answerCount,
         el('small', { text: 'قيّم التطبيق المضمون، وليس اللغة أو الطلاقة.' })
       );
     const status = el('div', { class: 'evaluation-status' });
-    const submit = button('إرسال الإجابة للتقييم', { className: 'wide' });
+    const submit = button('إرسال الإجابة للتقييم', { className: 'wide', 'aria-describedby': 'answer-submit-hint' });
     const retryButton = button('إعادة الإرسال', { className: 'wide resend-evaluation', hidden: true });
+    // سطر مساعد يشرح سبب تعطيل زر الإرسال.
+    const submitHint = el('small', { class: 'hint', id: 'answer-submit-hint', text: 'اكتب إجابتك أولًا' });
     const runner = createEvaluationRunner({ status, submit, retryButton, workingText: 'جارٍ تحليل الأدلة والتحقق من الاقتباسات…', workingHint: 'قد يستغرق ذلك عدة ثوانٍ.' });
     function syncSubmitState() {
       submit.disabled = answerInput.value.trim().length < 5;
+      submitHint.hidden = !submit.disabled;
     }
     syncSubmitState();
 
@@ -891,6 +937,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       ) : null,
       methodReminder,
       status,
+      submitHint,
       submit,
       retryButton,
       button('حفظ والخروج إلى الرئيسية', {
@@ -996,8 +1043,8 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         example: current.example || null,
         onRetry: () => retrySameQuestion(session, current.question),
         // الخطوة 5: المثال بطلب المتدرب فقط، ويُحفظ محليًا مع الجلسة؛ مثال واحد لكل إجابة.
-        onRequestExample: async payload => {
-          const response = await requestWorkedExample({ ...payload, answer: current.answer });
+        onRequestExample: async (payload, waitOptions = {}) => {
+          const response = await requestWorkedExample({ ...payload, answer: current.answer }, waitOptions);
           current.example = { ...response.example, meta: response.meta, requested_at: new Date().toISOString() };
           session.responses[session.current_index] = current;
           await set('sessions', { ...session, updated_at: new Date().toISOString() });

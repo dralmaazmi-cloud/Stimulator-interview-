@@ -1,0 +1,6 @@
+[
+  { "action": "wait", "ms": 1500 },
+  { "action": "goto", "url": "#/practice/a1?mode=missing" },
+  { "action": "wait", "ms": 1500 },
+  { "name": "A1 answer feedback (missing-element option)", "action": "tap", "selector": ".practice-option >> nth=0", "feedback": ".practice-feedback" }
+]

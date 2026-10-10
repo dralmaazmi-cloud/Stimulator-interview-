@@ -1,0 +1,305 @@
+{
+ "note": "Interleaved A/B cold load, PARTS=load RUNS=5, 2 rounds each; before=HEAD copy served on :4373, after=working tree on :4273. Medians of the 2 round medians (mean of two).",
+ "rows": [
+  {
+   "device": "iPhone SE (3rd gen)",
+   "cpu": 1,
+   "before": {
+    "fcp": 80,
+    "lcp": 208,
+    "dcl": 113.3,
+    "tbt": 0,
+    "longTaskMax": 0,
+    "requests": 51,
+    "transferredKB": 2252.6,
+    "rounds": [
+     {
+      "fcp": 80,
+      "lcp": 212,
+      "dcl": 112.3,
+      "tbt": 0
+     },
+     {
+      "fcp": 80,
+      "lcp": 204,
+      "dcl": 114.2,
+      "tbt": 0
+     }
+    ]
+   },
+   "after": {
+    "fcp": 80,
+    "lcp": 202,
+    "dcl": 125.5,
+    "tbt": 0,
+    "longTaskMax": 0,
+    "requests": 49,
+    "transferredKB": 1997.7,
+    "rounds": [
+     {
+      "fcp": 72,
+      "lcp": 192,
+      "dcl": 114.4,
+      "tbt": 0
+     },
+     {
+      "fcp": 88,
+      "lcp": 212,
+      "dcl": 136.6,
+      "tbt": 0
+     }
+    ]
+   }
+  },
+  {
+   "device": "iPhone SE (3rd gen)",
+   "cpu": 4,
+   "before": {
+    "fcp": 198,
+    "lcp": 606,
+    "dcl": 320.3,
+    "tbt": 51,
+    "longTaskMax": 88,
+    "requests": 51,
+    "transferredKB": 2252.6,
+    "rounds": [
+     {
+      "fcp": 192,
+      "lcp": 604,
+      "dcl": 318.1,
+      "tbt": 51
+     },
+     {
+      "fcp": 204,
+      "lcp": 608,
+      "dcl": 322.5,
+      "tbt": 51
+     }
+    ]
+   },
+   "after": {
+    "fcp": 188,
+    "lcp": 572,
+    "dcl": 325.9,
+    "tbt": 56.5,
+    "longTaskMax": 84.5,
+    "requests": 49,
+    "transferredKB": 1997.7,
+    "rounds": [
+     {
+      "fcp": 192,
+      "lcp": 588,
+      "dcl": 335.9,
+      "tbt": 65
+     },
+     {
+      "fcp": 184,
+      "lcp": 556,
+      "dcl": 315.9,
+      "tbt": 48
+     }
+    ]
+   }
+  },
+  {
+   "device": "iPhone 14",
+   "cpu": 1,
+   "before": {
+    "fcp": 78,
+    "lcp": 208,
+    "dcl": 107.2,
+    "tbt": 0,
+    "longTaskMax": 0,
+    "requests": 51,
+    "transferredKB": 2252.6,
+    "rounds": [
+     {
+      "fcp": 76,
+      "lcp": 200,
+      "dcl": 104.9,
+      "tbt": 0
+     },
+     {
+      "fcp": 80,
+      "lcp": 216,
+      "dcl": 109.5,
+      "tbt": 0
+     }
+    ]
+   },
+   "after": {
+    "fcp": 76,
+    "lcp": 172,
+    "dcl": 107.7,
+    "tbt": 0,
+    "longTaskMax": 0,
+    "requests": 49,
+    "transferredKB": 1997.7,
+    "rounds": [
+     {
+      "fcp": 80,
+      "lcp": 176,
+      "dcl": 108.7,
+      "tbt": 0
+     },
+     {
+      "fcp": 72,
+      "lcp": 168,
+      "dcl": 106.7,
+      "tbt": 0
+     }
+    ]
+   }
+  },
+  {
+   "device": "iPhone 14",
+   "cpu": 4,
+   "before": {
+    "fcp": 206,
+    "lcp": 660,
+    "dcl": 340.9,
+    "tbt": 59,
+    "longTaskMax": 91.5,
+    "requests": 51,
+    "transferredKB": 2252.6,
+    "rounds": [
+     {
+      "fcp": 204,
+      "lcp": 668,
+      "dcl": 324.8,
+      "tbt": 60
+     },
+     {
+      "fcp": 208,
+      "lcp": 652,
+      "dcl": 357,
+      "tbt": 58
+     }
+    ]
+   },
+   "after": {
+    "fcp": 190,
+    "lcp": 558,
+    "dcl": 315.3,
+    "tbt": 54.5,
+    "longTaskMax": 79.5,
+    "requests": 49,
+    "transferredKB": 1997.7,
+    "rounds": [
+     {
+      "fcp": 184,
+      "lcp": 592,
+      "dcl": 335.6,
+      "tbt": 54
+     },
+     {
+      "fcp": 196,
+      "lcp": 524,
+      "dcl": 294.9,
+      "tbt": 55
+     }
+    ]
+   }
+  },
+  {
+   "device": "iPhone 15 Pro Max",
+   "cpu": 1,
+   "before": {
+    "fcp": 70,
+    "lcp": 194,
+    "dcl": 103.8,
+    "tbt": 0,
+    "longTaskMax": 0,
+    "requests": 51,
+    "transferredKB": 2252.6,
+    "rounds": [
+     {
+      "fcp": 72,
+      "lcp": 188,
+      "dcl": 100.4,
+      "tbt": 0
+     },
+     {
+      "fcp": 68,
+      "lcp": 200,
+      "dcl": 107.3,
+      "tbt": 0
+     }
+    ]
+   },
+   "after": {
+    "fcp": 82,
+    "lcp": 182,
+    "dcl": 109.7,
+    "tbt": 0,
+    "longTaskMax": 0,
+    "requests": 49,
+    "transferredKB": 1997.7,
+    "rounds": [
+     {
+      "fcp": 88,
+      "lcp": 184,
+      "dcl": 113.8,
+      "tbt": 0
+     },
+     {
+      "fcp": 76,
+      "lcp": 180,
+      "dcl": 105.5,
+      "tbt": 0
+     }
+    ]
+   }
+  },
+  {
+   "device": "iPhone 15 Pro Max",
+   "cpu": 4,
+   "before": {
+    "fcp": 216,
+    "lcp": 658,
+    "dcl": 332.7,
+    "tbt": 67.5,
+    "longTaskMax": 97.5,
+    "requests": 51,
+    "transferredKB": 2252.6,
+    "rounds": [
+     {
+      "fcp": 220,
+      "lcp": 656,
+      "dcl": 333,
+      "tbt": 65
+     },
+     {
+      "fcp": 212,
+      "lcp": 660,
+      "dcl": 332.4,
+      "tbt": 70
+     }
+    ]
+   },
+   "after": {
+    "fcp": 208,
+    "lcp": 588,
+    "dcl": 342.9,
+    "tbt": 72.5,
+    "longTaskMax": 92.5,
+    "requests": 49,
+    "transferredKB": 1997.7,
+    "rounds": [
+     {
+      "fcp": 204,
+      "lcp": 556,
+      "dcl": 323,
+      "tbt": 78
+     },
+     {
+      "fcp": 212,
+      "lcp": 620,
+      "dcl": 362.7,
+      "tbt": 67
+     }
+    ]
+   }
+  }
+ ]
+}

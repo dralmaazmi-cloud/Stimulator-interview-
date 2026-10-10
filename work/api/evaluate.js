@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { complete, createBudget, evaluationThinkingLevel } from './_lib/provider.js';
+import { complete, createBudget, evaluationThinkingLevel, evaluationMaxOutputTokens, callSummary } from './_lib/provider.js';
 import { getQuestionContext, sampleAnswerTexts } from './_lib/data.js';
 import { evaluationSchema } from './_lib/schemas.js';
 import { buildEvaluationPrompt } from './_lib/prompts.js';
@@ -24,7 +24,7 @@ function cleanFollowups(value) {
 async function runEvaluation(context, answer, followups, model, budget) {
   // fix/evaluate-timeout: تفكير منخفض لتقرير evaluation-1.3 الطويل، واحتياطي مرة واحدة عند انتهاء المهلة.
   const response = await complete(buildEvaluationPrompt(context, answer, followups), evaluationSchema, {
-    model, budget, thinkingLevel: evaluationThinkingLevel() || undefined, fallbackOnTimeout: true
+    model, budget, thinkingLevel: evaluationThinkingLevel() || undefined, maxOutputTokens: evaluationMaxOutputTokens() || undefined, fallbackOnTimeout: true
   });
   const errors = shapeErrors(response.data, context.question.id, context.question.rubric_mode);
   if (errors.length) {
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
       duration_ms: Date.now() - started,
       ...usage,
       attempts,
-      provider_call_count: budget.calls,
+      provider_call_count: budget.calls, ...callSummary(budget),
       fallback_used: budget.fallbackUsed,
       final_provider_status: budget.lastProviderStatus,
       validation: trusted ? 'passed' : 'untrusted',
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
       }
     });
   } catch (error) {
-    recordUsage({ type: 'evaluate', duration_ms: Date.now() - started, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
+    recordUsage({ type: 'evaluate', duration_ms: Date.now() - started, provider_call_count: budget.calls, ...callSummary(budget), fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
     handleApiError(res, error);
   }
 }

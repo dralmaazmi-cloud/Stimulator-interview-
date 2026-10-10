@@ -113,28 +113,187 @@ export async function clearAll() {
     .forEach(key => localStorage.removeItem(key));
 }
 
-export async function exportBackup(metadata = {}) {
+export const BACKUP_FORMAT = 'leadership-interview-coach-backup';
+export const BACKUP_MAX_BYTES = 5 * 1024 * 1024;
+const BACKUP_SCHEMA_VERSIONS = [1, 2];
+const V2_KEY_PREFIX = 'lic:v2:';
+const V2_KEY_PATTERN = /^lic:v2:[A-Za-z0-9:_.-]{1,80}$/;
+const MAX_RECORDS_PER_STORE = 5000;
+const MAX_V2_VALUE_BYTES = 200 * 1024;
+
+function localKeys(prefix) {
+  try {
+    return Object.keys(localStorage).filter(key => key.startsWith(prefix));
+  } catch {
+    return [];
+  }
+}
+
+// مفاتيح تمارين التعلّم lic:v2:* كقيم JSON مفككة (تُدرج في النسخة الاحتياطية).
+function readV2Keys() {
+  const values = {};
+  localKeys(V2_KEY_PREFIX).forEach(key => {
+    try { values[key] = JSON.parse(localStorage.getItem(key)); } catch { /* قيمة تالفة: تُتجاوز */ }
+  });
+  return values;
+}
+
+// حقول نصوص الإجابات داخل الجلسات: تُفرَّغ عند تصدير نسخة بلا نصوص (تطابق تامّ للمفتاح).
+const TEXT_KEYS_EMPTY_STRING = new Set(['answer', 'transcript', 'draft_answer', 'original_answer']);
+const TEXT_KEYS_EMPTY_LIST = new Set(['followups', 'follow_ups', 'evidence', 'quotes']);
+const TEXT_KEYS_NULL = new Set(['example']);
+// حقول نص المقيّم الحرّة في تقرير التقييم (justification وimprove وsummary وstrengths وmissing وnext_actions وغيرها):
+// قد تُعيد صياغة الإجابة أو تقتبس منها، فتُفرَّغ هي أيضًا. الدرجات والتصنيفات وأرقام المعايير (key وscore) وأعلام التحقق تبقى.
+const REPORT_TEXT_EMPTY_STRING = new Set(['justification', 'improve', 'summary']);
+const REPORT_TEXT_EMPTY_LIST = new Set([
+  'strengths', 'gaps', 'missing', 'next_actions', 'follow_up_questions', 'follow_up_reasons', 'supporting', 'negative'
+]);
+const REPORT_FEEDBACK_KEY = /feedback/i;
+
+export function stripAnswerText(value) {
+  if (Array.isArray(value)) return value.map(stripAnswerText);
+  if (!value || typeof value !== 'object') return value;
+  const result = {};
+  for (const [key, item] of Object.entries(value)) {
+    if (TEXT_KEYS_EMPTY_STRING.has(key) && typeof item === 'string') result[key] = '';
+    else if (TEXT_KEYS_EMPTY_LIST.has(key) && Array.isArray(item)) result[key] = [];
+    else if (key === 'quote' && typeof item === 'string') result[key] = '';
+    else if (TEXT_KEYS_NULL.has(key) && item && typeof item === 'object') result[key] = null;
+    else if ((REPORT_TEXT_EMPTY_STRING.has(key) || REPORT_FEEDBACK_KEY.test(key)) && typeof item === 'string') result[key] = '';
+    else if ((REPORT_TEXT_EMPTY_LIST.has(key) || REPORT_FEEDBACK_KEY.test(key)) && Array.isArray(item)) result[key] = [];
+    else result[key] = stripAnswerText(item);
+  }
+  return result;
+}
+
+export async function exportBackup(metadata = {}, options = {}) {
+  const includeAnswers = options.includeAnswers !== false;
   const stores = {};
   for (const store of STORES) stores[store] = await getAll(store);
+  let bookmarks = [];
+  try { bookmarks = JSON.parse(localStorage.getItem('lic:bookmarked-questions') || '[]'); } catch { bookmarks = []; }
+  if (!includeAnswers) {
+    stores.sessions = stores.sessions.map(stripAnswerText);
+    // المسودة المحلية للتعريف الشخصي نص شخصي أيضًا؛ ومخزن القصص غير مستخدم لكنه مخصص لنصوص المتعلم.
+    stores.settings = stores.settings.filter(item => item.id !== 'self-intro-draft');
+    stores.stories = [];
+  }
   return {
-    format: 'leadership-interview-coach-backup',
-    schema_version: 1,
+    format: BACKUP_FORMAT,
+    schema_version: 2,
     exported_at: new Date().toISOString(),
+    include_answers: includeAnswers,
     metadata,
     stores,
-    bookmarks: JSON.parse(localStorage.getItem('lic:bookmarked-questions') || '[]')
+    bookmarks: Array.isArray(bookmarks) ? bookmarks.filter(item => typeof item === 'string') : [],
+    v2: readV2Keys()
   };
 }
 
-export async function importBackup(backup) {
-  if (backup?.format !== 'leadership-interview-coach-backup' || backup?.schema_version !== 1) {
-    throw new Error('ملف النسخة الاحتياطية غير صالح أو غير مدعوم.');
-  }
+const INVALID = 'ملف النسخة الاحتياطية غير صالح أو غير مدعوم. لم تتغير بياناتك.';
+const fail = detail => { throw new Error(detail ? `${INVALID} (${detail})` : INVALID); };
+const isPlainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+const isIdType = value => (typeof value === 'string' && value.length > 0 && value.length <= 300) || (typeof value === 'number' && Number.isFinite(value));
+
+// يتحقق من النسخة كاملة قبل أي كتابة. يرمي خطأً بالعربية ولا يغيّر شيئًا.
+export function validateBackup(backup, { maxBytes = BACKUP_MAX_BYTES } = {}) {
+  if (!isPlainObject(backup) || backup.format !== BACKUP_FORMAT) fail();
+  if (!BACKUP_SCHEMA_VERSIONS.includes(backup.schema_version)) fail('إصدار غير مدعوم');
+  let size = 0;
+  try {
+    const json = JSON.stringify(backup);
+    size = typeof TextEncoder === 'function' ? new TextEncoder().encode(json).length : json.length;
+  } catch { fail(); }
+  if (size > maxBytes) throw new Error('حجم ملف النسخة الاحتياطية أكبر من الحد المسموح (5 ميغابايت). لم تتغير بياناتك.');
+  if (backup.stores !== undefined && !isPlainObject(backup.stores)) fail('بنية المخازن');
   for (const store of STORES) {
-    await clearStore(store);
-    for (const value of backup.stores?.[store] || []) await set(store, value);
+    const records = backup.stores?.[store];
+    if (records === undefined) continue;
+    if (!Array.isArray(records)) fail(`المخزن ${store}`);
+    if (records.length > MAX_RECORDS_PER_STORE) fail(`المخزن ${store} كبير جدًا`);
+    for (const record of records) {
+      if (!isPlainObject(record) || !isIdType(record.id)) fail(`سجل غير صالح في ${store}`);
+      if (hasForbiddenKey(record)) fail(`سجل غير آمن في ${store}`);
+      validateRecordShape(store, record);
+    }
   }
-  localStorage.setItem('lic:bookmarked-questions', JSON.stringify(Array.isArray(backup.bookmarks) ? backup.bookmarks : []));
+  if (backup.bookmarks !== undefined && (!Array.isArray(backup.bookmarks) || !backup.bookmarks.every(item => typeof item === 'string'))) {
+    fail('المحفوظات');
+  }
+  if (backup.v2 !== undefined) {
+    if (!isPlainObject(backup.v2)) fail('تمارين التعلّم');
+    for (const [key, value] of Object.entries(backup.v2)) {
+      if (!V2_KEY_PATTERN.test(key)) fail('مفتاح تمارين غير صالح');
+      let encoded;
+      if (hasForbiddenKey(value)) fail('قيمة تمارين غير آمنة');
+      try { encoded = JSON.stringify(value); } catch { fail('قيمة تمارين غير صالحة'); }
+      if (encoded === undefined || encoded.length > MAX_V2_VALUE_BYTES) fail('قيمة تمارين غير صالحة');
+    }
+  }
+  return true;
+}
+
+// L-A: مفاتيح تلوّث النموذج الأولي (prototype pollution) مرفوضة في أي مستوى من السجلات المستوردة.
+// JSON.parse ينشئ __proto__ كمفتاح عادي، لذا يظهر في Object.keys. العمق الأقصى 12؛ ما بعده يُرفض.
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+export const BACKUP_MAX_DEPTH = 12;
+
+export function hasForbiddenKey(value, depth = 0) {
+  if (!value || typeof value !== 'object') return false;
+  if (depth > BACKUP_MAX_DEPTH) return true;
+  if (Array.isArray(value)) return value.some(item => hasForbiddenKey(item, depth + 1));
+  return Object.keys(value).some(key => FORBIDDEN_KEYS.has(key) || hasForbiddenKey(value[key], depth + 1));
+}
+
+function validateRecordShape(store, record) {
+  const bad = detail => fail(`${store}: ${detail}`);
+  if (store === 'sessions') {
+    if (record.responses !== undefined && !Array.isArray(record.responses)) bad('responses');
+    if (record.status !== undefined && typeof record.status !== 'string') bad('status');
+    if (record.question_ids !== undefined && !Array.isArray(record.question_ids)) bad('question_ids');
+  } else if (store === 'progress') {
+    if (record.completed !== undefined && typeof record.completed !== 'boolean') bad('completed');
+  } else if (store === 'checklists') {
+    if (record.checked !== undefined && (!Array.isArray(record.checked) || !record.checked.every(Number.isFinite))) bad('checked');
+  } else if (store === 'attempts') {
+    if (record.attempts !== undefined && !Array.isArray(record.attempts)) bad('attempts');
+  } else if (store === 'rotation') {
+    if (record.count !== undefined && !Number.isFinite(record.count)) bad('count');
+    if (record.last_shown_at !== undefined && typeof record.last_shown_at !== 'string') bad('last_shown_at');
+  }
+}
+
+export async function importBackup(backup) {
+  validateBackup(backup);
+  // لقطة من الحالة الحالية لاستعادتها إن فشلت الكتابة في منتصف الاستيراد.
+  const snapshot = {};
+  for (const store of STORES) snapshot[store] = await getAll(store);
+  const previousBookmarks = localStorage.getItem('lic:bookmarked-questions');
+  const previousV2 = {};
+  localKeys(V2_KEY_PREFIX).forEach(key => { previousV2[key] = localStorage.getItem(key); });
+  try {
+    for (const store of STORES) {
+      await clearStore(store);
+      for (const value of backup.stores?.[store] || []) await set(store, value);
+    }
+    localStorage.setItem('lic:bookmarked-questions', JSON.stringify(Array.isArray(backup.bookmarks) ? backup.bookmarks : []));
+    if (backup.v2) {
+      localKeys(V2_KEY_PREFIX).forEach(key => localStorage.removeItem(key));
+      for (const [key, value] of Object.entries(backup.v2)) localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch (error) {
+    try {
+      for (const store of STORES) {
+        await clearStore(store);
+        for (const value of snapshot[store]) await set(store, value);
+      }
+      if (previousBookmarks == null) localStorage.removeItem('lic:bookmarked-questions');
+      else localStorage.setItem('lic:bookmarked-questions', previousBookmarks);
+      localKeys(V2_KEY_PREFIX).forEach(key => localStorage.removeItem(key));
+      Object.entries(previousV2).forEach(([key, value]) => { if (value != null) localStorage.setItem(key, value); });
+    } catch { /* الاستعادة بأفضل جهد */ }
+    throw new Error('تعذر استيراد النسخة الاحتياطية، وأُعيدت بياناتك السابقة.');
+  }
 }
 
 // ---------- التسجيل الصوتي المعلق (A3) ----------

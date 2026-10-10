@@ -1,0 +1,43 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "G=\"${CLAUDE_PROJECT_DIR:-.}/.claude/agent-team/guard.py\"; IN=$(cat); if [ -z \"$IN\" ]; then echo \"[ai-dev-team guard] BLOCKED: empty hook input; failing closed\" >&2; exit 2; fi; if command -v python3 >/dev/null 2>&1 && [ -f \"$G\" ]; then printf '%s' \"$IN\" | python3 \"$G\" --shared-mode; RC=$?; if [ \"$RC\" -eq 0 ] || [ \"$RC\" -eq 2 ]; then exit \"$RC\"; fi; echo \"[ai-dev-team guard] BLOCKED: guard exited with code $RC; failing closed\" >&2; exit 2; fi; case \"$IN\" in *'\"agent_id\"'*) echo \"[ai-dev-team guard] BLOCKED: python3 or guard.py is unavailable; failing closed for subagent calls\" >&2; exit 2;; esac; exit 0",
+            "timeout": 30,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "G=\"${CLAUDE_PROJECT_DIR:-.}/.claude/agent-team/guard.py\"; IN=$(cat); if [ -z \"$IN\" ]; then echo \"[ai-dev-team guard] BLOCKED: empty hook input; failing closed\" >&2; exit 2; fi; if command -v python3 >/dev/null 2>&1 && [ -f \"$G\" ]; then printf '%s' \"$IN\" | python3 \"$G\" --shared-mode --post; RC=$?; if [ \"$RC\" -eq 0 ] || [ \"$RC\" -eq 2 ]; then exit \"$RC\"; fi; echo \"[ai-dev-team guard] BLOCKED: guard exited with code $RC; failing closed\" >&2; exit 2; fi; case \"$IN\" in *'\"agent_id\"'*) echo \"[ai-dev-team guard] BLOCKED: python3 or guard.py is unavailable; failing closed for subagent calls\" >&2; exit 2;; esac; exit 0",
+            "timeout": 60,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "G=\"${CLAUDE_PROJECT_DIR:-.}/.claude/agent-team/guard.py\"; IN=$(cat); if [ -z \"$IN\" ]; then echo \"[ai-dev-team guard] BLOCKED: empty hook input; failing closed\" >&2; exit 2; fi; if command -v python3 >/dev/null 2>&1 && [ -f \"$G\" ]; then printf '%s' \"$IN\" | python3 \"$G\" --shared-mode --post; RC=$?; if [ \"$RC\" -eq 0 ] || [ \"$RC\" -eq 2 ]; then exit \"$RC\"; fi; echo \"[ai-dev-team guard] BLOCKED: guard exited with code $RC; failing closed\" >&2; exit 2; fi; case \"$IN\" in *'\"agent_id\"'*) echo \"[ai-dev-team guard] BLOCKED: python3 or guard.py is unavailable; failing closed for subagent calls\" >&2; exit 2;; esac; exit 0",
+            "timeout": 60,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}

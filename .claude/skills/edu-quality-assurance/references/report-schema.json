@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ai-dev-team educational QA report",
+  "type": "object",
+  "required": ["mode", "scope", "verdict", "findings", "sources", "limitations"],
+  "properties": {
+    "mode": {"enum": ["educational-gate", "content-review", "assessment-audit"]},
+    "scope": {"type": "string"},
+    "verdict": {"enum": ["APPROVED", "CHANGES REQUIRED", "BLOCKED", "N/A"]},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "location", "category", "severity", "evidence_label", "description", "recommendation"],
+        "properties": {
+          "id": {"type": "string"},
+          "location": {"type": "string"},
+          "category": {"type": "string"},
+          "severity": {"enum": ["blocker", "major", "minor", "info"]},
+          "evidence_label": {"enum": ["Documented", "Inferred", "Estimated"]},
+          "description": {"type": "string"},
+          "recommendation": {"type": "string"},
+          "source_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "description": "Assessment audit only",
+      "items": {
+        "type": "object",
+        "required": ["item_id", "key_status"],
+        "properties": {
+          "item_id": {"type": "string"},
+          "aligned_to": {"type": ["string", "null"]},
+          "key_status": {"enum": ["Verified", "Disputed", "Unverifiable"]},
+          "difficulty": {"type": "string"},
+          "difficulty_basis": {"enum": ["estimated", "empirical"]},
+          "issues": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "coverage_gaps": {"type": "array", "items": {"type": "string"}},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "location"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "location": {"type": "string"},
+          "accessed": {"type": "string"}
+        }
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

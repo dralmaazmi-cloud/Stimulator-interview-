@@ -1,6 +1,6 @@
 import { handleApiError, httpError, methodAllowed, rateLimitScopes, readJson, sendJson } from './_lib/http.js';
 import { enforceRateLimit } from './_lib/rate-limit.js';
-import { complete, createBudget } from './_lib/provider.js';
+import { complete, createBudget, callSummary } from './_lib/provider.js';
 import { selfIntroSchema } from './_lib/schemas.js';
 import { buildSelfIntroPrompt } from './_lib/prompts.js';
 import { recordUsage } from './_lib/usage.js';
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     if (!candidate || wordCount > maximumWords || result.data?.facts_preserved !== true) {
       throw httpError(502, 'لم يجتز النص المحسن فحص الحفاظ على المعلومات.', 'SELF_INTRO_VALIDATION_FAILED');
     }
-    recordUsage({ type: 'self-intro', duration_ms: Date.now() - started, ...result.usage, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: budget.lastProviderStatus, validation: 'passed', success: true });
+    recordUsage({ type: 'self-intro', duration_ms: Date.now() - started, ...result.usage, provider_call_count: budget.calls, ...callSummary(budget), fallback_used: budget.fallbackUsed, final_provider_status: budget.lastProviderStatus, validation: 'passed', success: true });
     sendJson(res, 200, {
       text: candidate,
       changes: Array.isArray(result.data.changes) ? result.data.changes.slice(0, 6) : [],
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       requires_user_approval: true
     });
   } catch (error) {
-    recordUsage({ type: 'self-intro', duration_ms: Date.now() - started, provider_call_count: budget.calls, fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
+    recordUsage({ type: 'self-intro', duration_ms: Date.now() - started, provider_call_count: budget.calls, ...callSummary(budget), fallback_used: budget.fallbackUsed, final_provider_status: error?.providerStatus ?? budget.lastProviderStatus, error_code: error?.code || 'failed', validation: error?.code || 'failed', success: false });
     handleApiError(res, error);
   }
 }
