@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.2-51d413de-v2i';
+const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.2-51d413de-v2j';
 const APP_SHELL = [
   './',
   './index.html',
@@ -64,7 +64,9 @@ const APP_SHELL = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/icon-maskable-512.png',
-  './assets/icons/apple-touch-icon-180.png'
+  './assets/icons/apple-touch-icon-180.png',
+  './assets/icons/favicon-32.png',
+  './favicon.ico'
 ];
 
 self.addEventListener('install', event => {
