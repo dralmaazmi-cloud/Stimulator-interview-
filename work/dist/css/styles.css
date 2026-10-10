@@ -4664,3 +4664,7 @@ body[data-page="questions"] .app-main {
   .ai-working, .simulation-start, .question-focus-actions { position: static; }
 }
 }
+
+/* Perf/QA 2026-10: the summary that appears after the last self-check rating must not sit behind the sticky action bar. */
+.selfcheck, .selfcheck-summary, .selfcheck-row { scroll-margin-block-end: 112px; }
+.question-focus-content .selfcheck { margin-block-end: 24px; }

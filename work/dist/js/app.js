@@ -1,4 +1,4 @@
-import { loadData } from './data.js';
+import { loadData, loadQuestionAudit } from './data.js';
 import { renderHome } from './home.js';
 import { cleanupLearn, renderLearnIndex, renderLesson } from './learn.js';
 import { renderCompetenciesIndex, renderCompetencyDetail, renderQuestionFocus } from './competencies.js';
@@ -67,7 +67,7 @@ async function route({ restoreScroll = false } = {}) {
     else if (page === 'tools' && parts[1] === 'saved') renderSavedQuestions(root, data);
     else if (page === 'tools') renderTools(root);
     else if (page === 'evidence') renderTools(root);
-    else if (page === 'search') renderSearch(root, data, params);
+    else if (page === 'search') await renderSearch(root, data, params);
     else if (page === 'settings') renderSettings(root, data);
     else clear(root).append(el('div', { class: 'card empty-state' },
       el('strong', { text: 'الصفحة غير موجودة' }),
@@ -170,6 +170,16 @@ function setupBackButton() {
   });
 }
 
+// فحص سلامة قائمة المستبعدة (question-audit.json، ≈24KB) يعمل بعد أول عرض بدل تأخير الإقلاع.
+// عدم التطابق يوقف التطبيق كما كان قبل التأجيل؛ فشل الجلب وحده لا يوقفه.
+function verifyQuestionAudit() {
+  loadQuestionAudit().then(audit => {
+    if (data.manifest.counts.excluded_questions !== audit.excluded_question_count) {
+      clear(root).append(notice('تعذر تشغيل التطبيق: فشل تحقق سلامة بيانات الأسئلة.', 'danger'));
+    }
+  }).catch(error => console.warn('Question audit check skipped:', error));
+}
+
 async function init() {
   setupPreferences();
   setupBackButton();
@@ -179,7 +189,6 @@ async function init() {
     if (data.manifest.counts.total_questions !== data.questions.length
       || data.manifest.counts.unique_question_ids !== new Set(data.questions.map(question => question.id)).size
       || data.manifest.counts.primary_questions !== data.curation.primary_ids.length
-      || data.manifest.counts.excluded_questions !== data.questionAudit.excluded_question_count
       || !data.questions.every(question => ['complete_source_star_l', 'approved_expanded_seal', 'complete_source_paragraph'].includes(question.model_answer_status))) {
       throw new Error('فشل تحقق سلامة بيانات الأسئلة.');
     }
@@ -196,6 +205,7 @@ async function init() {
       await route({ restoreScroll: true });
     });
     await route();
+    verifyQuestionAudit();
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       const upgradingExistingInstall = Boolean(navigator.serviceWorker.controller);
       if (upgradingExistingInstall) {

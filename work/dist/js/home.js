@@ -44,6 +44,8 @@ export async function renderHome(root, data) {
     el('section', { class: 'home-photo-hero', 'aria-label': 'مدرّب المقابلات القيادية' },
       el('img', {
         src: 'assets/images/abu-dhabi-sea-hero.jpg',
+        decoding: 'async',
+        fetchpriority: 'high',
         alt: 'أفق مدينة أبوظبي كما يبدو من البحر'
       }),
       el('div', { class: 'home-photo-overlay' },

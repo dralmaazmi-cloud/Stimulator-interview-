@@ -16,9 +16,11 @@ export function renderSelfCheck(question) {
     p('لا حاجة إلى إجابة مثالية. اسأل نفسك بصدق: هل غطّيت كل عنصر في إجابتك؟', 'practice-lead')
   );
 
+  let interactive = false;
   const refreshSummary = () => {
     const rated = elements.filter(item => ratings[item.key]);
     if (rated.length < elements.length) { summary.replaceChildren(); return; }
+    const firstReveal = !summary.hasChildNodes();
     const strong = elements.filter(item => ratings[item.key] === 'full');
     const next = elements.filter(item => ratings[item.key] !== 'full');
     const children = [];
@@ -38,6 +40,10 @@ export function renderSelfCheck(question) {
       }));
     }
     summary.replaceChildren(...children, actions);
+    // الملخص يظهر أسفل آخر عنصر وقد يقع خلف شريط الإجراءات اللاصق؛ نُظهره عند أول ظهور فقط.
+    if (firstReveal && interactive && typeof summary.scrollIntoView === 'function') {
+      summary.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
   };
 
   const rows = el('div', { class: 'selfcheck-rows' }, ...elements.map(item => {
@@ -67,5 +73,6 @@ export function renderSelfCheck(question) {
 
   host.append(rows, summary, p('تقييم ذاتي للتدريب، ولا يدخل في درجة المحاكاة.', 'practice-helper'));
   refreshSummary();
+  interactive = true;
   return host;
 }

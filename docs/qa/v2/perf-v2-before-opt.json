@@ -1,0 +1,3487 @@
+{
+  "tool": "measure-app",
+  "base": "http://localhost:4273",
+  "startedAt": "2026-10-10T06:34:02.909Z",
+  "runs": 3,
+  "throttles": [
+    1,
+    4
+  ],
+  "notes": [
+    "Chromium emulation, not iOS Safari. Local server: network time is near zero, so transfer size matters more than transfer time.",
+    "CPU throttle 4 = Chromium Emulation.setCPUThrottlingRate(4), a mid-range phone proxy only.",
+    "Every run uses a fresh browser context (cold HTTP cache, empty storage, new service worker)."
+  ],
+  "engine": "chromium 141.0.7390.37",
+  "coldLoad": [
+    {
+      "device": "iPhone SE (3rd gen)",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "cpuThrottle": 1,
+      "median": {
+        "ttfbMs": 2.6,
+        "fcpMs": 88,
+        "lcpMs": 216,
+        "dclMs": 130.9,
+        "loadMs": 132.6,
+        "longTaskCount": 0,
+        "longTaskTotalMs": 0,
+        "longTaskMaxMs": 0,
+        "tbtMs": 0,
+        "cls": 0,
+        "requests": 51,
+        "transferredKB": 2252.6,
+        "decodedKB": 2228,
+        "heapMB": 2.3,
+        "domNodes": 220
+      },
+      "kbByType": {
+        "html": 4.1,
+        "css": 335.3,
+        "font": 500.8,
+        "js": 429.8,
+        "json/fetch": 780,
+        "image": 202.5
+      },
+      "topResources": [
+        {
+          "url": "/css/styles.css?v=0.6.0-alpha-10-v2b",
+          "type": "Stylesheet",
+          "encodedKB": 335.3
+        },
+        {
+          "url": "/data/reference.json",
+          "type": "Fetch",
+          "encodedKB": 263.8
+        },
+        {
+          "url": "/data/derived/search-index.json",
+          "type": "Fetch",
+          "encodedKB": 257.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Bold.ttf",
+          "type": "Font",
+          "encodedKB": 255.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Regular.ttf",
+          "type": "Font",
+          "encodedKB": 245.5
+        },
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "type": "Image",
+          "encodedKB": 202.5
+        }
+      ],
+      "hero": [
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "encodedKB": 202.5
+        }
+      ],
+      "horizontalScroll": false,
+      "failedRequests": 0,
+      "raw": [
+        {
+          "ttfbMs": 3.6000000000931323,
+          "fcpMs": 112,
+          "lcpMs": 248,
+          "dclMs": 151.89999999990687,
+          "loadMs": 153.10000000009313,
+          "longTaskCount": 1,
+          "longTaskTotalMs": 52,
+          "longTaskMaxMs": 52,
+          "tbtMs": 2,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.3999999999068677,
+          "fcpMs": 84,
+          "lcpMs": 212,
+          "dclMs": 123,
+          "loadMs": 124.29999999981374,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.6000000000931323,
+          "fcpMs": 88,
+          "lcpMs": 216,
+          "dclMs": 130.90000000037253,
+          "loadMs": 132.60000000009313,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        }
+      ]
+    },
+    {
+      "device": "iPhone SE (3rd gen)",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "cpuThrottle": 4,
+      "median": {
+        "ttfbMs": 3.1,
+        "fcpMs": 220,
+        "lcpMs": 632,
+        "dclMs": 349.3,
+        "loadMs": 355.9,
+        "longTaskCount": 2,
+        "longTaskTotalMs": 169,
+        "longTaskMaxMs": 103,
+        "tbtMs": 69,
+        "cls": 0,
+        "requests": 51,
+        "transferredKB": 2252.6,
+        "decodedKB": 2228,
+        "heapMB": 2.3,
+        "domNodes": 220
+      },
+      "kbByType": {
+        "html": 4.1,
+        "css": 335.3,
+        "font": 500.8,
+        "js": 429.8,
+        "json/fetch": 780,
+        "image": 202.5
+      },
+      "topResources": [
+        {
+          "url": "/css/styles.css?v=0.6.0-alpha-10-v2b",
+          "type": "Stylesheet",
+          "encodedKB": 335.3
+        },
+        {
+          "url": "/data/reference.json",
+          "type": "Fetch",
+          "encodedKB": 263.8
+        },
+        {
+          "url": "/data/derived/search-index.json",
+          "type": "Fetch",
+          "encodedKB": 257.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Bold.ttf",
+          "type": "Font",
+          "encodedKB": 255.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Regular.ttf",
+          "type": "Font",
+          "encodedKB": 245.5
+        },
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "type": "Image",
+          "encodedKB": 202.5
+        }
+      ],
+      "hero": [
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "encodedKB": 202.5
+        }
+      ],
+      "horizontalScroll": false,
+      "failedRequests": 0,
+      "raw": [
+        {
+          "ttfbMs": 3.1000000000931323,
+          "fcpMs": 200,
+          "lcpMs": 612,
+          "dclMs": 349.29999999981374,
+          "loadMs": 355.89999999990687,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 159,
+          "longTaskMaxMs": 98,
+          "tbtMs": 59,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 3,
+          "fcpMs": 220,
+          "lcpMs": 632,
+          "dclMs": 329.6999999997206,
+          "loadMs": 337.60000000009313,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 169,
+          "longTaskMaxMs": 103,
+          "tbtMs": 69,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 3.3999999999068677,
+          "fcpMs": 228,
+          "lcpMs": 672,
+          "dclMs": 366.79999999981374,
+          "loadMs": 374.39999999990687,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 177,
+          "longTaskMaxMs": 115,
+          "tbtMs": 77,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        }
+      ]
+    },
+    {
+      "device": "iPhone 14",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "cpuThrottle": 1,
+      "median": {
+        "ttfbMs": 2.2,
+        "fcpMs": 76,
+        "lcpMs": 216,
+        "dclMs": 115.8,
+        "loadMs": 117.6,
+        "longTaskCount": 0,
+        "longTaskTotalMs": 0,
+        "longTaskMaxMs": 0,
+        "tbtMs": 0,
+        "cls": 0,
+        "requests": 51,
+        "transferredKB": 2252.6,
+        "decodedKB": 2228,
+        "heapMB": 2.3,
+        "domNodes": 220
+      },
+      "kbByType": {
+        "html": 4.1,
+        "css": 335.3,
+        "font": 500.8,
+        "js": 429.8,
+        "json/fetch": 780,
+        "image": 202.5
+      },
+      "topResources": [
+        {
+          "url": "/css/styles.css?v=0.6.0-alpha-10-v2b",
+          "type": "Stylesheet",
+          "encodedKB": 335.3
+        },
+        {
+          "url": "/data/reference.json",
+          "type": "Fetch",
+          "encodedKB": 263.8
+        },
+        {
+          "url": "/data/derived/search-index.json",
+          "type": "Fetch",
+          "encodedKB": 257.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Bold.ttf",
+          "type": "Font",
+          "encodedKB": 255.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Regular.ttf",
+          "type": "Font",
+          "encodedKB": 245.5
+        },
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "type": "Image",
+          "encodedKB": 202.5
+        }
+      ],
+      "hero": [
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "encodedKB": 202.5
+        }
+      ],
+      "horizontalScroll": false,
+      "failedRequests": 0,
+      "raw": [
+        {
+          "ttfbMs": 2.1999999997206032,
+          "fcpMs": 76,
+          "lcpMs": 216,
+          "dclMs": 115.79999999981374,
+          "loadMs": 117.59999999962747,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.7999999998137355,
+          "fcpMs": 88,
+          "lcpMs": 220,
+          "dclMs": 129.60000000009313,
+          "loadMs": 130.79999999981374,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.2000000001862645,
+          "fcpMs": 72,
+          "lcpMs": 204,
+          "dclMs": 104.60000000009313,
+          "loadMs": 105.79999999981374,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        }
+      ]
+    },
+    {
+      "device": "iPhone 14",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "cpuThrottle": 4,
+      "median": {
+        "ttfbMs": 2.3,
+        "fcpMs": 196,
+        "lcpMs": 636,
+        "dclMs": 312.6,
+        "loadMs": 323,
+        "longTaskCount": 2,
+        "longTaskTotalMs": 178,
+        "longTaskMaxMs": 93,
+        "tbtMs": 65,
+        "cls": 0,
+        "requests": 51,
+        "transferredKB": 2252.6,
+        "decodedKB": 2228,
+        "heapMB": 2.3,
+        "domNodes": 220
+      },
+      "kbByType": {
+        "html": 4.1,
+        "css": 335.3,
+        "font": 500.8,
+        "js": 429.8,
+        "json/fetch": 780,
+        "image": 202.5
+      },
+      "topResources": [
+        {
+          "url": "/css/styles.css?v=0.6.0-alpha-10-v2b",
+          "type": "Stylesheet",
+          "encodedKB": 335.3
+        },
+        {
+          "url": "/data/reference.json",
+          "type": "Fetch",
+          "encodedKB": 263.8
+        },
+        {
+          "url": "/data/derived/search-index.json",
+          "type": "Fetch",
+          "encodedKB": 257.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Bold.ttf",
+          "type": "Font",
+          "encodedKB": 255.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Regular.ttf",
+          "type": "Font",
+          "encodedKB": 245.5
+        },
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "type": "Image",
+          "encodedKB": 202.5
+        }
+      ],
+      "hero": [
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "encodedKB": 202.5
+        }
+      ],
+      "horizontalScroll": false,
+      "failedRequests": 0,
+      "raw": [
+        {
+          "ttfbMs": 2.7999999998137355,
+          "fcpMs": 224,
+          "lcpMs": 636,
+          "dclMs": 351.60000000009313,
+          "loadMs": 353.5,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 178,
+          "longTaskMaxMs": 103,
+          "tbtMs": 78,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.1999999997206032,
+          "fcpMs": 156,
+          "lcpMs": 512,
+          "dclMs": 244.60000000009313,
+          "loadMs": 245.79999999981374,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 135,
+          "longTaskMaxMs": 68,
+          "tbtMs": 35,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.3000000002793968,
+          "fcpMs": 196,
+          "lcpMs": 640,
+          "dclMs": 312.60000000009313,
+          "loadMs": 323,
+          "longTaskCount": 3,
+          "longTaskTotalMs": 215,
+          "longTaskMaxMs": 93,
+          "tbtMs": 65,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        }
+      ]
+    },
+    {
+      "device": "iPhone 15 Pro Max",
+      "viewport": {
+        "width": 430,
+        "height": 739
+      },
+      "cpuThrottle": 1,
+      "median": {
+        "ttfbMs": 2.3,
+        "fcpMs": 76,
+        "lcpMs": 196,
+        "dclMs": 101.5,
+        "loadMs": 102.8,
+        "longTaskCount": 0,
+        "longTaskTotalMs": 0,
+        "longTaskMaxMs": 0,
+        "tbtMs": 0,
+        "cls": 0,
+        "requests": 51,
+        "transferredKB": 2252.6,
+        "decodedKB": 2228,
+        "heapMB": 2.3,
+        "domNodes": 220
+      },
+      "kbByType": {
+        "html": 4.1,
+        "css": 335.3,
+        "font": 500.8,
+        "js": 429.8,
+        "json/fetch": 780,
+        "image": 202.5
+      },
+      "topResources": [
+        {
+          "url": "/css/styles.css?v=0.6.0-alpha-10-v2b",
+          "type": "Stylesheet",
+          "encodedKB": 335.3
+        },
+        {
+          "url": "/data/reference.json",
+          "type": "Fetch",
+          "encodedKB": 263.8
+        },
+        {
+          "url": "/data/derived/search-index.json",
+          "type": "Fetch",
+          "encodedKB": 257.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Bold.ttf",
+          "type": "Font",
+          "encodedKB": 255.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Regular.ttf",
+          "type": "Font",
+          "encodedKB": 245.5
+        },
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "type": "Image",
+          "encodedKB": 202.5
+        }
+      ],
+      "hero": [
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "encodedKB": 202.5
+        }
+      ],
+      "horizontalScroll": false,
+      "failedRequests": 0,
+      "raw": [
+        {
+          "ttfbMs": 2.2999999998137355,
+          "fcpMs": 76,
+          "lcpMs": 188,
+          "dclMs": 101.5,
+          "loadMs": 102.79999999981374,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.2999999998137355,
+          "fcpMs": 68,
+          "lcpMs": 196,
+          "dclMs": 100.5,
+          "loadMs": 101.79999999981374,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.400000000372529,
+          "fcpMs": 84,
+          "lcpMs": 208,
+          "dclMs": 115.3000000002794,
+          "loadMs": 119.10000000009313,
+          "longTaskCount": 0,
+          "longTaskTotalMs": 0,
+          "longTaskMaxMs": 0,
+          "tbtMs": 0,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        }
+      ]
+    },
+    {
+      "device": "iPhone 15 Pro Max",
+      "viewport": {
+        "width": 430,
+        "height": 739
+      },
+      "cpuThrottle": 4,
+      "median": {
+        "ttfbMs": 2.9,
+        "fcpMs": 192,
+        "lcpMs": 588,
+        "dclMs": 326.2,
+        "loadMs": 331.7,
+        "longTaskCount": 2,
+        "longTaskTotalMs": 145,
+        "longTaskMaxMs": 81,
+        "tbtMs": 45,
+        "cls": 0,
+        "requests": 51,
+        "transferredKB": 2252.6,
+        "decodedKB": 2228,
+        "heapMB": 2.3,
+        "domNodes": 220
+      },
+      "kbByType": {
+        "html": 4.1,
+        "css": 335.3,
+        "font": 500.8,
+        "js": 429.8,
+        "json/fetch": 780,
+        "image": 202.5
+      },
+      "topResources": [
+        {
+          "url": "/css/styles.css?v=0.6.0-alpha-10-v2b",
+          "type": "Stylesheet",
+          "encodedKB": 335.3
+        },
+        {
+          "url": "/data/reference.json",
+          "type": "Fetch",
+          "encodedKB": 263.8
+        },
+        {
+          "url": "/data/derived/search-index.json",
+          "type": "Fetch",
+          "encodedKB": 257.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Bold.ttf",
+          "type": "Font",
+          "encodedKB": 255.3
+        },
+        {
+          "url": "/assets/fonts/NotoSansArabic-Regular.ttf",
+          "type": "Font",
+          "encodedKB": 245.5
+        },
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "type": "Image",
+          "encodedKB": 202.5
+        }
+      ],
+      "hero": [
+        {
+          "url": "/assets/images/abu-dhabi-sea-hero.jpg",
+          "encodedKB": 202.5
+        }
+      ],
+      "horizontalScroll": false,
+      "failedRequests": 0,
+      "raw": [
+        {
+          "ttfbMs": 2.3000000002793968,
+          "fcpMs": 192,
+          "lcpMs": 584,
+          "dclMs": 275.3000000002794,
+          "loadMs": 281,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 142,
+          "longTaskMaxMs": 81,
+          "tbtMs": 42,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 4.600000000093132,
+          "fcpMs": 224,
+          "lcpMs": 588,
+          "dclMs": 326.1999999997206,
+          "loadMs": 331.6999999997206,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 145,
+          "longTaskMaxMs": 91,
+          "tbtMs": 45,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        },
+        {
+          "ttfbMs": 2.8999999999068677,
+          "fcpMs": 180,
+          "lcpMs": 644,
+          "dclMs": 361.1999999997206,
+          "loadMs": 367.29999999981374,
+          "longTaskCount": 2,
+          "longTaskTotalMs": 152,
+          "longTaskMaxMs": 76,
+          "tbtMs": 52,
+          "cls": 0,
+          "hscroll": false,
+          "lcpEl": null,
+          "requests": 51,
+          "transferredKB": 2252.6,
+          "decodedKB": 2228,
+          "failed": 0,
+          "heapMB": 2.26,
+          "domNodes": 220
+        }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 1,
+      "routes": [
+        {
+          "route": "#/preparation",
+          "median": {
+            "renderMs": 5.9,
+            "paintedMs": 33.6,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 147,
+            "heapMB": 1.9,
+            "heapDeltaMB": 0,
+            "layoutMs": 8,
+            "styleMs": 6.4,
+            "scriptMs": 1.1
+          },
+          "timedOut": false,
+          "raw": [
+            33.59999999962747,
+            36,
+            27.300000000279397
+          ]
+        },
+        {
+          "route": "#/preparation/U2",
+          "median": {
+            "renderMs": 6.7,
+            "paintedMs": 26.8,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 444,
+            "heapMB": 2,
+            "heapDeltaMB": 0.1,
+            "layoutMs": 13.7,
+            "styleMs": 5.7,
+            "scriptMs": 6.2
+          },
+          "timedOut": false,
+          "raw": [
+            29.600000000093132,
+            22.90000000037253,
+            26.800000000279397
+          ]
+        },
+        {
+          "route": "#/competencies",
+          "median": {
+            "renderMs": 2.3,
+            "paintedMs": 12.6,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 137,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 1.9,
+            "styleMs": 4.5,
+            "scriptMs": 1.6
+          },
+          "timedOut": false,
+          "raw": [
+            9.100000000093132,
+            12.600000000093132,
+            13.5
+          ]
+        },
+        {
+          "route": "#/competencies/C1",
+          "median": {
+            "renderMs": 3.5,
+            "paintedMs": 14.2,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 228,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 3.2,
+            "styleMs": 5.8,
+            "scriptMs": 3.2
+          },
+          "timedOut": false,
+          "raw": [
+            17.100000000093132,
+            14.200000000186265,
+            9
+          ]
+        },
+        {
+          "route": "#/question/C1-S1",
+          "median": {
+            "renderMs": 9.4,
+            "paintedMs": 10.7,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 95,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 4.3,
+            "styleMs": 2.7,
+            "scriptMs": 2.1
+          },
+          "timedOut": false,
+          "raw": [
+            20,
+            10.700000000186265,
+            9.399999999906868
+          ]
+        },
+        {
+          "route": "#/questions?view=deck",
+          "median": {
+            "renderMs": 10000.7,
+            "paintedMs": 10013.2,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 115,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 3.1,
+            "styleMs": 5.6,
+            "scriptMs": 5.9
+          },
+          "timedOut": true,
+          "raw": [
+            10013.200000000186,
+            10012,
+            10013.899999999907
+          ]
+        },
+        {
+          "route": "#/simulation",
+          "median": {
+            "renderMs": 12.2,
+            "paintedMs": 38,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 153,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 6.8,
+            "styleMs": 7.1,
+            "scriptMs": 3.6
+          },
+          "timedOut": false,
+          "raw": [
+            43.5,
+            36.39999999990687,
+            38
+          ]
+        },
+        {
+          "route": "#/reports",
+          "median": {
+            "renderMs": 4,
+            "paintedMs": 29.8,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 73,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 1.8,
+            "styleMs": 4,
+            "scriptMs": 1.1
+          },
+          "timedOut": false,
+          "raw": [
+            29.799999999813735,
+            33.200000000186265,
+            22
+          ]
+        },
+        {
+          "route": "#/self-intro",
+          "median": {
+            "renderMs": 5.4,
+            "paintedMs": 33.7,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 175,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 5.2,
+            "styleMs": 3.2,
+            "scriptMs": 1.4
+          },
+          "timedOut": false,
+          "raw": [
+            34.799999999813735,
+            33.700000000186265,
+            32.39999999990687
+          ]
+        },
+        {
+          "route": "#/settings",
+          "median": {
+            "renderMs": 10000.5,
+            "paintedMs": 10011.8,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 233,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 2.4,
+            "styleMs": 4.8,
+            "scriptMs": 3.7
+          },
+          "timedOut": true,
+          "raw": [
+            10011.799999999814,
+            10017.399999999907,
+            10008.80000000028
+          ]
+        }
+      ],
+      "endOfSessionHeapMB": 2.1
+    },
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 4,
+      "routes": [
+        {
+          "route": "#/preparation",
+          "median": {
+            "renderMs": 24.5,
+            "paintedMs": 92.3,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 147,
+            "heapMB": 1.9,
+            "heapDeltaMB": 0,
+            "layoutMs": 32.1,
+            "styleMs": 29.2,
+            "scriptMs": 6.7
+          },
+          "timedOut": false,
+          "raw": [
+            92.3000000002794,
+            75.39999999990687,
+            102.70000000018626
+          ]
+        },
+        {
+          "route": "#/preparation/U2",
+          "median": {
+            "renderMs": 53.4,
+            "paintedMs": 173.2,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 444,
+            "heapMB": 2,
+            "heapDeltaMB": 0.1,
+            "layoutMs": 75.3,
+            "styleMs": 35.1,
+            "scriptMs": 49.1
+          },
+          "timedOut": false,
+          "raw": [
+            151,
+            176.3000000002794,
+            173.1999999997206
+          ]
+        },
+        {
+          "route": "#/competencies",
+          "median": {
+            "renderMs": 20.6,
+            "paintedMs": 73.8,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 137,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 18.2,
+            "styleMs": 33.9,
+            "scriptMs": 15.3
+          },
+          "timedOut": false,
+          "raw": [
+            44.5,
+            73.8000000002794,
+            86.20000000018626
+          ]
+        },
+        {
+          "route": "#/competencies/C1",
+          "median": {
+            "renderMs": 25.8,
+            "paintedMs": 67.8,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 228,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 15.8,
+            "styleMs": 30.5,
+            "scriptMs": 21.6
+          },
+          "timedOut": false,
+          "raw": [
+            66.29999999981374,
+            67.8000000002794,
+            76.39999999990687
+          ]
+        },
+        {
+          "route": "#/question/C1-S1",
+          "median": {
+            "renderMs": 56.9,
+            "paintedMs": 65.7,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 95,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 20.5,
+            "styleMs": 20.7,
+            "scriptMs": 14
+          },
+          "timedOut": false,
+          "raw": [
+            47.299999999813735,
+            65.6999999997206,
+            102.29999999981374
+          ]
+        },
+        {
+          "route": "#/questions?view=deck",
+          "median": {
+            "renderMs": 10001.7,
+            "paintedMs": 10007.2,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 115,
+            "heapMB": 2,
+            "heapDeltaMB": 0,
+            "layoutMs": 13.1,
+            "styleMs": 27.6,
+            "scriptMs": 23.6
+          },
+          "timedOut": true,
+          "raw": [
+            10017.600000000093,
+            10007.19999999972,
+            10004.700000000186
+          ]
+        },
+        {
+          "route": "#/simulation",
+          "median": {
+            "renderMs": 57.2,
+            "paintedMs": 75,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 153,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 28.1,
+            "styleMs": 38,
+            "scriptMs": 25.7
+          },
+          "timedOut": false,
+          "raw": [
+            75,
+            64.5,
+            84.8000000002794
+          ]
+        },
+        {
+          "route": "#/reports",
+          "median": {
+            "renderMs": 22.4,
+            "paintedMs": 47.9,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 73,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 10.2,
+            "styleMs": 21.9,
+            "scriptMs": 5.6
+          },
+          "timedOut": false,
+          "raw": [
+            47.89999999990687,
+            39.39999999990687,
+            50.200000000186265
+          ]
+        },
+        {
+          "route": "#/self-intro",
+          "median": {
+            "renderMs": 25.6,
+            "paintedMs": 74.9,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 175,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 22.5,
+            "styleMs": 20.9,
+            "scriptMs": 6.7
+          },
+          "timedOut": false,
+          "raw": [
+            74.89999999990687,
+            72.1999999997206,
+            83.20000000018626
+          ]
+        },
+        {
+          "route": "#/settings",
+          "median": {
+            "renderMs": 10001.9,
+            "paintedMs": 10012.7,
+            "longTasks": 0,
+            "longTaskMs": 0,
+            "domNodes": 233,
+            "heapMB": 2.1,
+            "heapDeltaMB": 0,
+            "layoutMs": 11.6,
+            "styleMs": 28.7,
+            "scriptMs": 27.5
+          },
+          "timedOut": true,
+          "raw": [
+            10012.700000000186,
+            10007.80000000028,
+            10020
+          ]
+        }
+      ],
+      "endOfSessionHeapMB": 2.1
+    }
+  ],
+  "swipe": [
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 1,
+      "medianMs": 13.6,
+      "samples": [
+        12.799999999813735,
+        30.100000000093132,
+        12,
+        5.2000000001862645,
+        14.5,
+        13.599999999627471,
+        16.899999999906868,
+        10.299999999813735,
+        13.800000000279397
+      ]
+    },
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 4,
+      "medianMs": 24.4,
+      "samples": [
+        32,
+        21.699999999720603,
+        21.899999999906868,
+        35.5,
+        19.5,
+        23.40000000037253,
+        29.299999999813735,
+        30.600000000558794,
+        24.40000000037253
+      ]
+    }
+  ],
+  "inpageInteractions": [
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 1,
+      "method": "in-page event.timeStamp to second animation frame after content ready",
+      "steps": [
+        {
+          "name": "nav tap: home -> preparation",
+          "medianMs": 77.8,
+          "medianRenderMs": 47.8,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            75,
+            79.20000000018626,
+            77.79999999981374
+          ]
+        },
+        {
+          "name": "nav tap: preparation -> simulation",
+          "medianMs": 79.2,
+          "medianRenderMs": 57,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            80.20000000018626,
+            79.20000000018626,
+            79
+          ]
+        },
+        {
+          "name": "nav tap: simulation -> reports",
+          "medianMs": 78.8,
+          "medianRenderMs": 46,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            79.6000000005588,
+            78.79999999981374,
+            77.3999999994412
+          ]
+        },
+        {
+          "name": "nav tap: reports -> more (settings)",
+          "medianMs": 78.6,
+          "medianRenderMs": 45.7,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            78.6000000005588,
+            78.29999999981374,
+            79.69999999925494
+          ]
+        },
+        {
+          "name": "nav tap: settings -> home",
+          "medianMs": 79,
+          "medianRenderMs": 46.7,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            79.79999999981374,
+            79,
+            77.79999999981374
+          ]
+        },
+        {
+          "name": "deck: next question (button)",
+          "medianMs": 63.6,
+          "medianRenderMs": 30.4,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            63.60000000055879,
+            64,
+            60.60000000055879
+          ]
+        },
+        {
+          "name": "deck: filter scenario",
+          "medianMs": 62.9,
+          "medianRenderMs": 29.8,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            62.90000000037253,
+            63.40000000037253,
+            61.60000000055879
+          ]
+        },
+        {
+          "name": "deck: filter all",
+          "medianMs": 63.6,
+          "medianRenderMs": 30.2,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            63.10000000055879,
+            63.60000000055879,
+            63.60000000055879
+          ]
+        },
+        {
+          "name": "deck: search keystroke (filters 70 -> 23)",
+          "medianMs": 32.7,
+          "medianRenderMs": 6.2,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            32.700000000186265,
+            31.200000000186265,
+            33.700000000186265
+          ]
+        }
+      ]
+    },
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 4,
+      "method": "in-page event.timeStamp to second animation frame after content ready",
+      "steps": [
+        {
+          "name": "nav tap: home -> preparation",
+          "medianMs": 170.4,
+          "medianRenderMs": 106.3,
+          "medianLongTasks": 1,
+          "medianLongTaskMs": 74,
+          "samples": [
+            208.19999999925494,
+            170.3999999994412,
+            168.1000000005588
+          ]
+        },
+        {
+          "name": "nav tap: preparation -> simulation",
+          "medianMs": 171.2,
+          "medianRenderMs": 79.2,
+          "medianLongTasks": 1,
+          "medianLongTaskMs": 74,
+          "samples": [
+            171.20000000018626,
+            176.3999999994412,
+            169
+          ]
+        },
+        {
+          "name": "nav tap: simulation -> reports",
+          "medianMs": 76.8,
+          "medianRenderMs": 65.5,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            87.6000000005588,
+            75.5,
+            76.79999999981374
+          ]
+        },
+        {
+          "name": "nav tap: reports -> more (settings)",
+          "medianMs": 87.7,
+          "medianRenderMs": 72.4,
+          "medianLongTasks": 1,
+          "medianLongTaskMs": 51,
+          "samples": [
+            85.5,
+            87.70000000018626,
+            107
+          ]
+        },
+        {
+          "name": "nav tap: settings -> home",
+          "medianMs": 107,
+          "medianRenderMs": 81.8,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            121.70000000018626,
+            107,
+            106.30000000074506
+          ]
+        },
+        {
+          "name": "deck: next question (button)",
+          "medianMs": 69.4,
+          "medianRenderMs": 50,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            57.19999999925494,
+            69.3999999994412,
+            71.59999999962747
+          ]
+        },
+        {
+          "name": "deck: filter scenario",
+          "medianMs": 55.7,
+          "medianRenderMs": 32.6,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            55.700000000186265,
+            57.19999999925494,
+            51
+          ]
+        },
+        {
+          "name": "deck: filter all",
+          "medianMs": 56.8,
+          "medianRenderMs": 44.8,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            54.59999999962747,
+            56.799999999813735,
+            67.90000000037253
+          ]
+        },
+        {
+          "name": "deck: search keystroke (filters 70 -> 23)",
+          "medianMs": 44.3,
+          "medianRenderMs": 29.5,
+          "medianLongTasks": 0,
+          "medianLongTaskMs": 0,
+          "samples": [
+            44.299999999813735,
+            43.80000000074506,
+            50.90000000037253
+          ]
+        }
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 1,
+      "ok": true,
+      "fullResults": "/tmp/perf-mi-18750-x1/interaction-1791614491039.json",
+      "steps": [
+        {
+          "name": "accordion open (lesson details)",
+          "medians": {
+            "nextFrameAfterInputMs": 27.4,
+            "firstDomChangeMs": 24.2,
+            "feedbackVisibleMs": 24.5,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 24.2,
+            "interaction.latencyMs": 40,
+            "interaction.inputDelayMs": 15.3,
+            "interaction.processingMs": 3.6,
+            "interaction.presentationDelayMs": 20.3,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 17.4,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 24.2,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              26.5,
+              31
+            ],
+            "firstDomChangeMs": [
+              21.6,
+              25.9
+            ],
+            "feedbackVisibleMs": [
+              23.6,
+              28
+            ],
+            "completionMs": [
+              21.6,
+              25.9
+            ],
+            "interaction.latencyMs": [
+              40,
+              40.1
+            ],
+            "interaction.inputDelayMs": [
+              15,
+              18.3
+            ],
+            "interaction.processingMs": [
+              3.6,
+              4.5
+            ],
+            "interaction.presentationDelayMs": [
+              18.1,
+              21.4
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              17,
+              17.6
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              21.6,
+              25.9
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "accordion open (competency details)",
+          "medians": {
+            "nextFrameAfterInputMs": 29.5,
+            "firstDomChangeMs": 16.5,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 29.5,
+            "interaction.latencyMs": 40,
+            "interaction.inputDelayMs": 11.9,
+            "interaction.processingMs": 2.4,
+            "interaction.presentationDelayMs": 25.7,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 17.6,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 29.5,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              25.7,
+              30.4
+            ],
+            "firstDomChangeMs": [
+              13.5,
+              17
+            ],
+            "completionMs": [
+              25.6,
+              30.4
+            ],
+            "interaction.latencyMs": [
+              40,
+              40
+            ],
+            "interaction.inputDelayMs": [
+              9,
+              13.1
+            ],
+            "interaction.processingMs": [
+              2.1,
+              2.4
+            ],
+            "interaction.presentationDelayMs": [
+              24.8,
+              28.6
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              17.5,
+              18
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              25.6,
+              30.4
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [
+            "no visual feedback detected before the timeout"
+          ],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "competency tab: how to show",
+          "medians": {
+            "nextFrameAfterInputMs": 29.8,
+            "firstDomChangeMs": 17.3,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 17.3,
+            "interaction.latencyMs": 40,
+            "interaction.inputDelayMs": 12.1,
+            "interaction.processingMs": 5.1,
+            "interaction.presentationDelayMs": 22.7,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 17.3,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 17.3,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              29.4,
+              30
+            ],
+            "firstDomChangeMs": [
+              17,
+              18.4
+            ],
+            "completionMs": [
+              17,
+              18.4
+            ],
+            "interaction.latencyMs": [
+              40,
+              40.1
+            ],
+            "interaction.inputDelayMs": [
+              11.9,
+              13.3
+            ],
+            "interaction.processingMs": [
+              5.1,
+              5.2
+            ],
+            "interaction.presentationDelayMs": [
+              21.7,
+              23
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              16.9,
+              18.4
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              17,
+              18.4
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: select mode card (2 questions)",
+          "medians": {
+            "nextFrameAfterInputMs": 29.1,
+            "firstDomChangeMs": 15.7,
+            "feedbackVisibleMs": 27.8,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 15.7,
+            "interaction.latencyMs": 40.1,
+            "interaction.inputDelayMs": 11.6,
+            "interaction.processingMs": 4.4,
+            "interaction.presentationDelayMs": 23.6,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 18.9,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 15.7,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              26.7,
+              29.6
+            ],
+            "firstDomChangeMs": [
+              14.1,
+              16.5
+            ],
+            "feedbackVisibleMs": [
+              25.4,
+              27.8
+            ],
+            "completionMs": [
+              14.1,
+              16.5
+            ],
+            "interaction.latencyMs": [
+              32.1,
+              40.2
+            ],
+            "interaction.inputDelayMs": [
+              9.8,
+              12.1
+            ],
+            "interaction.processingMs": [
+              4.1,
+              4.4
+            ],
+            "interaction.presentationDelayMs": [
+              17.9,
+              24.5
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              16.9,
+              42.6
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              14.1,
+              16.5
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: answer method voice",
+          "medians": {
+            "nextFrameAfterInputMs": 29,
+            "firstDomChangeMs": 18.9,
+            "feedbackVisibleMs": 27.9,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 18.9,
+            "interaction.latencyMs": 40.1,
+            "interaction.inputDelayMs": 16,
+            "interaction.processingMs": 2.5,
+            "interaction.presentationDelayMs": 20.7,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 18.5,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 18.9,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              26.8,
+              29.5
+            ],
+            "firstDomChangeMs": [
+              18.1,
+              19.4
+            ],
+            "feedbackVisibleMs": [
+              25.6,
+              28.4
+            ],
+            "completionMs": [
+              18.1,
+              19.4
+            ],
+            "interaction.latencyMs": [
+              32.1,
+              40.1
+            ],
+            "interaction.inputDelayMs": [
+              15.6,
+              16.9
+            ],
+            "interaction.processingMs": [
+              2.5,
+              2.9
+            ],
+            "interaction.presentationDelayMs": [
+              14,
+              21.2
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              17,
+              20.3
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              18.1,
+              19.4
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: answer method text",
+          "medians": {
+            "nextFrameAfterInputMs": 29.1,
+            "firstDomChangeMs": 13.9,
+            "feedbackVisibleMs": 27.5,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 13.9,
+            "interaction.latencyMs": 32.1,
+            "interaction.inputDelayMs": 11.8,
+            "interaction.processingMs": 1.8,
+            "interaction.presentationDelayMs": 18.1,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 17.1,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 13.9,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              28.6,
+              29.5
+            ],
+            "firstDomChangeMs": [
+              12.9,
+              14.5
+            ],
+            "feedbackVisibleMs": [
+              27.5,
+              28.6
+            ],
+            "completionMs": [
+              12.9,
+              14.5
+            ],
+            "interaction.latencyMs": [
+              32,
+              32.2
+            ],
+            "interaction.inputDelayMs": [
+              11.3,
+              12.7
+            ],
+            "interaction.processingMs": [
+              1.6,
+              2.1
+            ],
+            "interaction.presentationDelayMs": [
+              17.6,
+              19.3
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              17,
+              17.2
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              12.9,
+              14.5
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: start (privacy gate)",
+          "medians": {
+            "nextFrameAfterInputMs": 29.4,
+            "firstDomChangeMs": 38.3,
+            "feedbackVisibleMs": 45.4,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 38.3,
+            "interaction.latencyMs": 32.1,
+            "interaction.inputDelayMs": 12.8,
+            "interaction.processingMs": 3,
+            "interaction.presentationDelayMs": 16.3,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 19,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 38.3,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              29.2,
+              29.4
+            ],
+            "firstDomChangeMs": [
+              37.5,
+              38.8
+            ],
+            "feedbackVisibleMs": [
+              45.2,
+              45.5
+            ],
+            "completionMs": [
+              37.5,
+              38.8
+            ],
+            "interaction.latencyMs": [
+              32,
+              32.1
+            ],
+            "interaction.inputDelayMs": [
+              12.8,
+              12.9
+            ],
+            "interaction.processingMs": [
+              2.8,
+              3.3
+            ],
+            "interaction.presentationDelayMs": [
+              15.9,
+              16.4
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              17.1,
+              20.7
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              37.5,
+              38.8
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: acknowledge privacy",
+          "medians": {
+            "nextFrameAfterInputMs": 29.6,
+            "firstDomChangeMs": 14.1,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 14.1,
+            "interaction.latencyMs": 32,
+            "interaction.inputDelayMs": 12.6,
+            "interaction.processingMs": 1.5,
+            "interaction.presentationDelayMs": 17.9,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 17.5,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 14.1,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              28.2,
+              30.2
+            ],
+            "firstDomChangeMs": [
+              13.2,
+              14.1
+            ],
+            "completionMs": [
+              13.2,
+              14.1
+            ],
+            "interaction.latencyMs": [
+              32,
+              32
+            ],
+            "interaction.inputDelayMs": [
+              11.2,
+              12.6
+            ],
+            "interaction.processingMs": [
+              1.5,
+              2
+            ],
+            "interaction.presentationDelayMs": [
+              17.9,
+              18.8
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              17.3,
+              17.8
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              13.2,
+              14.1
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: continue to first question",
+          "medians": {
+            "nextFrameAfterInputMs": 30.6,
+            "firstDomChangeMs": 34.1,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 52.3,
+            "interaction.latencyMs": 32.1,
+            "interaction.inputDelayMs": 12.8,
+            "interaction.processingMs": 5,
+            "interaction.presentationDelayMs": 14.6,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 23.5,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 52.3,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              30,
+              31.2
+            ],
+            "firstDomChangeMs": [
+              32.7,
+              34.6
+            ],
+            "completionMs": [
+              50.3,
+              52.4
+            ],
+            "interaction.latencyMs": [
+              32,
+              32.2
+            ],
+            "interaction.inputDelayMs": [
+              12.1,
+              12.9
+            ],
+            "interaction.processingMs": [
+              4.6,
+              5.3
+            ],
+            "interaction.presentationDelayMs": [
+              14.2,
+              14.8
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              22,
+              24.9
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              50.3,
+              52.4
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: theme dark",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: font size large",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: motion reduced",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: contrast high",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: open audio section (accordion, closes appearance)",
+          "medians": {
+            "nextFrameAfterInputMs": 30.6,
+            "firstDomChangeMs": 17.1,
+            "feedbackVisibleMs": 28.8,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 17.1,
+            "interaction.latencyMs": 40,
+            "interaction.inputDelayMs": 12.7,
+            "interaction.processingMs": 2.3,
+            "interaction.presentationDelayMs": 24.6,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 17,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 17.1,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              29.9,
+              30.7
+            ],
+            "firstDomChangeMs": [
+              16.8,
+              18.3
+            ],
+            "feedbackVisibleMs": [
+              28.1,
+              28.8
+            ],
+            "completionMs": [
+              16.8,
+              18.3
+            ],
+            "interaction.latencyMs": [
+              40,
+              40.1
+            ],
+            "interaction.inputDelayMs": [
+              12.6,
+              13.1
+            ],
+            "interaction.processingMs": [
+              2.1,
+              3
+            ],
+            "interaction.presentationDelayMs": [
+              24.4,
+              25.3
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              16.9,
+              17.5
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              16.8,
+              18.3
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        }
+      ]
+    },
+    {
+      "device": "iPhone 14",
+      "cpuThrottle": 4,
+      "ok": true,
+      "fullResults": "/tmp/perf-mi-18750-x4/interaction-1791614643219.json",
+      "steps": [
+        {
+          "name": "accordion open (lesson details)",
+          "medians": {
+            "nextFrameAfterInputMs": 76.4,
+            "firstDomChangeMs": 58.8,
+            "feedbackVisibleMs": 60.4,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 58.8,
+            "interaction.latencyMs": 80.1,
+            "interaction.inputDelayMs": 16.8,
+            "interaction.processingMs": 21.7,
+            "interaction.presentationDelayMs": 46.1,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 43.4,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 58.8,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              67.3,
+              82.1
+            ],
+            "firstDomChangeMs": [
+              43.5,
+              60
+            ],
+            "feedbackVisibleMs": [
+              46.5,
+              62.1
+            ],
+            "completionMs": [
+              43.5,
+              60
+            ],
+            "interaction.latencyMs": [
+              80.1,
+              96.2
+            ],
+            "interaction.inputDelayMs": [
+              10.4,
+              20.1
+            ],
+            "interaction.processingMs": [
+              19.9,
+              23.6
+            ],
+            "interaction.presentationDelayMs": [
+              40.1,
+              57.7
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              39.7,
+              48.1
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              43.5,
+              60
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "accordion open (competency details)",
+          "medians": {
+            "nextFrameAfterInputMs": 54.1,
+            "firstDomChangeMs": 33,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 43,
+            "interaction.latencyMs": 48,
+            "interaction.inputDelayMs": 9.6,
+            "interaction.processingMs": 13.4,
+            "interaction.presentationDelayMs": 29.5,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 28.7,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 43,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              42.8,
+              62.2
+            ],
+            "firstDomChangeMs": [
+              31.3,
+              47.6
+            ],
+            "completionMs": [
+              41.2,
+              60
+            ],
+            "interaction.latencyMs": [
+              48,
+              72.1
+            ],
+            "interaction.inputDelayMs": [
+              5.2,
+              16.3
+            ],
+            "interaction.processingMs": [
+              13.3,
+              16.1
+            ],
+            "interaction.presentationDelayMs": [
+              25,
+              39.7
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              28,
+              37.6
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              41.2,
+              60
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [
+            "no visual feedback detected before the timeout"
+          ],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "competency tab: how to show",
+          "medians": {
+            "nextFrameAfterInputMs": 59.8,
+            "firstDomChangeMs": 40.6,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 40.6,
+            "interaction.latencyMs": 72,
+            "interaction.inputDelayMs": 8.2,
+            "interaction.processingMs": 32.5,
+            "interaction.presentationDelayMs": 30.3,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 40.9,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 40.6,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              49.4,
+              69.1
+            ],
+            "firstDomChangeMs": [
+              33.6,
+              53.8
+            ],
+            "completionMs": [
+              33.6,
+              53.8
+            ],
+            "interaction.latencyMs": [
+              64.1,
+              80.1
+            ],
+            "interaction.inputDelayMs": [
+              5.3,
+              19.8
+            ],
+            "interaction.processingMs": [
+              28.5,
+              34.1
+            ],
+            "interaction.presentationDelayMs": [
+              26.2,
+              31.3
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              36.9,
+              42.4
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              33.6,
+              53.8
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: select mode card (2 questions)",
+          "medians": {
+            "nextFrameAfterInputMs": 53.1,
+            "firstDomChangeMs": 28.4,
+            "feedbackVisibleMs": 45.9,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 28.4,
+            "interaction.latencyMs": 56.1,
+            "interaction.inputDelayMs": 7.6,
+            "interaction.processingMs": 19.9,
+            "interaction.presentationDelayMs": 30.5,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 40.1,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 28.4,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              47,
+              74.8
+            ],
+            "firstDomChangeMs": [
+              25.6,
+              38.2
+            ],
+            "feedbackVisibleMs": [
+              39.2,
+              60.7
+            ],
+            "completionMs": [
+              25.6,
+              38.2
+            ],
+            "interaction.latencyMs": [
+              56.1,
+              80.1
+            ],
+            "interaction.inputDelayMs": [
+              5.8,
+              8.6
+            ],
+            "interaction.processingMs": [
+              19.8,
+              31.2
+            ],
+            "interaction.presentationDelayMs": [
+              27.6,
+              41.3
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              1
+            ],
+            "blocking.longestFrameGapMs": [
+              35.8,
+              56.4
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              1
+            ],
+            "breakdown.frontendTotalMs": [
+              25.6,
+              38.2
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: answer method voice",
+          "medians": {
+            "nextFrameAfterInputMs": 36.3,
+            "firstDomChangeMs": 22.8,
+            "feedbackVisibleMs": 28.9,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 22.8,
+            "interaction.latencyMs": 40.1,
+            "interaction.inputDelayMs": 12.1,
+            "interaction.processingMs": 12.1,
+            "interaction.presentationDelayMs": 18.9,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 24.7,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 22.8,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              34.6,
+              45.9
+            ],
+            "firstDomChangeMs": [
+              21.2,
+              28
+            ],
+            "feedbackVisibleMs": [
+              28,
+              35.4
+            ],
+            "completionMs": [
+              21.2,
+              28
+            ],
+            "interaction.latencyMs": [
+              40.1,
+              56
+            ],
+            "interaction.inputDelayMs": [
+              9.1,
+              14.3
+            ],
+            "interaction.processingMs": [
+              9.1,
+              15.9
+            ],
+            "interaction.presentationDelayMs": [
+              16.7,
+              28
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              21.7,
+              26.9
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              21.2,
+              28
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: answer method text",
+          "medians": {
+            "nextFrameAfterInputMs": 31.4,
+            "firstDomChangeMs": 16.6,
+            "feedbackVisibleMs": 24.6,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 16.6,
+            "interaction.latencyMs": 32.1,
+            "interaction.inputDelayMs": 6.5,
+            "interaction.processingMs": 9.8,
+            "interaction.presentationDelayMs": 15.6,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 19.2,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 16.6,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              24.6,
+              31.9
+            ],
+            "firstDomChangeMs": [
+              13.5,
+              17
+            ],
+            "feedbackVisibleMs": [
+              19.8,
+              24.9
+            ],
+            "completionMs": [
+              13.5,
+              17
+            ],
+            "interaction.latencyMs": [
+              32.1,
+              32.2
+            ],
+            "interaction.inputDelayMs": [
+              5.8,
+              6.8
+            ],
+            "interaction.processingMs": [
+              7.7,
+              10.5
+            ],
+            "interaction.presentationDelayMs": [
+              15.1,
+              18.6
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              19.2,
+              22.2
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              13.5,
+              17
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: start (privacy gate)",
+          "medians": {
+            "nextFrameAfterInputMs": 36,
+            "firstDomChangeMs": 89.9,
+            "feedbackVisibleMs": 94.1,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 89.9,
+            "interaction.latencyMs": 40.1,
+            "interaction.inputDelayMs": 6.6,
+            "interaction.processingMs": 22.9,
+            "interaction.presentationDelayMs": 9.2,
+            "blocking.longTaskCount": 1,
+            "blocking.longTaskTotalMs": 53,
+            "blocking.longTaskMaxMs": 53,
+            "blocking.longAnimationFrameBlockingMs": 7.3,
+            "blocking.longestFrameGapMs": 61.9,
+            "blocking.framesOver50ms": 1,
+            "breakdown.frontendTotalMs": 89.9,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              27,
+              38
+            ],
+            "firstDomChangeMs": [
+              74.2,
+              99.5
+            ],
+            "feedbackVisibleMs": [
+              77.9,
+              104.2
+            ],
+            "completionMs": [
+              74.2,
+              99.5
+            ],
+            "interaction.latencyMs": [
+              32.1,
+              40.9
+            ],
+            "interaction.inputDelayMs": [
+              6.3,
+              6.8
+            ],
+            "interaction.processingMs": [
+              16.4,
+              24.6
+            ],
+            "interaction.presentationDelayMs": [
+              9.1,
+              11.2
+            ],
+            "blocking.longTaskCount": [
+              0,
+              1
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              62
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              62
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              17
+            ],
+            "blocking.longestFrameGapMs": [
+              53.7,
+              71.4
+            ],
+            "blocking.framesOver50ms": [
+              1,
+              1
+            ],
+            "breakdown.frontendTotalMs": [
+              74.2,
+              99.5
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [
+            "long task(s) on the main thread, max 53 ms"
+          ],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: acknowledge privacy",
+          "medians": {
+            "nextFrameAfterInputMs": 30.2,
+            "firstDomChangeMs": 17.3,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 17.3,
+            "interaction.latencyMs": 32,
+            "interaction.inputDelayMs": 10.3,
+            "interaction.processingMs": 7.3,
+            "interaction.presentationDelayMs": 14.4,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 18.2,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 17.3,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              26.8,
+              31.2
+            ],
+            "firstDomChangeMs": [
+              13,
+              17.6
+            ],
+            "completionMs": [
+              13,
+              17.6
+            ],
+            "interaction.latencyMs": [
+              24.1,
+              32.1
+            ],
+            "interaction.inputDelayMs": [
+              5.6,
+              12.1
+            ],
+            "interaction.processingMs": [
+              5.2,
+              7.4
+            ],
+            "interaction.presentationDelayMs": [
+              11.1,
+              14.8
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              18.1,
+              20.3
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              13,
+              17.6
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "simulation: continue to first question",
+          "medians": {
+            "nextFrameAfterInputMs": 42.6,
+            "firstDomChangeMs": 55.2,
+            "feedbackVisibleMs": null,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 85.8,
+            "interaction.latencyMs": 40.2,
+            "interaction.inputDelayMs": 6.5,
+            "interaction.processingMs": 18.2,
+            "interaction.presentationDelayMs": 12.4,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 43.5,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 85.8,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              29.3,
+              54.7
+            ],
+            "firstDomChangeMs": [
+              39.8,
+              61.6
+            ],
+            "completionMs": [
+              64.7,
+              94.7
+            ],
+            "interaction.latencyMs": [
+              32.1,
+              56
+            ],
+            "interaction.inputDelayMs": [
+              4.1,
+              19.2
+            ],
+            "interaction.processingMs": [
+              15.6,
+              22.5
+            ],
+            "interaction.presentationDelayMs": [
+              11.2,
+              18.6
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              43.3,
+              46.5
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              64.7,
+              94.7
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: theme dark",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: font size large",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: motion reduced",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: contrast high",
+          "medians": {},
+          "spread": {},
+          "flags": [],
+          "errors": {},
+          "problems": [
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded.",
+            "action failed: locator.tap: Timeout 10000ms exceeded."
+          ],
+          "unavailable": {}
+        },
+        {
+          "name": "settings: open audio section (accordion, closes appearance)",
+          "medians": {
+            "nextFrameAfterInputMs": 49,
+            "firstDomChangeMs": 36.3,
+            "feedbackVisibleMs": 37.6,
+            "loadingShownMs": null,
+            "loadingVisibleForMs": null,
+            "completionMs": 36.3,
+            "interaction.latencyMs": 56.4,
+            "interaction.inputDelayMs": 12.2,
+            "interaction.processingMs": 14.2,
+            "interaction.presentationDelayMs": 35.1,
+            "blocking.longTaskCount": 0,
+            "blocking.longTaskTotalMs": 0,
+            "blocking.longTaskMaxMs": 0,
+            "blocking.longAnimationFrameBlockingMs": 0,
+            "blocking.longestFrameGapMs": 33,
+            "blocking.framesOver50ms": 0,
+            "breakdown.frontendTotalMs": 36.3,
+            "breakdown.networkAndBackendMs": 0
+          },
+          "spread": {
+            "nextFrameAfterInputMs": [
+              46.3,
+              71.7
+            ],
+            "firstDomChangeMs": [
+              32.2,
+              51.5
+            ],
+            "feedbackVisibleMs": [
+              34.1,
+              53.1
+            ],
+            "completionMs": [
+              32.2,
+              51.5
+            ],
+            "interaction.latencyMs": [
+              56.1,
+              72.1
+            ],
+            "interaction.inputDelayMs": [
+              4.8,
+              20.4
+            ],
+            "interaction.processingMs": [
+              12.2,
+              16.6
+            ],
+            "interaction.presentationDelayMs": [
+              31.7,
+              37.4
+            ],
+            "blocking.longTaskCount": [
+              0,
+              0
+            ],
+            "blocking.longTaskTotalMs": [
+              0,
+              0
+            ],
+            "blocking.longTaskMaxMs": [
+              0,
+              0
+            ],
+            "blocking.longAnimationFrameBlockingMs": [
+              0,
+              0
+            ],
+            "blocking.longestFrameGapMs": [
+              29.6,
+              37.7
+            ],
+            "blocking.framesOver50ms": [
+              0,
+              0
+            ],
+            "breakdown.frontendTotalMs": [
+              32.2,
+              51.5
+            ],
+            "breakdown.networkAndBackendMs": [
+              0,
+              0
+            ]
+          },
+          "flags": [],
+          "errors": {},
+          "problems": [],
+          "unavailable": {}
+        }
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-10T06:44:03.301Z"
+}
