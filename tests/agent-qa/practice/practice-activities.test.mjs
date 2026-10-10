@@ -161,6 +161,69 @@ for (const [w, h] of VIEWPORTS) {
   const cards2 = await page.evaluate(() => JSON.parse(localStorage.getItem('lic:v2:cards')));
   check(`A5 persistence across reload ${tag}`, Object.keys(cards2.cards).length === 2);
 
+  // ---- F4: C3-B4 is excluded from the A1/A3 drill pool only (A2 chooser keeps it)
+  const pools = await page.evaluate(async () => {
+    const core = await import('/js/practice-core.js');
+    const data = { questions: await (await fetch('/data/derived/questions.json')).json() };
+    const ids = list => list.map(item => item.id);
+    return { star: ids(core.drillPool(data, 'star_l')), seal: ids(core.drillPool(data, 'seal')), chooser: ids(core.chooserPool(data, 'star_l')), exclude: [...core.ELEMENT_DRILL_EXCLUDE] };
+  });
+  check(`F4 ELEMENT_DRILL_EXCLUDE is C3-B4 ${tag}`, pools.exclude.join() === 'C3-B4', pools.exclude.join());
+  check(`F4 drill pool (A1/A3) omits C3-B4, keeps others ${tag}`, !pools.star.includes('C3-B4') && pools.star.length === 42 && pools.seal.length === 22, `${pools.star.length}/${pools.seal.length}`);
+  check(`F4 A2 chooser pool still has C3-B4 ${tag}`, pools.chooser.includes('C3-B4'));
+  await page.goto(`${BASE}/#/practice/a1?mode=sort&q=C3-B4`); await page.waitForSelector('.practice-question-text');
+  const forced = (await page.locator('.practice-question-text').innerText()).replace(/\s+/g, ' ').trim();
+  check(`F4 A1 sort ignores a forced C3-B4 ${tag}`, forced !== questions.find(item => item.id === 'C3-B4').display_question);
+
+  // ---- F1/F3: A5 card wording
+  await page.goto(`${BASE}/#/practice/a5?only=mistakes:1`); await page.waitForSelector('.flashcard');
+  const mistakeFront = await page.locator('.flashcard-front').innerText();
+  check(`F1 mistakes card front asks why it is a common mistake ${tag}`, /^لماذا يُعدّ «.+» خطأً شائعًا في الإجابة؟$/.test(mistakeFront.trim()), mistakeFront);
+  await page.getByRole('button', { name: 'أظهر الإجابة' }).click();
+  const mistakeBack = await page.locator('.flashcard-back').innerHTML();
+  check(`F1 mistakes card back = mistake (bold) then explanation ${tag}`, /^<strong>.+<\/strong><p>.+<\/p>$/.test(mistakeBack.trim()), mistakeBack.slice(0, 200));
+  await page.goto(`${BASE}/#/practice/a5?only=comp:C1`); await page.waitForSelector('.flashcard');
+  const compFront = await page.locator('.flashcard-front').innerText();
+  check(`F3 competency card front has no "ببساطة" ${tag}`, /^ما تعريف كفاءة «.+»؟$/.test(compFront.trim()) && !compFront.includes('ببساطة'), compFront);
+  await page.getByRole('button', { name: 'أظهر الإجابة' }).click();
+  const compBack = (await page.locator('.flashcard-back').innerText()).trim();
+  check(`F3 competency card back is one short sentence ${tag}`, compBack.length > 20 && compBack.length < 260, String(compBack.length));
+
+  // ---- F3/F2 copy
+  await page.goto(`${BASE}/#/competencies/C1`); await page.waitForSelector('#competency-meaning, .competency-explainer');
+  const meaningTitles = await page.locator('.competency-explainer-item > summary').allInnerTexts();
+  check(`F3 competency accordion titles ${tag}`, meaningTitles.some(t => t.includes('تعريف الكفاءة')) && !meaningTitles.some(t => t.includes('المعنى ببساطة')), meaningTitles.join(' | '));
+  await page.goto(`${BASE}/#/preparation/U5`); await page.waitForSelector('.smart-accordion');
+  const u5 = await page.evaluate(() => document.body.textContent);
+  check(`F2 U5 6.1 says 2-3 strong situations ${tag}`, u5.includes('اختر من موقفين إلى ثلاثة مواقف قوية لكل كفاءة') && !u5.includes('قصة أو قصتين'));
+
+  // ---- F5: U1 and U2 mini-checks (one attempt per question, immediate icon+text feedback, persisted)
+  for (const [lesson, storeName, firstCorrect, firstWrong, secondCorrect] of [
+    ['U1', 'u1-check', 'سلوكك القيادي الفعلي ودليله', 'المعلومات النظرية التي تحفظها', '«لاحظت أن الفريق لم يفهم التوجيه، فأعدت صياغته وطلبت من كل فرد أن يعيد شرح جزئه.»'],
+    ['U2', 'u2-check', 'الإجراء', 'الموقف', 'التقييم']
+  ]) {
+    await page.goto(`${BASE}/#/preparation/${lesson}`); await page.reload(); await page.waitForSelector('.mini-check');
+    const mini = page.locator('.mini-check');
+    check(`F5 ${lesson} mini-check shows question 1 of 2 ${tag}`, (await mini.innerText()).includes('1 من 2'));
+    await mini.locator('.mini-check-option', { hasText: firstWrong }).click();
+    const wrongText = await mini.locator('.practice-feedback').innerText();
+    check(`F5 ${lesson} wrong answer: glyph and text feedback ${tag}`, wrongText.includes('✗') && wrongText.includes('ليست الإجابة الأدق') && wrongText.length > 40, wrongText);
+    check(`F5 ${lesson} options locked after one attempt, marks not colour-only ${tag}`,
+      (await mini.locator('.mini-check-option:disabled').count()) >= 2 && (await mini.locator('.mini-check-option.right .mini-check-mark').innerText()) === '✓' && (await mini.locator('.mini-check-option.wrong .mini-check-mark').innerText()) === '✗');
+    await mini.getByRole('button', { name: 'السؤال التالي' }).click();
+    check(`F5 ${lesson} question 2 of 2 ${tag}`, (await mini.innerText()).includes('2 من 2'));
+    await mini.locator('.mini-check-option', { hasText: secondCorrect }).first().click();
+    check(`F5 ${lesson} correct answer feedback ${tag}`, (await mini.locator('.practice-feedback').innerText()).includes('✓'));
+    await mini.getByRole('button', { name: 'عرض النتيجة' }).click();
+    const saved5 = await page.evaluate(name => JSON.parse(localStorage.getItem('lic:v2:' + name) || 'null'), storeName);
+    check(`F5 ${lesson} persisted lic:v2:${storeName} ${tag}`, saved5 && saved5.passed === false && saved5.answers.length === 2 && typeof saved5.at === 'string', JSON.stringify(saved5));
+    await page.reload(); await page.waitForSelector('.mini-check');
+    check(`F5 ${lesson} summary restored after reload ${tag}`, (await page.locator('.mini-check').innerText()).includes('1 من 2'));
+    await page.getByRole('button', { name: 'أعد التحقق' }).click();
+    await page.locator('.mini-check .mini-check-option', { hasText: firstCorrect }).click();
+    check(`F5 ${lesson} correct first answer is marked ${tag}`, (await page.locator('.mini-check .practice-feedback').innerText()).includes('صحيح'));
+  }
+
   // ---- layout, targets, hub
   for (const route of ['practice', 'practice/a1', 'practice/a2', 'practice/a3', 'practice/a4', 'practice/a5', 'preparation', 'preparation/U2', 'preparation/U5']) {
     await page.goto(`${BASE}/#/${route}`); await page.waitForTimeout(300);

@@ -80,10 +80,11 @@ export async function renderA1(root, data, params = new URLSearchParams()) {
   const save = () => writeStore('a1', { ...store, lastMode: mode });
 
   const body = el('div', { class: 'practice-body' });
+  // I3: السؤال والبطاقات أولًا؛ مفتاحا النوع والإطار بعد التمرين حتى تظهر البطاقات في الشاشة الأولى.
   const shell = practiceShell('ورشة العناصر', 'درّب عينك على عناصر STAR-L وSEAL داخل إجابات حقيقية.',
+    body,
     segmented('نوع التمرين', [['sort', 'رتّب العناصر'], ['missing', 'اكتشف الناقص']], mode, value => { mode = value; forced = {}; save(); start(); }),
-    segmented('الإطار', [['star_l', 'STAR-L'], ['seal', 'SEAL']], fw, value => { fw = value; forced = {}; start(); }),
-    body
+    segmented('الإطار', [['star_l', 'STAR-L'], ['seal', 'SEAL']], fw, value => { fw = value; forced = {}; start(); })
   );
   clear(root).append(shell);
 
@@ -214,7 +215,7 @@ export async function renderA1(root, data, params = new URLSearchParams()) {
       state.phase === 'arrange' || state.phase === 'retry' ? actions : null,
       feedback.node,
       footer,
-      store.mastered.sort ? badge('أتقنت هذا التمرين') : null
+      store.mastered.sort ? badge('أنجزت هذا التمرين') : null
     );
     restoreFocus(body, focusId);
   }
@@ -323,7 +324,7 @@ export async function renderA1(root, data, params = new URLSearchParams()) {
       state.finished ? el('div', { class: 'practice-actions' },
         button('تمرين جديد', { onClick: () => startMissing() }),
         fw === 'star_l' ? button('شاهد إجابة كاملة', { href: '#/practice/a3', variant: 'secondary' }) : null) : null,
-      store.mastered.missing ? badge('أتقنت هذا التمرين') : null
+      store.mastered.missing ? badge('أنجزت هذا التمرين') : null
     );
     restoreFocus(body, focusId);
   }

@@ -490,10 +490,14 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     });
     const continueButton = button('فهمت، متابعة', {
       className: 'wide simulation-privacy-continue',
-      disabled: true
+      disabled: true,
+      'aria-describedby': 'simulation-privacy-hint'
     });
+    // سطر مساعد يشرح سبب تعطيل الزر ويختفي عند التأكيد.
+    const continueHint = el('small', { class: 'hint', id: 'simulation-privacy-hint', text: 'أكّد التنبيه للمتابعة' });
     acknowledgement.addEventListener('change', () => {
       continueButton.disabled = !acknowledgement.checked;
+      continueHint.hidden = acknowledgement.checked;
     });
     continueButton.addEventListener('click', async () => {
       if (!acknowledgement.checked) return;
@@ -533,6 +537,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
           el('small', { text: 'سأخفي الهوية وأُبقي التفاصيل اللازمة للتقييم.' })
         )
       ),
+      continueHint,
       el('div', { class: 'simulation-privacy-actions' },
         continueButton,
         button('رجوع', {
@@ -859,11 +864,14 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         el('small', { text: 'قيّم التطبيق المضمون، وليس اللغة أو الطلاقة.' })
       );
     const status = el('div', { class: 'evaluation-status' });
-    const submit = button('إرسال الإجابة للتقييم', { className: 'wide' });
+    const submit = button('إرسال الإجابة للتقييم', { className: 'wide', 'aria-describedby': 'answer-submit-hint' });
     const retryButton = button('إعادة الإرسال', { className: 'wide resend-evaluation', hidden: true });
+    // سطر مساعد يشرح سبب تعطيل زر الإرسال.
+    const submitHint = el('small', { class: 'hint', id: 'answer-submit-hint', text: 'اكتب إجابتك أولًا' });
     const runner = createEvaluationRunner({ status, submit, retryButton, workingText: 'جارٍ تحليل الأدلة والتحقق من الاقتباسات…', workingHint: 'قد يستغرق ذلك عدة ثوانٍ.' });
     function syncSubmitState() {
       submit.disabled = answerInput.value.trim().length < 5;
+      submitHint.hidden = !submit.disabled;
     }
     syncSubmitState();
 
@@ -929,6 +937,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       ) : null,
       methodReminder,
       status,
+      submitHint,
       submit,
       retryButton,
       button('حفظ والخروج إلى الرئيسية', {

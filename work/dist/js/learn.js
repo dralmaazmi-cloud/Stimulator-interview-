@@ -4,7 +4,7 @@ import { renderInlineQuestion } from './competencies.js';
 import { bookActions } from './print-actions.js';
 import { renderBudgetPanel } from './practice-a4.js';
 import { rateCard, reviewStatus } from './practice-a5.js';
-import { FRAMEWORKS, readStore, rich, u2PracticeMastered, writeStore } from './practice-core.js';
+import { FRAMEWORKS, miniCheck, readStore, rich, u2PracticeMastered, writeStore } from './practice-core.js';
 import {
   bindExclusiveAccordions, button, clear, el, icon, notice, renderBlock, tag, toast
 } from './ui.js';
@@ -31,10 +31,10 @@ const CARD_DESCRIPTIONS = Object.freeze({
 
 // تقدير زمني [EST] يُضبط مع متعلمين حقيقيين.
 const TIME_HINTS = Object.freeze({
-  U1: 'نحو 8 دقائق',
-  U2: 'نحو 15 دقيقة مع التدريبات',
-  U4: 'نحو 10 دقائق',
-  U5: 'نحو 5 دقائق'
+  U1: 'نحو 8 دقائق (تقدير تقريبي)',
+  U2: 'نحو 15 دقيقة مع التدريبات (تقدير تقريبي)',
+  U4: 'نحو 10 دقائق (تقدير تقريبي)',
+  U5: 'نحو 5 دقائق (تقدير تقريبي)'
 });
 
 const PATH_STEPS = Object.freeze([
@@ -310,6 +310,56 @@ function twoTypesPanel() {
   );
 }
 
+// F5: تحقق قصير في نهاية المحطتين (O1 وO5). النصوص من مخطط S2/S3، والإجابات من المرجع 1.2 و1.3 و2.1 و2.2 و2.4.
+function understandCheck() {
+  return miniCheck({
+    storeName: 'u1-check',
+    title: 'تحقق سريع',
+    questions: [
+      {
+        text: 'ما الذي تقيسه المقابلة المبنية على الكفاءات أساسًا؟',
+        options: [
+          { text: 'المعلومات النظرية التي تحفظها', feedback: 'المعرفة داعمة لكنها لا تكشف السلوك وحدها.' },
+          { text: 'سلوكك القيادي الفعلي ودليله', correct: true, feedback: 'الكفاءة تُقاس بأدلة سلوكية: ماذا فعلت فعلًا.' },
+          { text: 'الطلاقة والانطباع العام', feedback: 'التقييم يعتمد على جودة الإجابة لا على الطلاقة أو الانطباع العام.' }
+        ]
+      },
+      {
+        text: 'أي الجملتين أقرب إلى دليل سلوكي؟',
+        options: [
+          { text: '«أنا أؤمن بالتواصل الجيد.»', feedback: 'هذا رأي. الدليل يريد ما فعلته أنت فعلًا.' },
+          { text: '«لاحظت أن الفريق لم يفهم التوجيه، فأعدت صياغته وطلبت من كل فرد أن يعيد شرح جزئه.»', correct: true, feedback: 'هذه جملة تصف ما فعلته أنت فعلًا، وهذا هو الدليل السلوكي.' }
+        ]
+      }
+    ]
+  });
+}
+
+function answerBuildingCheck() {
+  return miniCheck({
+    storeName: 'u2-check',
+    title: 'تحقق سريع',
+    questions: [
+      {
+        text: 'أي عنصر ينبغي أن يكون الجزء الأكبر من إجابة STAR-L؟',
+        options: [
+          { text: 'الموقف', feedback: 'الموقف يمهّد فقط. الجزء الأكبر من إجابة STAR-L هو الإجراء (نحو 70%).' },
+          { text: 'الإجراء', correct: true, feedback: 'الإجراء هو الجزء الأكبر من إجابتك (نحو 70%). قل «أنا فعلت» لا «نحن فعلنا».' },
+          { text: 'التعلّم', feedback: 'التعلّم يختم الإجابة. الجزء الأكبر من إجابة STAR-L هو الإجراء (نحو 70%).' }
+        ]
+      },
+      {
+        text: 'في سؤال سيناريو، أي عنصر هو الأهم؟',
+        options: [
+          { text: 'فهم الوضع', feedback: 'فهم الوضع يمهّد للقرار. العنصر الأهم في SEAL هو التقييم: حلّل الخيارات والمخاطر قبل أن تقرر.' },
+          { text: 'التقييم', correct: true, feedback: 'التقييم هو أهم عنصر: حلّل الخيارات والمخاطر قبل أن تقرر.' },
+          { text: 'الأثر القيادي', feedback: 'الأثر القيادي يختم الإجابة. العنصر الأهم في SEAL هو التقييم: حلّل الخيارات والمخاطر قبل أن تقرر.' }
+        ]
+      }
+    ]
+  });
+}
+
 function renderUnderstand(body, data, lesson) {
   body.append(
     el('div', { class: 'learning-progress no-print' },
@@ -324,6 +374,7 @@ function renderUnderstand(body, data, lesson) {
       label: 'محاور فهم المقابلة',
       icons: ['target', 'book', 'microphone', 'communication', 'leadership']
     }),
+    understandCheck(),
     el('aside', { class: 'reading-tip' },
       el('span', {}, icon('problem')),
       el('div', {}, el('small', { text: 'نصيحة عملية' }), el('p', { text: 'اربط كل مفهوم بخبرة حقيقية من عملك؛ فالوضوح والصدق أقوى من الإجابات المحفوظة.' }))
@@ -362,7 +413,8 @@ function renderAnswerBuilding(body, data, lesson) {
     sourceAccordion(pick(['2.6', '2.7']), 'answer-building-deep', {
       idKey: 'answer-building',
       icons: ['communication', 'leadership']
-    })
+    }),
+    answerBuildingCheck()
   );
 }
 
@@ -448,7 +500,7 @@ async function readinessAccordion(data) {
       if (section.number === '6.1') {
         renderChecklist(body, section);
         body.append(
-          el('p', { class: 'practice-helper', text: 'اختر قصة أو قصتين على الأقل لكل كفاءة، ثم تدرّب على قولها بصوتك.' }),
+          el('p', { class: 'practice-helper', text: 'اختر من موقفين إلى ثلاثة مواقف قوية لكل كفاءة، ثم تدرّب على قولها بصوتك.' }),
           el('a', { class: 'practice-link', href: '#/competencies' }, 'افتح الكفاءات'));
       }
       if (section.number === '6.3') body.append(renderBudgetPanel(), renderSelfIntroLauncher());

@@ -85,7 +85,7 @@ export async function renderA2(root, data, params = new URLSearchParams()) {
           if (question.rubric_mode === 'star_l') {
             feedback.show('bad', 'ليس هذا.', 'هذا سؤال سلوكي: يطلب قصة من خبرتك، فنستخدم STAR-L.', 'غالبًا يبدأ السؤال السلوكي بطلب مثل: صف، أخبرني، اذكر.');
           } else {
-            feedback.show('bad', 'ليس هذا.', 'هذا سؤال سيناريو: الموقف مكتوب أمامك ويسأل ماذا ستفعل، فنستخدم SEAL.');
+            feedback.show('bad', 'ليس هذا.', 'هذا سؤال سيناريو: الموقف مكتوب أمامك ويسأل ماذا ستفعل، فنستخدم SEAL.', 'انتبه لآخر السؤال: كيف ستتعامل؟ ماذا ستفعل؟ هذه صيغة موقف افتراضي.');
           }
         }
         save();
@@ -127,7 +127,7 @@ export async function renderA2(root, data, params = new URLSearchParams()) {
           passed ? null : button('راجع المقارنة بين النوعين', { href: '#/preparation/U2', variant: 'secondary' }),
           button('كل التمارين', { href: '#/practice', variant: 'ghost' })
         ),
-        store.mastered ? el('p', { class: 'practice-badge' }, el('span', { 'aria-hidden': 'true', text: '✓' }), ' أتقنت هذا التمرين') : null
+        store.mastered ? el('p', { class: 'practice-badge' }, el('span', { 'aria-hidden': 'true', text: '✓' }), ' أنجزت هذا التمرين') : null
       )
     );
     feedback.show(passed ? 'good' : 'info', passed ? 'ممتاز. تميّز نوع السؤال بثقة.' : 'راجع المقارنة بين النوعين ثم أعد الجولة.');

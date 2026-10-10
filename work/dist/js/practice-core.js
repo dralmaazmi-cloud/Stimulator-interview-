@@ -1,6 +1,6 @@
 // تمارين التعلّم V2: أدوات مشتركة (تخزين محلي آمن، ترتيب بالتدوير، مكوّنات واجهة مشتركة).
 // لا يُكتب هنا أي محتوى معتمد؛ كل نصوص الأسئلة والإجابات والتعريفات تُقرأ وقت التشغيل من البيانات المعتمدة.
-import { el } from './ui.js';
+import { button, el } from './ui.js';
 import { rotateOrder } from './rotation.js';
 import { modelElements } from './guidance.js';
 
@@ -9,6 +9,10 @@ export const PREFIX = 'lic:v2:';
 // آلية data-drill-exclude (البند 11.2): قائمة معرّفات أسئلة تُستبعد من التمارين دون تعديل البيانات المعتمدة.
 // فارغة افتراضيًا. تُقرأ أيضًا من السمة data-drill-exclude="C1-B3,C2-S1" على عنصر html.
 export const DRILL_EXCLUDE = Object.freeze([]);
+
+// F4: عناصر تُستبعد من تمرينَي الفرز والاكتشاف (A1، A3) فقط، ولا تُستبعد من المميّز (A2).
+// C3-B4: نص «المهمة» فيه يُقرأ كنتيجة، فيتنافس مع «النتيجة» في الفرز ويُربك حذف العنصر. البيانات المعتمدة لا تُعدَّل.
+export const ELEMENT_DRILL_EXCLUDE = Object.freeze(['C3-B4']);
 
 export function excludedIds() {
   const ids = new Set(DRILL_EXCLUDE);
@@ -77,6 +81,7 @@ export function hasText(value) {
 export function drillPool(data, mode) {
   const framework = FRAMEWORKS[mode];
   const excluded = excludedIds();
+  ELEMENT_DRILL_EXCLUDE.forEach(id => excluded.add(id));
   return data.questions.filter(question => {
     if (question.rubric_mode !== mode || excluded.has(question.id)) return false;
     const answer = question[framework.answerField];
@@ -225,4 +230,79 @@ export function a2Mastered() {
 
 export function u2PracticeMastered() {
   return a1Mastered() && a2Mastered();
+}
+
+// F5: تحقق قصير (سؤال واحد في كل شاشة، محاولة واحدة لكل سؤال، ثم تغذية راجعة فورية بأيقونة ونص).
+// questions = [{ text, options: [{ text, correct?, feedback }] }]. الحالة تُحفظ تحت lic:v2:<storeName>.
+export function miniCheck({ storeName, title, questions }) {
+  const host = el('section', { class: 'mini-check card no-print', 'aria-label': title });
+  const total = questions.length;
+  let answers = [];
+
+  const saved = readStore(storeName, null);
+  const isSaved = saved && typeof saved === 'object' && Array.isArray(saved.answers) && saved.answers.length === total;
+
+  function finish() {
+    const passed = answers.every((chosen, index) => questions[index].options[chosen]?.correct === true);
+    writeStore(storeName, { v: 1, passed, at: new Date().toISOString(), answers: [...answers] });
+    drawSummary(passed);
+  }
+
+  function drawSummary(passed, moveFocus = true) {
+    const right = answers.filter((chosen, index) => questions[index].options[chosen]?.correct === true).length;
+    fill(host,
+      el('h2', { text: title }),
+      el('div', { class: 'practice-feedback ' + (passed ? 'good' : 'info'), role: 'status', tabindex: '-1' },
+        el('span', { class: 'practice-feedback-glyph', 'aria-hidden': 'true', text: passed ? '✓' : 'ⓘ' }),
+        el('div', { class: 'practice-feedback-body' },
+          el('strong', {}, 'أجبت إجابة صحيحة عن ', el('bdi', { text: String(right) }), ' من ', el('bdi', { text: String(total) }), '.'),
+          p(passed ? 'ممتاز. انتقل إلى الخطوة التالية.' : 'راجع الشرح تحت كل سؤال في الدرس، ثم أعد التحقق متى شئت.'))),
+      el('div', { class: 'practice-actions' }, button('أعد التحقق', { variant: 'secondary', onClick: () => { answers = []; drawQuestion(0); } })),
+      el('p', { class: 'practice-disclaimer', text: 'تمرين للتعلّم، وليس تقييمًا.' })
+    );
+    if (moveFocus) host.querySelector('[role="status"]')?.focus({ preventScroll: true });
+  }
+
+  function drawQuestion(index) {
+    const question = questions[index];
+    const feedback = createFeedback();
+    const optionButtons = [];
+    const next = button(index + 1 < total ? 'السؤال التالي' : 'عرض النتيجة', { onClick: () => (index + 1 < total ? drawQuestion(index + 1) : finish()) });
+    next.hidden = true;
+    const group = el('div', { class: 'mini-check-options', role: 'group', 'aria-label': question.text });
+    shuffle(question.options.map((option, optionIndex) => ({ option, optionIndex }))).forEach(({ option, optionIndex }) => {
+      const choice = el('button', { type: 'button', class: 'selfcheck-choice mini-check-option', 'data-correct': option.correct ? 'true' : 'false' },
+        el('span', { class: 'mini-check-mark', 'aria-hidden': 'true' }), el('span', {}, ...rich(option.text)));
+      choice.addEventListener('click', () => {
+        answers[index] = optionIndex;
+        optionButtons.forEach(item => {
+          item.disabled = true;
+          const isCorrect = item.dataset.correct === 'true';
+          const mark = item.querySelector('.mini-check-mark');
+          if (isCorrect) { item.classList.add('right'); mark.textContent = '✓'; }
+          if (item === choice && !isCorrect) { item.classList.add('wrong'); mark.textContent = '✗'; }
+        });
+        feedback.show(option.correct ? 'good' : 'bad', option.correct ? 'صحيح.' : 'ليست الإجابة الأدق.', option.feedback);
+        next.hidden = false;
+      });
+      optionButtons.push(choice);
+      group.append(choice);
+    });
+    fill(host,
+      el('h2', { text: title }),
+      el('p', { class: 'practice-helper' }, 'السؤال ', el('bdi', { text: String(index + 1) }), ' من ', el('bdi', { text: String(total) }), ' · محاولة واحدة لكل سؤال'),
+      el('p', { class: 'practice-instruction', tabindex: '-1' }, ...rich(question.text)),
+      group, feedback.node, next,
+      el('p', { class: 'practice-disclaimer', text: 'تمرين للتعلّم، وليس تقييمًا.' })
+    );
+    if (index > 0 || answers.length) host.querySelector('.practice-instruction')?.focus({ preventScroll: true });
+  }
+
+  if (isSaved) {
+    answers = saved.answers.map(Number);
+    drawSummary(saved.passed === true, false);
+  } else {
+    drawQuestion(0);
+  }
+  return host;
 }

@@ -2910,7 +2910,7 @@ body[data-page="questions"] .app-main {
     --bg: #F7F3EA; --bg-sunk: #EFE9DC; --surface: #FFFDF8; --surface-2: #F2EEE3;
     --line: #E3DCCB; --line-strong: #7E918D;
     --ink: #12302D; --ink-2: #3E5552; --muted: #536663;
-    --brand: #0F5B57; --brand-strong: #083B39; --brand-text: #0E7C73;
+    --brand: #0F5B57; --brand-strong: #083B39; --brand-text: #0B6B63;
     --brand-tint: #E1F0EC; --brand-tint-2: #CDE5DF;
     --sand: #E9DDC3; --sand-soft: #F6ECD3; --gold: #C98416; --gold-text: #8A5A0B;
     --success: #1E7A5C; --success-soft: #E3F2EA; --success-ink: #17624A;
@@ -4328,8 +4328,104 @@ body[data-page="questions"] .app-main {
     .practice-progress-track > i, .budget-bar > i { transition: none; }
   }
 }
+/* ==========================================================================
+   V2 visual QA fixes (docs/design/v2/visual-qa.md). Most are V1 `legacy` properties that
+   the V2 layers did not set again, so they are reset here at the V2 layer.
+   ========================================================================== */
+@layer screens {
+  /* M7: keyboard focus and in-page jumps must clear the sticky header, action bars and bottom nav */
+  html {
+    scroll-padding-block-start: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 8px);
+    scroll-padding-block-end: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 112px);
+  }
+
+  /* B1: competency detail tabs (div.competency-tabs.focus-tabs; legacy .focus-tabs button.active lost to base) */
+  .competency-tabs > button { min-block-size: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--ink-2); font: 700 var(--fs-small)/1.2 var(--font); }
+  .competency-tabs > button.active { background: var(--surface); color: var(--brand-text); box-shadow: var(--e-1); outline: 1.5px solid var(--brand-text); outline-offset: -1.5px; }
+
+  /* B2: A5 deck cards have no icon badge, so the legacy 40/50px first column crushed the copy */
+  .practice-deck { grid-template-columns: minmax(0, 1fr) auto; }
+  .practice-deck .unit-copy p { display: block; -webkit-line-clamp: unset; overflow: visible; }
+
+  /* B3: session summary ring (legacy 116px circle with 12px border still wrapped the V2 ring) */
+  .session-average { inline-size: auto; block-size: auto; border: 0; border-radius: 0; align-self: center; }
+  .session-average strong { display: flex; align-items: center; justify-content: center; gap: 0; white-space: nowrap; direction: ltr; }
+  .aggregate-hero { overflow: visible; }
+
+  /* M1: score pills (legacy circles forced the % onto a second line) */
+  .session-result-score, .session-history-score { inline-size: auto; block-size: auto; min-inline-size: 56px; border: 0; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
+  .session-history-stat:first-child { grid-column: auto; }
+
+  /* M2: bookmark belongs at the end (left in RTL), not on the symbol badge */
+  .competency-focus-hero .competency-bookmark, .competency-smart-dashboard .competency-bookmark { inset-inline-start: auto; inset-inline-end: 12px; }
+
+  /* M3: legacy absolute chevron drew over the icon badge */
+  .question-hub-option-arrow { position: static; inset: auto; grid-column: 3; }
+
+  /* M5: answering screen. The page head repeats the step; keep the title, hide its extras, and put the
+     input first. Mode switch and privacy line come after the field (the submit bar stays sticky). */
+  main:has(.answer-capture) > .page-head { margin-block-end: var(--s-3); }
+  main:has(.answer-capture) > .page-head .eyebrow, main:has(.answer-capture) > .page-head p { display: none; }
+  main:has(.answer-capture) > .page-head h1 { font-size: var(--fs-h3); }
+  .answer-capture > * { order: 5; }
+  .answer-capture > .text-answer-card, .answer-capture > .voice-answer-panel, .answer-capture > .transcript-field { order: 1; }
+  .answer-capture > .privacy-reminder { order: 2; }
+  .answer-capture > .training-method-reminder { order: 3; }
+  .answer-capture > .direct-training-switch { order: 4; }
+  .hint { display: block; margin: 0; color: var(--ink-2); font-size: var(--fs-caption); line-height: 1.5; text-align: center; }
+  .hint[hidden] { display: none; }
+  /* the disabled sticky submit button explains itself: the hint rides just above the bar */
+  .answer-capture > .hint:not([hidden]) {
+    position: sticky; inset-block-end: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + var(--s-2) + 62px); z-index: 19; justify-self: center;
+    padding: 2px var(--s-3); border-radius: var(--r-pill); background: color-mix(in srgb, var(--bg) 92%, transparent);
+  }
+
+  /* M6: duplicated title in the question focus row, nested model-answer cards, done-step check */
+  .question-focus-heading strong { display: none; }
+  .focus-answer-sample { padding: 0; border: 0; background: none; }
+  .focus-answer-part { grid-template-columns: 40px minmax(0, 1fr); align-items: center; column-gap: var(--s-3); row-gap: var(--s-2); }
+  .focus-answer-part > div { display: contents; }
+  .focus-answer-part > div > strong { align-self: center; }
+  .focus-answer-part > div > p { grid-column: 1 / -1; margin: 0; }
+  .question-step.complete b { font-size: 0; }
+  .question-step.complete b::before { content: "✓"; font-size: var(--fs-caption); }
+
+  /* M8: legacy ltr + translateX flipped the logical inset and doubled the shift */
+  .action-share-marker-label { direction: inherit; unicode-bidi: isolate; transform: none; inset-block-start: auto; margin: 0; }
+
+  /* Minor 5: orphan secondary action spans the row */
+  .report-actions .button:last-of-type:nth-child(odd) { grid-column: 1 / -1; }
+  /* Minor 9: deck reads from the start; the primary action is full width */
+  .question-deck-card { text-align: start; }
+  .question-deck-card h2 { max-inline-size: none; margin-inline: 0; text-align: start; }
+  .question-deck-actions { grid-template-columns: 1fr; }
+  /* Minor 12: tile 4 used a pink tint that reads like the "weak" band */
+  .tone-rose { --soft-rose: var(--tint-violet); }
+  .competency-card.tone-rose .competency-symbol { background: var(--tint-violet); color: var(--brand-text); }
+  /* Minor 7: the legacy 44px icon circle overflowed the 24px column and touched the heading */
+  .focus-explanation { grid-template-columns: 40px minmax(0, 1fr); }
+  .focus-explanation > span { inline-size: 40px; block-size: 40px; }
+  /* Minor 13: notices keep UI line height at large font */
+  .notice p, .privacy-reminder span { line-height: var(--lh-ui); }
+
+  /* F5: mini-checks (non-colour cues: glyph plus border style) */
+  .mini-check { display: grid; gap: var(--s-3); padding: var(--s-4); margin-block-start: var(--s-4); }
+  .mini-check > * { margin: 0; }
+  .mini-check h2 { font-size: var(--fs-h3); }
+  .mini-check-options { display: grid; gap: var(--s-2); }
+  .mini-check-option { display: flex; align-items: center; justify-content: flex-start; gap: var(--s-2); inline-size: 100%; text-align: start; line-height: 1.7; flex: none; }
+  .mini-check-option:disabled { opacity: 1; color: var(--ink); cursor: default; }
+  .mini-check-mark { flex: none; inline-size: 22px; text-align: center; font-weight: 700; }
+  .mini-check-option.right { border-color: var(--success); background: var(--success-soft); color: var(--success-ink); border-width: 2px; }
+  .mini-check-option.right:disabled { color: var(--success-ink); }
+  .mini-check-option.wrong { border-color: var(--danger); background: var(--danger-soft); border-style: dashed; border-width: 2px; }
+  .mini-check-option.wrong:disabled { color: var(--danger-ink); }
+}
 @layer themes {
   [data-theme="dark"] .home-photo-hero { box-shadow: none; }
+  /* M4: dark contrast */
+  [data-theme="dark"] .home-start-card.simulation .home-start-kicker, [data-theme="dark"] .home-start-kicker { color: #fff; }
+  [data-theme="dark"] .question-deck-meta > span { color: var(--brand-text); }
   [data-theme="dark"] .toast { background: var(--ink); color: var(--bg); }
   [data-theme="dark"] .button:focus-visible { outline-color: #fff; }
   [data-contrast="high"] .card, [data-contrast="high"] .report-section, [data-contrast="high"] details { border-color: var(--line-strong); }

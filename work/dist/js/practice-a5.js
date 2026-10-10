@@ -51,8 +51,8 @@ export function buildCards(data) {
     if (!competency.definition_v1_2025) return;
     cards.push({
       key: `comp:${competency.id}`, deck: 'comp',
-      front: `ما معنى كفاءة «${competency.name}» ببساطة؟`,
-      back: [competency.definition_v1_2025]
+      front: `ما تعريف كفاءة «${competency.name}»؟`,
+      back: [firstSentence(competency.definition_v1_2025)]
     });
   });
   (data.reference?.part_4_mission_command?.principles || []).forEach(principle => {
@@ -65,8 +65,8 @@ export function buildCards(data) {
   referenceTable(data, '2.4').forEach((row, index) => {
     cards.push({
       key: `mistakes:${index + 1}`, deck: 'mistakes',
-      front: `ما الخطأ الشائع: «${cellText(row[0])}»؟`,
-      back: [cellText(row[1])]
+      front: `لماذا يُعدّ «${cellText(row[0])}» خطأً شائعًا في الإجابة؟`,
+      back: [cellText(row[0]), cellText(row[1])]
     });
   });
   referenceTable(data, '2.5').forEach((row, index) => {

@@ -138,12 +138,12 @@ function accordionItem(id, iconName, title, body, tone = 'mint', open = false) {
 
 function meaningPanel(competency) {
   const accordion = el('div', { class: 'competency-explainer' },
-    accordionItem('competency-meaning', 'book', 'المعنى ببساطة',
+    accordionItem('competency-meaning', 'book', 'تعريف الكفاءة',
       el('div', { class: 'step-reading' },
         el('p', { text: competency.definition_v1_2025 || competency.definition })
       ), 'mint', true),
     competency.definition_v1_2025 && competency.definition_v1_2025 !== competency.definition
-      ? accordionItem('competency-formal', 'competencies', 'الصياغة الرسمية في الدليل',
+      ? accordionItem('competency-formal', 'competencies', 'صياغة أخرى في الدليل',
         el('div', { class: 'step-reading' }, el('p', { text: competency.definition })), 'blue')
       : null,
     accordionItem('competency-measures', 'target', 'ما الذي يبحث عنه المقابل؟',

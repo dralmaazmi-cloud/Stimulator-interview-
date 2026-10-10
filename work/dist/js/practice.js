@@ -17,8 +17,8 @@ const ACTIVITIES = Object.freeze([
 ]);
 
 function activityStatus(id, review) {
-  if (id === 'a1' && a1Mastered()) return 'أتقنت هذا التمرين';
-  if (id === 'a2' && a2Mastered()) return 'أتقنت هذا التمرين';
+  if (id === 'a1' && a1Mastered()) return 'أنجزت هذا التمرين';
+  if (id === 'a2' && a2Mastered()) return 'أنجزت هذا التمرين';
   if (id === 'a3' && readStore('a3', null)?.completedAt) return 'شاهدته';
   if (id === 'a4' && readStore('budget', null)?.at) return 'بدأته';
   if (id === 'a5') return review.due ? `${review.due} بطاقة مستحقة` : 'لا بطاقات مستحقة الآن';
