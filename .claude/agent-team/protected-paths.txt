@@ -80,7 +80,8 @@ work/THIRD_PARTY_NOTICES.md
 Leadership_Interview_Coach_*.zip
 
 # 7. Approved visual design and brand assets
-work/dist/css/styles.css
+# UNLOCKED for V2 redesign (user-authorized V2 visual redesign, 2026-10-10); restore after implementation:
+# work/dist/css/styles.css
 work/dist/assets/**
 work/dist/manifest.webmanifest
 
