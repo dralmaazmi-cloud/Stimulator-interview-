@@ -190,6 +190,7 @@ function privacyPanel() {
 function infoPanel(data) {
   return el('div', { class: 'settings-panel app-info-panel' },
     infoRow('الإصدار', `${String(CONFIG.appVersion).split('-')[0]} — نسخة اختبار`),
+    infoRow('عنوان التطبيق', location.host),
     infoRow('أسئلة التدريب', `${data.manifest.counts.primary_questions} بإجابة نموذجية إرشادية`),
     infoRow('الكفاءات', `${data.manifest.counts.competencies} من 8`),
     infoRow('محطات التحضير', String(data.manifest.counts.lessons))

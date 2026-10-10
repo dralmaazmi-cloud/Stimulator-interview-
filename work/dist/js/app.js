@@ -229,6 +229,13 @@ async function init() {
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
         .then(registration => registration.update())
         .catch(error => console.warn('Service worker:', error));
+      // iOS يستأنف تطبيق الشاشة الرئيسية من الذاكرة دون إعادة تحميل، فلا يُفحص التحديث عند الإقلاع وحده.
+      // نفحص عند العودة إلى الواجهة؛ إن وُجد إصدار أحدث يتولى محرك الخدمة الجديد الصفحة فتُعاد مرة واحدة (controllerchange).
+      const checkForUpdate = () => navigator.serviceWorker.getRegistration()
+        .then(registration => registration?.update())
+        .catch(() => {});
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkForUpdate(); });
+      window.addEventListener('pageshow', event => { if (event.persisted) checkForUpdate(); });
     }
   } catch (error) {
     console.error(error);
