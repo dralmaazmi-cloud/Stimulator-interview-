@@ -47,10 +47,14 @@ export function fragment(...children) {
   return appendChildren(result, ...children);
 }
 
-export function toast(message, duration = 2600) {
+export function toast(message, duration = 2600, kind = '') {
   const region = document.querySelector('#toast-region');
   if (!region) return;
-  const item = el('div', { class: 'toast', role: 'status', text: message });
+  const item = el('div', {
+    class: kind ? `toast ${kind}` : 'toast',
+    role: kind === 'error' ? 'alert' : 'status',
+    text: message
+  });
   region.replaceChildren(item);
   window.setTimeout(() => item.remove(), duration);
 }
@@ -100,6 +104,8 @@ const ICON_PATHS = Object.freeze({
   palette: 'M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a4 4 0 0 1 0-8h7.5A9 9 0 0 0 12 3ZM7 10h.01M10 7h.01M14 7h.01M17 10h.01',
   text: 'M5 5h14M12 5v14M8 19h8',
   privacy: 'M12 3 5 6v5c0 4.6 2.8 8.4 7 10 4.2-1.6 7-5.4 7-10V6l-7-3Zm-3 9 2 2 4-5',
+  lock: 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v10H6z',
+  warning: 'M12 3 2 20h20L12 3Zm0 6v5m0 3h.01',
   database: 'M4 6c0 2 3.6 3 8 3s8-1 8-3-3.6-3-8-3-8 1-8 3Zm0 0v6c0 2 3.6 3 8 3s8-1 8-3V6M4 12v6c0 2 3.6 3 8 3s8-1 8-3v-6'
 });
 
@@ -175,9 +181,16 @@ export function button(text, options = {}) {
   return el('button', { class: classes, type: 'button', on: onClick ? { click: onClick } : undefined, ...attrs }, text);
 }
 
+export function setBusy(control, busy) {
+  if (!control) return;
+  control.classList.toggle('is-loading', Boolean(busy));
+  if (busy) control.setAttribute('aria-busy', 'true');
+  else control.removeAttribute('aria-busy');
+}
+
 export function notice(text, kind = '', icon = 'ⓘ') {
   return el('div', { class: `notice ${kind}`.trim(), role: 'note' },
-    el('strong', { 'aria-hidden': 'true', text: icon }),
+    el('strong', { class: 'notice-icon', 'aria-hidden': 'true', text: icon }),
     el('p', { text })
   );
 }
@@ -301,4 +314,39 @@ export function downloadJson(filename, data) {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+// بطاقة انتظار الذكاء الاصطناعي: تعرض المرحلة والثواني المنقضية وزر إلغاء يُلغي الطلب فقط (النص أو التسجيل يبقى).
+// options تُمرَّر مباشرة إلى عميل التقييم: { onPhase, onProgress, onSlow, signal }.
+export function createAiWaiting({ title, hint = '', cancelLabel = 'إلغاء الانتظار', onCancel = null } = {}) {
+  const controller = new AbortController();
+  const phaseLine = el('small', { class: 'ai-working-phase', 'aria-live': 'off' });
+  const render = (label, elapsedMs, overrun = false) => {
+    const seconds = Math.max(0, Math.floor((elapsedMs || 0) / 1000));
+    phaseLine.textContent = `${label || ''} · ${seconds} ث${overrun ? ' · يستغرق أطول من المعتاد' : ''}`.replace(/^ · /, '');
+  };
+  const cancel = button(cancelLabel, {
+    variant: 'ghost',
+    className: 'ai-cancel',
+    onClick: () => {
+      cancel.disabled = true;
+      controller.abort();
+      onCancel?.();
+    }
+  });
+  const node = el('div', { class: 'card ai-working', role: 'status', 'aria-live': 'polite' },
+    el('span', { class: 'ai-working-badge', 'aria-hidden': 'true' }, icon('reports')),
+    el('span', { class: 'loader', 'aria-hidden': 'true' }),
+    el('strong', { text: title }),
+    hint ? el('small', { text: hint }) : null,
+    phaseLine,
+    cancel
+  );
+  const options = {
+    signal: controller.signal,
+    onPhase: ({ label, elapsedMs }) => render(label, elapsedMs),
+    onProgress: ({ label, elapsedMs, overrun }) => render(label, elapsedMs, overrun),
+    onSlow: text => node.append(el('small', { class: 'slow-notice', text }))
+  };
+  return { node, options, signal: controller.signal, cancelButton: cancel };
 }

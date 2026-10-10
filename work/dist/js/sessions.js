@@ -45,7 +45,7 @@ export async function renderSessions(root) {
     .sort((a, b) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || '')));
   root.append(
     pageHead('محفوظ محليًا', 'سجل الجلسات', 'تقاريرك السابقة موجودة على هذا الجهاز فقط.'),
-    notice('لا تُخزن التسجيلات الصوتية. يمكنك طباعة أي تقرير أو حفظه PDF من شاشة التقرير.', '', '▣'),
+    notice('لا تُخزن التسجيلات الصوتية. يمكنك طباعة أي تقرير أو حفظه PDF من شاشة التقرير.', '', 'ⓘ'),
     // alpha-5 (D3): رابط خريطة التغطية من «التقارير».
     el('a', { class: 'card coverage-link-card', href: '#/coverage' },
       el('div', {}, el('strong', { text: 'خريطة التغطية' }), el('small', { text: 'ما جرّبته من الكفاءات والمبادئ وما لم تجرّبه بعد.' })),

@@ -51,7 +51,7 @@ export async function renderHome(root, data) {
     ),
 
     el('section', { class: 'home-start-section', 'aria-labelledby': 'home-start-title' },
-      el('h2', { id: 'home-start-title', text: 'ابدأ من هنا' }),
+      el('h2', { id: 'home-start-title', class: 'sr-only', text: 'ابدأ من هنا' }),
       el('div', { class: 'home-start-grid' },
         startCard('simulation', 'ابدأ المحاكاة', 'اختبر نفسك في مقابلة قيادية واقعية', '#/simulation', 'microphone'),
         startCard('preparation', 'التحضير للمقابلة', 'تعلّم، راجع، ثم ادخل المحاكاة بثقة', '#/preparation', 'book'),
@@ -62,6 +62,7 @@ export async function renderHome(root, data) {
     el('section', { class: 'home-path-card card', 'aria-label': `اكتمل ${percent}% من مسار التحضير` },
       el('div', { class: 'home-path-copy' },
         el('h2', { text: 'مسارك التدريبي' }),
+        el('small', { class: 'path-caption', text: done ? `${done} من ${data.lessons.length} دروس` : 'ابدأ من درس التحضير' }),
         el('div', { class: 'path-nodes' },
           pathNode('book', 'المعرفة', done >= 1),
           pathNode('competencies', 'المهارات', done >= 3),

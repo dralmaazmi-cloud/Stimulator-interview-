@@ -93,7 +93,12 @@ function navPage(page) {
 
 function updateChrome(page) {
   const active = navPage(page);
-  document.querySelectorAll('[data-nav]').forEach(link => link.classList.toggle('active', link.dataset.nav === active));
+  document.querySelectorAll('[data-nav]').forEach(link => {
+    const isActive = link.dataset.nav === active;
+    link.classList.toggle('active', isActive);
+    if (isActive) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
   document.body.dataset.page = page;
   appHeader.hidden = page === 'home';
   backButton.hidden = page === 'home';
@@ -112,7 +117,7 @@ function applyTheme(theme) {
   const next = ['dark', 'light', 'cream'].includes(theme) ? theme : 'cream';
   document.documentElement.dataset.theme = next;
   localStorage.setItem('lic:theme', next);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#071b2e' : '#0f5b57');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#0A1A1C' : next === 'light' ? '#FFFFFF' : '#F7F3EA');
 }
 
 function setupPreferences() {

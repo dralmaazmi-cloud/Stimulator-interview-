@@ -1,7 +1,7 @@
 import { get, set } from './storage.js';
 import { improveSelfIntroduction } from './evaluate-client.js';
 import {
-  bindExclusiveAccordions, el, button, clear, notice, pageHead, privacyReminder, toast, trainingDisclaimer
+  bindExclusiveAccordions, createAiWaiting, el, button, clear, notice, pageHead, privacyReminder, toast, trainingDisclaimer
 } from './ui.js';
 import { acquireWakeLock, releaseWakeLock } from './wake-lock.js';
 
@@ -387,9 +387,10 @@ export async function renderSelfIntroPage(root) {
     improveButton.disabled = true;
     improveButton.textContent = 'جارٍ التحسين…';
     aiCandidate.hidden = false;
-    aiCandidate.replaceChildren(notice('جارٍ تحسين الصياغة مع الحفاظ على معلوماتك والمدة…'));
+    const waiting = createAiWaiting({ title: 'جارٍ تحسين الصياغة مع الحفاظ على معلوماتك والمدة…' });
+    aiCandidate.replaceChildren(waiting.node);
     try {
-      const result = await improveSelfIntroduction({ text: source, duration: selectedDuration });
+      const result = await improveSelfIntroduction({ text: source, duration: selectedDuration }, waiting.options);
       const candidateText = el('textarea', { class: 'input intro-result-text', rows: 12, value: result.text, 'aria-label': 'النص المحسن المقترح' });
       const candidateChildren = [
         el('div', { class: 'section-heading' }, el('h3', { text: 'نسخة محسّنة مقترحة' }), el('span', { class: 'tag warning', text: 'تحتاج اعتمادك' })),
@@ -412,7 +413,8 @@ export async function renderSelfIntroPage(root) {
       ].filter(Boolean);
       aiCandidate.replaceChildren(...candidateChildren);
     } catch (error) {
-      aiCandidate.replaceChildren(notice(error.message || 'تعذر تحسين النص الآن.', 'danger'));
+      if (error?.code === 'ABORTED') aiCandidate.replaceChildren(notice('أُلغي الطلب. نصك المحلي كما هو.', 'warning', '!'));
+      else aiCandidate.replaceChildren(notice(error.message || 'تعذر تحسين النص الآن.', 'danger'));
     } finally {
       improveButton.disabled = false;
       improveButton.textContent = 'تحسين الصياغة بالذكاء الاصطناعي — اختياري';

@@ -242,10 +242,11 @@ export async function renderCompetencyDetail(root, data, competencyId, params = 
   const progress = questions.length ? Math.round(trainedCount / questions.length * 100) : 0;
   const bookmarked = localStorage.getItem(`lic:competency-bookmark:${competency.id}`) === 'yes';
   const bookmark = el('button', {
-    class: `competency-bookmark ${bookmarked ? 'active' : ''}`, type: 'button', 'aria-label': 'حفظ الكفاءة'
+    class: `competency-bookmark ${bookmarked ? 'active' : ''}`, type: 'button', 'aria-label': 'حفظ الكفاءة', 'aria-pressed': String(bookmarked)
   }, icon('bookmark'));
   bookmark.addEventListener('click', () => {
     const active = bookmark.classList.toggle('active');
+    bookmark.setAttribute('aria-pressed', String(active));
     localStorage.setItem(`lic:competency-bookmark:${competency.id}`, active ? 'yes' : 'no');
     toast(active ? 'تم حفظ الكفاءة.' : 'تمت إزالة الكفاءة من المحفوظات.');
   });
@@ -321,11 +322,12 @@ export async function renderQuestionFocus(root, data, questionId, params = new U
 
   const bookmark = el('button', {
     class: `question-focus-bookmark ${isBookmarked(question.id) ? 'active' : ''}`,
-    type: 'button', 'aria-label': 'حفظ السؤال'
+    type: 'button', 'aria-label': 'حفظ السؤال', 'aria-pressed': String(isBookmarked(question.id))
   }, icon('bookmark'));
   bookmark.addEventListener('click', () => {
     const active = toggleBookmark(question.id);
     bookmark.classList.toggle('active', active);
+    bookmark.setAttribute('aria-pressed', String(active));
     toast(active ? 'تم حفظ السؤال.' : 'تمت إزالة السؤال من المحفوظات.');
   });
 

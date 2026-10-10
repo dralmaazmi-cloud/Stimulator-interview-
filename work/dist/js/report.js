@@ -1,5 +1,5 @@
 import { questionSamples } from './data.js';
-import { el, button, notice, showDialog, tag, formatType, trainingDisclaimer } from './ui.js';
+import { createAiWaiting, el, button, notice, showDialog, tag, formatType, trainingDisclaimer } from './ui.js';
 import {
   ELEMENT_ORDER, WEIGHTS_VERSION, normalizeReportForDisplay, percentTone, scoreBreakdown
 } from './scoring-rules.js';
@@ -123,7 +123,7 @@ function renderScoreCard(report, options = {}) {
   const hasElements = Number.isFinite(report.elements_total) && report.elements_total > 0;
   return el('header', { class: `score-hero score-card ${tone}` },
     el('div', { class: 'score-card-top' },
-      el('strong', { class: 'final-score' }, el('bdi', { text: `${percent}%` })),
+      el('strong', { class: 'final-score score-ring', style: { '--p': String(Math.max(0, Math.min(100, percent))) } }, el('bdi', { text: `${percent}%` })),
       el('div', { class: 'score-card-copy' },
         el('span', { class: `score-badge ${classificationTone(report.classification)}`, text: badgeText(report.classification) }),
         hasElements ? el('p', { class: 'elements-complete-line', text: `العناصر المكتملة: ${report.elements_complete} من ${report.elements_total}` }) : null
@@ -374,16 +374,18 @@ function renderExampleArea(options, report, question) {
   const trigger = button(EXAMPLE_BUTTON_TEXT, { variant: 'secondary', className: 'wide worked-example-button' });
   trigger.addEventListener('click', async () => {
     trigger.disabled = true;
-    status.replaceChildren(el('div', { class: 'card ai-working' }, el('span', { class: 'loader' }), el('strong', { text: 'جارٍ إعداد المثال…' })));
+    const waiting = createAiWaiting({ title: 'جارٍ إعداد المثال…' });
+    status.replaceChildren(waiting.node);
     try {
       const result = await onRequestExample({
         question_id: question.id,
         missing_elements: incompleteElementKeys(report),
         weak_criteria: weakCriterionKeys(report)
-      });
+      }, waiting.options);
       host.replaceChildren(renderExamplePanel(result, question.rubric_mode));
     } catch (error) {
-      status.replaceChildren(notice(error?.message || 'تعذّر إعداد المثال الآن.', 'danger'));
+      if (error?.code === 'ABORTED') status.replaceChildren(notice('أُلغي الطلب. يمكنك طلب المثال متى شئت.', 'warning', '!'));
+      else status.replaceChildren(notice(error?.message || 'تعذّر إعداد المثال الآن.', 'danger'));
       trigger.disabled = false;
     }
   });
@@ -627,7 +629,7 @@ export function renderSessionSummary(session, options = {}) {
       el('div', {}, el('small', { text: 'اكتملت المحاكاة' }), el('h1', { text: 'تقرير المقابلة الشامل' }),
         el('p', { text: `${allResponses.length} إجابة محللة · ${insights.trusted_count} تقييم موثوق` }),
         el('span', { class: `aggregate-classification ${classificationTone(average >= 80 ? 'قوية' : average >= 60 ? 'متوسطة' : 'ضعيفة')}`, text: insights.classification })),
-      el('div', { class: 'session-average' },
+      el('div', { class: 'session-average', style: average == null ? undefined : { '--p': String(Math.max(0, Math.min(100, average))) } },
         average == null ? el('strong', { text: '—' }) : el('strong', {}, el('bdi', { text: String(average) }), '%'),
         el('span', { text: average == null ? 'لا توجد درجة موثقة' : 'المتوسط التدريبي' })
       )

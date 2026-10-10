@@ -55,7 +55,7 @@ export async function renderLearnIndex(root, data) {
       el('h1', { text: 'تعلّم، طبّق، واستعد بثقة' }),
       el('p', { text: 'محطات تعليمية واضحة، يليها قسم تفاعلي للتدرّب على الأسئلة.' })
     ),
-    el('div', { class: 'preparation-grid' },
+    el('div', { class: 'preparation-grid', dataset: completed.size > 0 ? { ready: 'true' } : undefined },
       ...data.lessons.map(lesson => preparationCard(lesson, completed.has(lesson.id))),
       questionsPreparationCard()
     ),
