@@ -1,4 +1,5 @@
 import { loadData, loadQuestionAudit } from './data.js';
+import { initServiceWorker } from './pwa-update.js';
 import { renderHome } from './home.js';
 import { cleanupLearn, renderLearnIndex, renderLesson } from './learn.js';
 import { renderCompetenciesIndex, renderCompetencyDetail, renderQuestionFocus } from './competencies.js';
@@ -221,15 +222,7 @@ async function init() {
     });
     await route();
     verifyQuestionAudit();
-    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-      const upgradingExistingInstall = Boolean(navigator.serviceWorker.controller);
-      if (upgradingExistingInstall) {
-        navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
-      }
-      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
-        .then(registration => registration.update())
-        .catch(error => console.warn('Service worker:', error));
-    }
+    initServiceWorker();
   } catch (error) {
     console.error(error);
     clear(root).append(notice(`تعذر تشغيل التطبيق: ${error.message}`, 'danger'));

@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.2-51d413de-v2g';
+const CACHE = 'leadership-interview-coach-v0.6.0-alpha-10.2-51d413de-v2i';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const APP_SHELL = [
   './css/styles.css',
   './js/app.js',
   './js/boot.js',
+  './js/pwa-update.js',
   './js/config.js',
   './js/ui.js',
   './js/data.js',
@@ -67,7 +68,14 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
+  // لا تفعيل تلقائي: الإصدار الجديد ينتظر حتى تطلبه الصفحة في وقت آمن (pwa-update.js).
+  // التثبيت الأول (لا محرك سابق) يتفعّل فورًا كالمعتاد.
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data?.type === 'GET_VERSION') event.ports?.[0]?.postMessage(CACHE);
 });
 
 self.addEventListener('activate', event => {
