@@ -1,7 +1,7 @@
 import { get, completedLessons, markLesson, saveChecklist } from './storage.js';
 import { renderSelfIntroLauncher } from './self-intro.js';
 import { renderInlineQuestion } from './competencies.js';
-import { bookActions } from './print-book.js';
+import { bookActions } from './print-actions.js';
 import { renderBudgetPanel } from './practice-a4.js';
 import { rateCard, reviewStatus } from './practice-a5.js';
 import { FRAMEWORKS, readStore, rich, u2PracticeMastered, writeStore } from './practice-core.js';

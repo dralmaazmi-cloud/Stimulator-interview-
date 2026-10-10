@@ -145,3 +145,86 @@ Reading: the reliable gain is transfer (-255 KB, -2 requests, about 11 percent).
 - V2 remains slower than V1 at startup on this setup (for example iPhone 14 4x: FCP 136 -> about 192 ms, DCL 245 -> about 317 ms; V1 JS 326 KB vs V2 432 KB, CSS 207 KB vs 336 KB, 43 vs 49 requests). The optimisation recovered the extra JSON weight but not the larger CSS/JS. The next candidates, not done because they are bigger changes than "minimal and safe": trim the layered CSS overrides in `styles.css` (about 130 KB over V1), and lazy-load rarely used modules (`print-book.js`, `report.js`, `practice-a1..a5.js`, `recorder.js`) with dynamic `import()`.
 - The remaining first-render long tasks at 4x CPU (two per load, 54 to 92 ms TBT) are the initial style/layout of the 335 KB stylesheet and the first home render continuing after IndexedDB opens; both were present before this change.
 - `question-audit.json` is still fetched right after first render, so it appears in the request count (49 = 51 - search-index - variants).
+
+
+---
+
+## Round 3: lazy-loaded modules (cache `v2d`)
+
+Goal: cut startup JavaScript (V2 was about 432 KB of files / 415 KiB fetched on the home route vs V1 306 KiB). Tool: `tests/agent-qa/perf/startup-js.mjs` (new; counts JS responses and bytes per cold route load, service worker blocked) and `measure-app.mjs` with `PARTS=load RUNS=5 THROTTLES=1,4`. "before" = `git archive HEAD` copy on :4373, "after" = working tree on :4273, two alternating rounds, means of the two round medians (rounds in brackets). Chromium emulation, not iOS Safari.
+
+### What changed
+
+| Change | Files |
+| --- | --- |
+| Page modules loaded with dynamic `import()` on first visit of their route: `simulation.js` (with `report.js`, `recorder.js`, `session-plan.js`, `retry-plan.js`, `scoring-rules.js`), `sessions.js` (with `report.js`), `settings.js` (with `config.js`), `search.js`, `coverage.js`, `practice.js`. `cleanupSimulation()` is only called once the module has been loaded. | `js/app.js` |
+| `practice-a1.js`, `practice-a2.js`, `practice-a3.js` loaded when the activity opens. `practice-a4.js` and `practice-a5.js` stay static: `home.js` and `learn.js` need `reviewStatus`, `rateCard` and `renderBudgetPanel` on first paint of those pages. | `js/practice.js` |
+| `print-book.js` (19.6 KB) loaded when the user taps print or export PDF. The two buttons moved to a small `print-actions.js` (`bookActions`); `print-book.js` now exports `chooseScope`. The button shows `aria-busy` while loading; a failed load shows an Arabic toast. | `js/print-actions.js` (new), `js/print-book.js`, `js/learn.js`, `js/competencies.js`, `js/questions.js` |
+| Shared loader: shows the existing `loading-screen` markup if an import takes more than 200 ms, shows an Arabic error notice with a retry button if it fails, ignores a result for a route the user already left. `aria-busy` is only cleared by the newest route. | `js/lazy-load.js` (new), `js/app.js` |
+| New files added to `APP_SHELL`, so every lazy module is precached and works offline after the first load (checked: offline simulation page opened in the approved journey J3). Cache name and `?v=` bumped `v2c` -> `v2d`. | `sw.js`, `index.html` |
+
+### Startup JavaScript
+
+| Route (cold load, service worker blocked) | JS files before -> after | JS KiB before -> after |
+| --- | ---: | ---: |
+| #/home | 36 -> 22 | 415.2 -> 214 |
+| #/preparation | 36 -> 22 | 415.2 -> 214 |
+| #/competencies | 36 -> 22 | 415.2 -> 214 |
+| #/questions | 36 -> 22 | 415.2 -> 214 |
+| #/practice | 36 -> 23 | 415.2 -> 217.7 |
+| #/practice/a1 | 36 -> 24 | 415.2 -> 235.1 |
+| #/simulation | 36 -> 28 | 415.2 -> 328.1 |
+| #/reports | 36 -> 25 | 415.2 -> 269.6 |
+| #/settings | 36 -> 24 | 415.2 -> 227.7 |
+
+Home route: 415.2 -> 214.0 KiB (-48 percent), 36 -> 22 files; V1 on the same script: 305.8 KiB, 28 files. Routes that still need a lazy module pay for it only on first visit (for example `#/simulation` 328.1 KiB, `#/reports` 269.6 KiB, `#/practice/a1` 235.1 KiB, all still below the old home figure).
+
+### Cold load A/B (RUNS=5 x 2 rounds)
+
+| Device | CPU | Metric | before | after |
+| --- | --- | --- | ---: | ---: |
+| iPhone SE (3rd gen) | 1x | FCP ms | 80 (76/84) | 84 (80/88) |
+| iPhone SE (3rd gen) | 1x | LCP ms | 190 (200/180) | 198 (188/208) |
+| iPhone SE (3rd gen) | 1x | DCL ms | 122.3 (127.9/116.6) | 114.7 (98/131.3) |
+| iPhone SE (3rd gen) | 1x | TBT ms | 0 (0/0) | 0 (0/0) |
+| iPhone SE (3rd gen) | 1x | Transferred KB | 1997.7 (1997.7/1997.7) | 1789.8 (1789.8/1789.8) |
+| iPhone SE (3rd gen) | 1x | Requests | 49 (49/49) | 35 (35/35) |
+| iPhone SE (3rd gen) | 4x | FCP ms | 200 (208/192) | 190 (180/200) |
+| iPhone SE (3rd gen) | 4x | LCP ms | 560 (560/560) | 544 (516/572) |
+| iPhone SE (3rd gen) | 4x | DCL ms | 317.6 (325.5/309.6) | 306.3 (282.3/330.3) |
+| iPhone SE (3rd gen) | 4x | TBT ms | 61 (61/61) | 58 (54/62) |
+| iPhone SE (3rd gen) | 4x | Transferred KB | 1997.7 (1997.7/1997.7) | 1789.8 (1789.8/1789.8) |
+| iPhone SE (3rd gen) | 4x | Requests | 49 (49/49) | 35 (35/35) |
+| iPhone 14 | 1x | FCP ms | 78 (76/80) | 82 (76/88) |
+| iPhone 14 | 1x | LCP ms | 206 (188/224) | 182 (188/176) |
+| iPhone 14 | 1x | DCL ms | 123.8 (119.2/128.4) | 106.5 (112.2/100.7) |
+| iPhone 14 | 1x | TBT ms | 0 (0/0) | 0 (0/0) |
+| iPhone 14 | 1x | Transferred KB | 1997.7 (1997.7/1997.7) | 1789.8 (1789.8/1789.8) |
+| iPhone 14 | 1x | Requests | 49 (49/49) | 35 (35/35) |
+| iPhone 14 | 4x | FCP ms | 194 (196/192) | 190 (196/184) |
+| iPhone 14 | 4x | LCP ms | 602 (548/656) | 532 (536/528) |
+| iPhone 14 | 4x | DCL ms | 358.3 (318/398.6) | 290 (312/267.9) |
+| iPhone 14 | 4x | TBT ms | 57 (56/58) | 42 (43/41) |
+| iPhone 14 | 4x | Transferred KB | 1997.7 (1997.7/1997.7) | 1789.8 (1789.8/1789.8) |
+| iPhone 14 | 4x | Requests | 49 (49/49) | 35 (35/35) |
+| iPhone 15 Pro Max | 1x | FCP ms | 88 (88/88) | 80 (92/68) |
+| iPhone 15 Pro Max | 1x | LCP ms | 220 (212/228) | 182 (212/152) |
+| iPhone 15 Pro Max | 1x | DCL ms | 128.7 (116.9/140.4) | 102.1 (126.6/77.5) |
+| iPhone 15 Pro Max | 1x | TBT ms | 0 (0/0) | 0 (0/0) |
+| iPhone 15 Pro Max | 1x | Transferred KB | 1997.7 (1997.7/1997.7) | 1789.8 (1789.8/1789.8) |
+| iPhone 15 Pro Max | 1x | Requests | 49 (49/49) | 35 (35/35) |
+| iPhone 15 Pro Max | 4x | FCP ms | 186 (176/196) | 198 (196/200) |
+| iPhone 15 Pro Max | 4x | LCP ms | 546 (516/576) | 546 (544/548) |
+| iPhone 15 Pro Max | 4x | DCL ms | 314.9 (318.8/310.9) | 300.2 (308/292.3) |
+| iPhone 15 Pro Max | 4x | TBT ms | 58.5 (43/74) | 65 (65/65) |
+| iPhone 15 Pro Max | 4x | Transferred KB | 1997.7 (1997.7/1997.7) | 1789.8 (1789.8/1789.8) |
+| iPhone 15 Pro Max | 4x | Requests | 49 (49/49) | 35 (35/35) |
+
+
+Reading: transferred size -207.9 KB (1997.7 -> 1789.8) and -14 requests on every device. LCP is equal or better in 5 of 6 configurations (up to -70 ms at iPhone 14 4x, -38 ms at iPhone 15 Pro Max 1x) and +8 ms on iPhone SE 1x. DCL is lower in all six (-8 to -68 ms). TBT is lower at iPhone SE 4x and iPhone 14 4x and +6.5 ms at iPhone 15 Pro Max 4x. FCP differences are -10 to +12 ms; they are quantised at 4 ms and the two rounds differ by up to 24 ms, so no FCP gain or loss is claimed. No regression beyond noise, so the change is kept.
+
+### Notes
+
+- A lazy module is a second request after the route is chosen. On a real mobile network that adds one round trip the first time a user opens simulation, reports, settings, search, coverage, practice or print; the local server has no network latency, so this cost is not visible in the numbers above. Repeat visits and offline use come from the service worker cache.
+- Not done (bigger change): `learn.js`, `competencies.js`, `questions.js` and `self-intro.js` (about 93 KB together) are still static because `app.js` renders them as the main preparation flow and they import each other.
+- An older approved script (`work/audit-harness/book-pdf-check.mjs`) waits for a scope dialog on `#/preparation` that does not exist in HEAD either (single-scope contexts print directly), so it fails the same way on the pre-change tree; a separate check printed the full preparation book (97 PDF pages, 70 question pages) through the lazy path.

@@ -1,5 +1,6 @@
 // Mock-provider tests for the v2 AI audit changes. Run: node tests/agent-qa/ai/ai-integration.test.mjs
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -105,6 +106,35 @@ const audio = Buffer.alloc(300, 1);
   fetchSeq.push(res(429, { code: 'AI_RATE_LIMITED', retry_after: 30 }));
   await assert.rejects(client.evaluateWithAi({}), e => e.retryAfter === 30);
 
+  // L-D: the one automatic network retry stays for evaluate/example/self-intro but not for transcribe (large re-upload).
+  {
+    let calls = 0;
+    const counting = outcomes => { calls = 0; globalThis.fetch = async () => { calls += 1; const r = outcomes.shift(); if (r instanceof Error) throw r; return r; }; };
+    counting([new TypeError('net'), res(200, { ok: 1 })]);
+    await client.requestWorkedExample({});
+    assert.equal(calls, 2, 'example retries once after a network failure');
+    counting([new TypeError('net'), res(200, { ok: 1 })]);
+    await client.improveSelfIntroduction({});
+    assert.equal(calls, 2, 'self-intro retries once after a network failure');
+    counting([new TypeError('net'), res(200, { ok: 1 })]);
+    await client.evaluateWithAi({});
+    assert.equal(calls, 2, 'evaluate retries once after a network failure');
+    const audio = new Blob([new Uint8Array(2048)], { type: 'audio/webm' });
+    const phasesSeen = [];
+    counting([new TypeError('net'), res(200, { text: 'x' })]);
+    await assert.rejects(client.transcribeWithAi(audio, 3, { onPhase: p => phasesSeen.push(p.phase) }), e => e.code === 'NETWORK');
+    assert.equal(calls, 1, 'transcribe makes exactly one request (no automatic re-upload)');
+    assert.ok(!phasesSeen.includes('retrying'));
+    counting([new TypeError('net'), res(200, { text: 'x' })]);
+    await assert.rejects(client.transcribeWithAi(audio, 3, { retries: 3 }), e => e.code === 'NETWORK');
+    assert.equal(calls, 1, 'transcribe ignores a caller-supplied retries option');
+    counting([res(200, { text: 'ok' })]);
+    assert.equal((await client.transcribeWithAi(audio, 3)).text, 'ok');
+    assert.equal(calls, 1);
+    const clientSource = fs.readFileSync(path.join(root, 'dist/js/evaluate-client.js'), 'utf8');
+    assert.ok(!clientSource.includes('لا أثر جانبي لها'), 'the false "no side effect" claim is gone from the comment');
+  }
+
   const ctl = new AbortController();
   globalThis.fetch = (u, init) => new Promise((_, reject) => init.signal.addEventListener('abort', () => reject(Object.assign(new Error('a'), { name: 'AbortError' }))));
   const pending = client.evaluateWithAi({}, { signal: ctl.signal });
@@ -116,4 +146,4 @@ const audio = Buffer.alloc(300, 1);
   await client.evaluateWithAi({}, { onProgress: p => ticks.push(p) });
   assert.ok(ticks.length >= 1 && ticks[0].elapsedMs >= 900 && ticks[0].expectedMs === 30000);
 }
-console.log('PASS ai-integration (provider call log, opt-in generation_config, usage whitelist, client phases/retry/abort/error mapping)');
+console.log('PASS ai-integration (provider call log, opt-in generation_config, usage whitelist, client phases/retry/abort/error mapping, transcribe without network retry)');

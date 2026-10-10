@@ -128,7 +128,7 @@ function backupPanel() {
   const answersNote = el('div', { class: 'backup-answers-note', role: 'status' });
   const refreshNote = () => answersNote.replaceChildren(includeAnswers.checked
     ? notice('يحتوي الملف على إجاباتك الشخصية وأسئلة المتابعة وتقاريرك. احفظه في مكان آمن ولا تشاركه مع أحد.', 'warning', '!')
-    : notice('لن يتضمن الملف نصوص إجاباتك ولا أسئلة المتابعة ولا اقتباسات التقارير، وتبقى الدرجات والتقدم.', '', 'ⓘ'));
+    : notice('لن يتضمن الملف نصوص إجاباتك ولا أسئلة المتابعة ولا اقتباسات التقارير ولا تعليقات المقيّم النصية (الملخص والتعليق على المعايير ونقاط القوة والنواقص وخطوات التحسين)، وتبقى الدرجات والتصنيفات والتقدم.', '', 'ⓘ'));
   includeAnswers.addEventListener('change', refreshNote);
   refreshNote();
   const exportButton = button('تصدير البيانات', {
@@ -159,7 +159,7 @@ function backupPanel() {
   return el('div', { class: 'settings-panel' },
     el('p', { text: 'تتضمن النسخة تقدم التحضير، والأسئلة المحفوظة، وتمارين التعلّم، والجلسات والتقارير وقوائم الجاهزية، وسجل المحاولات وتدوير الأسئلة. يمكنك اختيار تضمين نصوص إجاباتك وأسئلة المتابعة أو استبعادها. التسجيلات الصوتية لا تدخل في التصدير.' }),
     el('label', { class: 'toggle-row' }, includeAnswers,
-      el('span', {}, el('strong', { text: 'تضمين نصوص إجاباتك' }), el('small', { text: 'الإجابات المكتوبة أو المفرّغة، وأسئلة المتابعة، واقتباسات التقارير' }))),
+      el('span', {}, el('strong', { text: 'تضمين نصوص إجاباتك' }), el('small', { text: 'الإجابات المكتوبة أو المفرّغة، وأسئلة المتابعة، واقتباسات التقارير، وتعليقات المقيّم النصية' }))),
     answersNote,
     el('div', { class: 'document-actions' }, exportButton, importButton, file)
   );

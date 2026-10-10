@@ -5,16 +5,11 @@ import { renderCompetenciesIndex, renderCompetencyDetail, renderQuestionFocus } 
 import { renderQuestions } from './questions.js';
 import { renderQuickReview, renderAnswerGuide } from './quick-review.js';
 import { renderSelfIntroPage } from './self-intro.js';
-import { renderSearch } from './search.js';
-import { renderSettings } from './settings.js';
 import { renderTools } from './tools.js';
 import { renderSavedQuestions } from './bookmarks.js';
-import { cleanupSimulation, renderSimulation } from './simulation.js';
-import { renderSavedSession, renderSessions } from './sessions.js';
-import { renderCoverageMap } from './coverage.js';
-import { renderPractice } from './practice.js';
 import { el, clear, notice } from './ui.js';
 import { purgeExpiredRecordings } from './storage.js';
+import { loadLazy } from './lazy-load.js';
 
 const root = document.querySelector('#main-content');
 const backButton = document.querySelector('#back-button');
@@ -26,6 +21,25 @@ const navigationStack = [activeHash];
 let goingBack = false;
 let replacingContext = false;
 let data;
+let routeSeq = 0;
+// صفحات ثقيلة لا تلزم عند الإقلاع (المحاكاة والتقارير والإعدادات والبحث والتمارين وخريطة التغطية) تُحمَّل عند أول زيارة.
+const lazyPages = {
+  simulation: () => import('./simulation.js'),
+  sessions: () => import('./sessions.js'),
+  settings: () => import('./settings.js'),
+  search: () => import('./search.js'),
+  coverage: () => import('./coverage.js'),
+  practice: () => import('./practice.js')
+};
+const loadedPages = {};
+
+async function withPage(name, seq, render) {
+  if (!loadedPages[name]) {
+    loadedPages[name] = await loadLazy(root, lazyPages[name], () => seq === routeSeq);
+    if (!loadedPages[name]) return;
+  }
+  if (seq === routeSeq) await render(loadedPages[name]);
+}
 
 function parseRoute() {
   const raw = location.hash.slice(1) || '/home';
@@ -34,8 +48,9 @@ function parseRoute() {
 }
 
 async function route({ restoreScroll = false } = {}) {
+  const seq = ++routeSeq;
   cleanupLearn();
-  cleanupSimulation();
+  loadedPages.simulation?.cleanupSimulation();
   const dialog = document.querySelector('#app-dialog');
   if (dialog?.open) dialog.close();
   const { parts, params } = parseRoute();
@@ -44,31 +59,31 @@ async function route({ restoreScroll = false } = {}) {
   root.setAttribute('aria-busy', 'true');
   try {
     if (page === 'home') await renderHome(root, data);
-    else if (page === 'preparation' && parts[1] === 'review') await renderPractice(root, data, 'a5', params);
+    else if (page === 'preparation' && parts[1] === 'review') await withPage('practice', seq, mod => mod.renderPractice(root, data, 'a5', params));
     else if (page === 'preparation' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'preparation') await renderLearnIndex(root, data);
-    else if (page === 'reports' && parts[1]) await renderSavedSession(root, parts[1]);
-    else if (page === 'reports') await renderSessions(root);
-    else if (page === 'coverage') await renderCoverageMap(root, data);
+    else if (page === 'reports' && parts[1]) await withPage('sessions', seq, mod => mod.renderSavedSession(root, parts[1]));
+    else if (page === 'reports') await withPage('sessions', seq, mod => mod.renderSessions(root));
+    else if (page === 'coverage') await withPage('coverage', seq, mod => mod.renderCoverageMap(root, data));
     else if (page === 'competencies' && parts[1]) await renderCompetencyDetail(root, data, parts[1], params);
     else if (page === 'competencies') await renderCompetenciesIndex(root, data);
     else if (page === 'questions') renderQuestions(root, data, params);
     else if (page === 'question' && parts[1]) await renderQuestionFocus(root, data, decodeURIComponent(parts[1]), params);
     else if (page === 'learn' && parts[1]) await renderLesson(root, data, parts[1], params);
     else if (page === 'learn') await renderLearnIndex(root, data);
-    else if (page === 'practice') await renderPractice(root, data, parts[1], params);
+    else if (page === 'practice') await withPage('practice', seq, mod => mod.renderPractice(root, data, parts[1], params));
     else if (page === 'bank') await renderCompetenciesIndex(root, data);
     else if (page === 'quick-review') renderQuickReview(root);
     else if (page === 'answer-guide') renderAnswerGuide(root);
     else if (page === 'self-intro') await renderSelfIntroPage(root);
-    else if (page === 'simulation') await renderSimulation(root, data, params);
-    else if (page === 'sessions' && parts[1]) await renderSavedSession(root, parts[1]);
-    else if (page === 'sessions') await renderSessions(root);
+    else if (page === 'simulation') await withPage('simulation', seq, mod => mod.renderSimulation(root, data, params));
+    else if (page === 'sessions' && parts[1]) await withPage('sessions', seq, mod => mod.renderSavedSession(root, parts[1]));
+    else if (page === 'sessions') await withPage('sessions', seq, mod => mod.renderSessions(root));
     else if (page === 'tools' && parts[1] === 'saved') renderSavedQuestions(root, data);
     else if (page === 'tools') renderTools(root);
     else if (page === 'evidence') renderTools(root);
-    else if (page === 'search') await renderSearch(root, data, params);
-    else if (page === 'settings') renderSettings(root, data);
+    else if (page === 'search') await withPage('search', seq, mod => mod.renderSearch(root, data, params));
+    else if (page === 'settings') await withPage('settings', seq, mod => mod.renderSettings(root, data));
     else clear(root).append(el('div', { class: 'card empty-state' },
       el('strong', { text: 'الصفحة غير موجودة' }),
       el('a', { class: 'button', href: '#/home', text: 'العودة إلى الرئيسية' })
@@ -82,7 +97,7 @@ async function route({ restoreScroll = false } = {}) {
     console.error(error);
     clear(root).append(notice(`حدث خطأ أثناء عرض الصفحة: ${error.message}`, 'danger'));
   } finally {
-    root.removeAttribute('aria-busy');
+    if (seq === routeSeq) root.removeAttribute('aria-busy');
   }
 }
 

@@ -2,10 +2,8 @@
 import { clear, el, icon } from './ui.js';
 import { a1Mastered, a2Mastered, p, practiceShell, readStore } from './practice-core.js';
 import { renderA5, reviewStatus } from './practice-a5.js';
-import { renderA1 } from './practice-a1.js';
-import { renderA2 } from './practice-a2.js';
-import { renderA3 } from './practice-a3.js';
 import { renderA4 } from './practice-a4.js';
+import { loadLazy } from './lazy-load.js';
 
 export { a1Mastered, a2Mastered, u2PracticeMastered } from './practice-core.js';
 export { reviewStatus, rateCard } from './practice-a5.js';
@@ -49,9 +47,10 @@ function renderHub(root, data) {
 
 export async function renderPractice(root, data, activity, params = new URLSearchParams()) {
   if (!activity) { renderHub(root, data); return; }
-  if (activity === 'a1') { await renderA1(root, data, params); return; }
-  if (activity === 'a2') { await renderA2(root, data, params); return; }
-  if (activity === 'a3') { await renderA3(root, data, params); return; }
+  // التمارين 1 إلى 3 (≈37KB) تُحمَّل عند فتح التمرين فقط؛ 4 و5 مشتركتان مع الرئيسية وصفحات التحضير فتبقيان ثابتتين.
+  if (activity === 'a1') { const mod = await loadLazy(root, () => import('./practice-a1.js')); if (mod) await mod.renderA1(root, data, params); return; }
+  if (activity === 'a2') { const mod = await loadLazy(root, () => import('./practice-a2.js')); if (mod) await mod.renderA2(root, data, params); return; }
+  if (activity === 'a3') { const mod = await loadLazy(root, () => import('./practice-a3.js')); if (mod) await mod.renderA3(root, data, params); return; }
   if (activity === 'a4') { await renderA4(root, data, params); return; }
   if (activity === 'a5') { await renderA5(root, data, params); return; }
   renderHub(root, data);

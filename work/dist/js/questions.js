@@ -1,5 +1,5 @@
 import { getBookmarkedIds, isBookmarked, toggleBookmark } from './bookmarks.js';
-import { bookActions } from './print-book.js';
+import { bookActions } from './print-actions.js';
 import {
   button, clear, el, formatModel, formatType, icon, normalizeArabic, notice, toast
 } from './ui.js';

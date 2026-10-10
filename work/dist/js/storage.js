@@ -142,6 +142,13 @@ function readV2Keys() {
 const TEXT_KEYS_EMPTY_STRING = new Set(['answer', 'transcript', 'draft_answer', 'original_answer']);
 const TEXT_KEYS_EMPTY_LIST = new Set(['followups', 'follow_ups', 'evidence', 'quotes']);
 const TEXT_KEYS_NULL = new Set(['example']);
+// حقول نص المقيّم الحرّة في تقرير التقييم (justification وimprove وsummary وstrengths وmissing وnext_actions وغيرها):
+// قد تُعيد صياغة الإجابة أو تقتبس منها، فتُفرَّغ هي أيضًا. الدرجات والتصنيفات وأرقام المعايير (key وscore) وأعلام التحقق تبقى.
+const REPORT_TEXT_EMPTY_STRING = new Set(['justification', 'improve', 'summary']);
+const REPORT_TEXT_EMPTY_LIST = new Set([
+  'strengths', 'gaps', 'missing', 'next_actions', 'follow_up_questions', 'follow_up_reasons', 'supporting', 'negative'
+]);
+const REPORT_FEEDBACK_KEY = /feedback/i;
 
 export function stripAnswerText(value) {
   if (Array.isArray(value)) return value.map(stripAnswerText);
@@ -152,6 +159,8 @@ export function stripAnswerText(value) {
     else if (TEXT_KEYS_EMPTY_LIST.has(key) && Array.isArray(item)) result[key] = [];
     else if (key === 'quote' && typeof item === 'string') result[key] = '';
     else if (TEXT_KEYS_NULL.has(key) && item && typeof item === 'object') result[key] = null;
+    else if ((REPORT_TEXT_EMPTY_STRING.has(key) || REPORT_FEEDBACK_KEY.test(key)) && typeof item === 'string') result[key] = '';
+    else if ((REPORT_TEXT_EMPTY_LIST.has(key) || REPORT_FEEDBACK_KEY.test(key)) && Array.isArray(item)) result[key] = [];
     else result[key] = stripAnswerText(item);
   }
   return result;
@@ -204,6 +213,7 @@ export function validateBackup(backup, { maxBytes = BACKUP_MAX_BYTES } = {}) {
     if (records.length > MAX_RECORDS_PER_STORE) fail(`المخزن ${store} كبير جدًا`);
     for (const record of records) {
       if (!isPlainObject(record) || !isIdType(record.id)) fail(`سجل غير صالح في ${store}`);
+      if (hasForbiddenKey(record)) fail(`سجل غير آمن في ${store}`);
       validateRecordShape(store, record);
     }
   }
@@ -215,11 +225,24 @@ export function validateBackup(backup, { maxBytes = BACKUP_MAX_BYTES } = {}) {
     for (const [key, value] of Object.entries(backup.v2)) {
       if (!V2_KEY_PATTERN.test(key)) fail('مفتاح تمارين غير صالح');
       let encoded;
+      if (hasForbiddenKey(value)) fail('قيمة تمارين غير آمنة');
       try { encoded = JSON.stringify(value); } catch { fail('قيمة تمارين غير صالحة'); }
       if (encoded === undefined || encoded.length > MAX_V2_VALUE_BYTES) fail('قيمة تمارين غير صالحة');
     }
   }
   return true;
+}
+
+// L-A: مفاتيح تلوّث النموذج الأولي (prototype pollution) مرفوضة في أي مستوى من السجلات المستوردة.
+// JSON.parse ينشئ __proto__ كمفتاح عادي، لذا يظهر في Object.keys. العمق الأقصى 12؛ ما بعده يُرفض.
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+export const BACKUP_MAX_DEPTH = 12;
+
+export function hasForbiddenKey(value, depth = 0) {
+  if (!value || typeof value !== 'object') return false;
+  if (depth > BACKUP_MAX_DEPTH) return true;
+  if (Array.isArray(value)) return value.some(item => hasForbiddenKey(item, depth + 1));
+  return Object.keys(value).some(key => FORBIDDEN_KEYS.has(key) || hasForbiddenKey(value[key], depth + 1));
 }
 
 function validateRecordShape(store, record) {

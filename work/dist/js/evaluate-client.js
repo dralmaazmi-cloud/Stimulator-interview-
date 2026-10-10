@@ -135,7 +135,8 @@ async function apiRequest(path, options = {}) {
           throw Object.assign(new Error(ERROR_MESSAGES.ABORTED), { code: 'ABORTED' });
         }
         if (error instanceof TypeError) {
-          // لا استجابة وصلت (انقطاع شبكة): إعادة واحدة فقط، وللطلبات التي لا أثر جانبي لها على حالة المستخدم.
+          // لا استجابة وصلت (انقطاع شبكة): إعادة واحدة فقط. الإعادة ليست بلا أثر: قد يكون الخادم استلم الطلب الأول وعالجه،
+          // فتُحتسب الإعادة ضمن حد المعدّل وتكلفة المزود (وقد تُرفع الحمولة مرتين). لذلك يعطّلها transcribe (رفع حتى 4MB).
           if (attempt < retries && !options.signal?.aborted) {
             emitPhase(PHASES.retrying);
             await wait(clientRetryDelay(attempt), options.signal);
@@ -173,6 +174,8 @@ export async function transcribeWithAi(blob, durationSeconds, options = {}) {
     body: blob,
     timeout: LONG_TIMEOUT,
     ...waitingOptions(options),
+    // لا إعادة محاولة تلقائية للشبكة: إعادة رفع تسجيل بحجم يصل إلى 4MB مكلفة؛ المستخدم يعيد الإرسال يدويًا (تسجيله محفوظ).
+    retries: 0,
     phases: [PHASES.uploading, PHASES.transcribing],
     // تقدير: fetch لا يكشف نهاية الرفع؛ نفترض ~150 KB/s كحد أدنى لثانية ونصف.
     phaseDelaysMs: [Math.max(1_500, Math.round((blob.size || 0) / 150) )],

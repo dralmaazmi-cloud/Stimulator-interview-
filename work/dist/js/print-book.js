@@ -370,7 +370,7 @@ function scopesFor(context, data) {
   ];
 }
 
-function chooseScope(data, context, action) {
+export function chooseScope(data, context, action) {
   const scopes = scopesFor(context, data);
   if (scopes.length === 1) {
     mountAndPrint(data, scopes[0]);
@@ -395,19 +395,5 @@ function chooseScope(data, context, action) {
         ? el('small', { text: 'على iPhone: من شاشة الطباعة اختر مشاركة، ثم «حفظ في الملفات».' })
         : null
     )
-  );
-}
-
-export function bookActions(data, context, label = 'المحتوى') {
-  return el('div', { class: 'document-actions no-print', 'aria-label': `خيارات ${label}` },
-    button('طباعة', {
-      className: 'document-action primary',
-      onClick: () => chooseScope(data, context, 'print')
-    }),
-    button('تصدير PDF', {
-      variant: 'secondary',
-      className: 'document-action',
-      onClick: () => chooseScope(data, context, 'export')
-    })
   );
 }

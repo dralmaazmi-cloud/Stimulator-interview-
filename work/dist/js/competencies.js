@@ -1,7 +1,7 @@
 import { isBookmarked, toggleBookmark } from './bookmarks.js';
 import { questionSamples } from './data.js';
 import { buildAnswerGuidance } from './guidance.js';
-import { bookActions } from './print-book.js';
+import { bookActions } from './print-actions.js';
 import { renderSelfCheck } from './practice-selfcheck.js';
 import {
   bindExclusiveAccordions, button, clear, el, formatModel, formatType, icon, notice, tag, toast, trainingDisclaimer
