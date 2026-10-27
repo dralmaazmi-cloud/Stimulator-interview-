@@ -49,7 +49,9 @@ async function passPrivacy(page) {
 async function toQuestion(page, { voice = false } = {}) {
   await page.goto(`${BASE}/#/home`);
   await page.goto(`${BASE}/#/simulation${voice ? '?answer=voice' : ''}`);
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
+  await page.locator('.simulation-next').click();
+  await page.locator(`.simulation-method-card[data-method="${voice ? 'voice' : 'text'}"]`).click();
   await page.locator('.simulation-start').click();
   await passPrivacy(page);
   await page.waitForSelector('.ai-question-card');
@@ -173,17 +175,18 @@ let backupSeed = null; // { ctx, page } kept alive for the backup section
 section('sim', async () => {
   const { ctx, page, errors } = await fresh();
   await page.goto(`${BASE}/#/simulation`);
-  await page.waitForSelector('.simulation-start');
-  // mode select and answer-method toggle
+  await page.waitForSelector('.simulation-next');
+  // mode select (step 1) and answer-method radios (step 2)
   const modeTitles = await page.locator('.simulation-mode-card strong').allInnerTexts();
   check('simulation setup lists 4 modes', modeTitles.length === 4, modeTitles.join('|'));
   await page.locator('.simulation-mode-card', { hasText: 'مقابلة واقعية' }).click();
   check('mode select marks card pressed', (await page.locator('.simulation-mode-card.selected strong').innerText()).includes('مقابلة واقعية'));
   await page.locator('.simulation-mode-card', { hasText: 'سؤال واحد' }).click();
-  await page.locator('.simulation-answer-switch button', { hasText: 'إجابة صوتية' }).click();
-  check('answer-method toggle -> voice', await page.locator('.simulation-answer-switch button.active').innerText().then(t => t.includes('صوتية')));
-  await page.locator('.simulation-answer-switch button', { hasText: 'إجابة نصية' }).click();
-  check('answer-method toggle -> text', await page.locator('.simulation-answer-switch button.active').innerText().then(t => t.includes('نصية')));
+  await page.locator('.simulation-next').click();
+  await page.locator('.simulation-answer-switch [role="radio"]', { hasText: 'إجابة صوتية' }).click();
+  check('answer-method toggle -> voice', await page.locator('.simulation-answer-switch [aria-checked="true"]').innerText().then(t => t.includes('صوتية')));
+  await page.locator('.simulation-answer-switch [role="radio"]', { hasText: 'إجابة نصية' }).click();
+  check('answer-method toggle -> text', await page.locator('.simulation-answer-switch [aria-checked="true"]').innerText().then(t => t.includes('نصية')));
   await page.locator('.simulation-start').click();
   await page.waitForSelector('.simulation-privacy-page');
   check('privacy gate: continue disabled until acknowledged', await page.locator('.simulation-privacy-continue').isDisabled());
@@ -368,7 +371,8 @@ section('offline', async () => {
   check('offline: tab navigation works', await page.evaluate(() => location.hash.startsWith('#/preparation')) && await page.locator('main h1').count() > 0);
   await page.goto(`${BASE}/#/simulation`);
   await page.reload();
-  await page.waitForSelector('.simulation-start', { timeout: 10000 }).catch(() => {});
+  await page.waitForSelector('.simulation-next', { timeout: 10000 }).catch(() => {});
+  await page.locator('.simulation-next').click().catch(() => {});
   await page.locator('.simulation-start').click().catch(() => {});
   await page.waitForTimeout(500);
   const body = await page.locator('body').innerText();
@@ -514,7 +518,9 @@ section('font', async () => {
     check(`home large font: last content not hidden behind bottom nav ${w}`, homeCover.lastBottom <= homeCover.navTop + 2, JSON.stringify(homeCover));
     await page.screenshot({ path: `${OUT}/font-home-${w}.png` });
     await page.goto(`${BASE}/#/simulation`);
-    await page.waitForSelector('.simulation-start');
+    await page.waitForSelector('.simulation-next');
+    await page.locator('.simulation-next').click();
+    await page.locator('.simulation-method-card[data-method="text"]').click();
     check(`simulation setup large font: no overflow ${w}`, await noOverflow(page));
     const reach = await page.evaluate(() => { const b = document.querySelector('.simulation-start'); b.scrollIntoView({ block: 'center', behavior: 'instant' }); const r = b.getBoundingClientRect(); const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return b === top || b.contains(top); });
     check(`simulation start button reachable, not covered ${w}`, reach);

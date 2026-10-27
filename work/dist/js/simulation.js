@@ -16,9 +16,9 @@ import { acquireWakeLock, releaseAllWakeLocks, releaseWakeLock, wakeLockUnsuppor
 import { modelElements } from './guidance.js';
 
 const MODE_CONFIG = Object.freeze({
-  single: { title: 'سؤال واحد', description: 'تدريب سريع', count: 1, minutes: '2–4 دقائق', icon: 'communication' },
+  single: { title: 'سؤال واحد', description: 'تدريب سريع على سؤال واحد.', count: 1, minutes: '2–4 دقائق', icon: 'communication' },
   realistic: { title: 'مقابلة واقعية', description: 'سؤالان', count: 2, minutes: 'نحو 7 دقائق', icon: 'interview' },
-  extended: { title: 'مقابلة موسّعة', description: 'خمسة أسئلة', count: 5, minutes: 'نحو 16 دقيقة', icon: 'book' },
+  extended: { title: 'مقابلة موسّعة', description: 'خمسة أسئلة متنوعة.', count: 5, minutes: 'نحو 16 دقيقة', icon: 'book' },
   full: { title: 'مقابلة كاملة', description: 'تقديم الذات ثم ستة أسئلة: سلوكية وموقفية وقيادة بالمهمة وسؤال معرفي.', count: 6, minutes: 'نحو 20 دقيقة', icon: 'checklist' }
 });
 
@@ -434,7 +434,9 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
   cleanupSimulation();
   clear(root);
   let selectedMode = params.get('mode') && MODE_CONFIG[params.get('mode')] ? params.get('mode') : 'single';
-  let answerMode = params.get('answer') === 'voice' ? 'voice' : 'text';
+  // الافتراضي إجابة صوتية متى دعم المتصفح التسجيل، وإلا نصية.
+  const voiceSupported = globalThis.isSecureContext !== false && recordingSupported();
+  let answerMode = voiceSupported && params.get('answer') !== 'text' ? 'voice' : 'text';
   let selectedScope = params.get('competency') || '';
   let followupsEnabled = localStorage.getItem('lic:followups') !== 'off';
   let includeSelfIntro = selectedMode === 'full';
@@ -544,7 +546,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
           variant: 'ghost wide',
           onClick: () => {
             if (session.direct_training) history.back();
-            else drawSetup();
+            else goToMethodStep();
           }
         })
       ),
@@ -553,15 +555,53 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     acknowledgement.focus({ preventScroll: true });
   };
 
+  // الإعداد بخطوتين: (1) نوع المحاكاة، ثم (2) طريقة الإجابة والإعدادات ثم البدء.
+  // الخطوة الثانية مدخل في سجل المتصفح على العنوان نفسه (pushState)، فيعيد «رجوع» وزر الرأس والرجوع بالسحب
+  // إلى الخطوة الأولى دون مغادرة المحاكاة، وتبقى الاختيارات لأنها في متغيرات هذه الدالة.
+  const simulationHash = location.hash;
+  let viewToken = 0;
+  const onMethodStep = () => history.state?.licSimulationStep === 2;
+  const listenForStepNavigation = () => {
+    const onPop = event => {
+      if (location.hash !== simulationHash) return; // الانتقال إلى صفحة أخرى يتولاه الموجّه
+      if (event.state?.licSimulationStep === 2) drawMethodStep();
+      else drawSetup();
+    };
+    window.addEventListener('popstate', onPop);
+    registerCleanup(() => window.removeEventListener('popstate', onPop));
+  };
+  const backToTypeStep = () => {
+    if (onMethodStep()) history.back();
+    else drawSetup();
+  };
+  const goToMethodStep = () => {
+    history.pushState({ licSimulationStep: 2 }, '', location.href);
+    drawMethodStep();
+  };
+  // يزيل مدخل الخطوة الثانية قبل بدء الجلسة، فيبقى الرجوع أثناء الجلسة كما كان.
+  const leaveMethodStepEntry = () => new Promise(resolve => {
+    if (!onMethodStep()) { resolve(); return; }
+    const done = () => { clearTimeout(timer); window.removeEventListener('popstate', done); resolve(); };
+    const timer = setTimeout(done, 500);
+    window.addEventListener('popstate', done);
+    history.back();
+  });
+  // مدخل خطوة ثانية متبقٍّ (إعادة تحميل أو رجوع من صفحة أخرى) يُعرض بالخطوة الأولى.
+  if (onMethodStep()) history.replaceState(null, '', location.href);
+
   const drawSetup = async () => {
+    const token = ++viewToken;
     cleanupSimulation();
     clear(root);
     scrollToTop();
+    listenForStepNavigation();
     const pending = (await inProgressSessions())[0] || null;
+    if (token !== viewToken) return;
+    const heading = el('h1', { text: 'اختر تجربة تناسب استعدادك', tabindex: '-1' });
     root.append(
       el('section', { class: 'simulation-hero' },
         el('span', {}, icon('microphone')),
-        el('div', {}, el('small', { text: 'بيئة تدريب تفاعلية' }), el('h1', { text: 'اختر تجربة تناسب استعدادك' }), el('p', { text: 'حدّد نوع المقابلة ثم ابدأ عندما تكون جاهزًا.' }))
+        el('div', {}, el('small', { text: 'بيئة تدريب تفاعلية' }), heading, el('p', { text: 'حدّد نوع المقابلة ثم ابدأ عندما تكون جاهزًا.' }))
       ),
       healthHost
     );
@@ -579,32 +619,45 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     }
 
     const modeGrid = el('div', { class: 'simulation-mode-grid' });
-    let introOptions;
-    let selfIntroToggle;
-    let selfIntroHelp;
-    const syncIntroOptions = () => {
-      if (!introOptions || !selfIntroToggle || !selfIntroHelp) return;
-      introOptions.hidden = selectedMode === 'single';
-      const full = selectedMode === 'full';
-      if (full) includeSelfIntro = true;
-      selfIntroToggle.checked = includeSelfIntro;
-      selfIntroToggle.disabled = full;
-      selfIntroHelp.textContent = full
-        ? 'جزء ثابت من المقابلة الكاملة.'
-        : 'اختياري في المحاكاة الواقعية والممتدة.';
-    };
     const redrawModes = () => {
       modeGrid.replaceChildren(...Object.entries(MODE_CONFIG).map(([id, config]) =>
         renderModeCard(id, config, selectedMode === id, next => {
           selectedMode = next;
           redrawModes();
-          syncIntroOptions();
         })
       ));
     };
     redrawModes();
 
-    const answerSwitch = el('div', { class: 'segmented simulation-answer-switch', role: 'group', 'aria-label': 'طريقة الإجابة' });
+    root.append(el('section', { class: 'card simulation-setup-card section-block' },
+      el('h2', { text: 'نوع المحاكاة' }), modeGrid,
+      el('button', { type: 'button', class: 'button wide simulation-next', on: { click: goToMethodStep } },
+        el('span', { text: 'التالي' }), el('span', { class: 'button-arrow', 'aria-hidden': 'true', text: '←' }))
+    ));
+    heading.focus({ preventScroll: true });
+  };
+
+  const drawMethodStep = async () => {
+    const token = ++viewToken;
+    cleanupSimulation();
+    clear(root);
+    scrollToTop();
+    listenForStepNavigation();
+    // زر الرأس وزر «المحاكاة» في الشريط السفلي يعيدان إلى الخطوة الأولى بدل مغادرة الصفحة.
+    const interceptBack = event => {
+      if (!(event.target instanceof Element) || !event.target.closest('#back-button, [data-nav="simulation"]')) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      backToTypeStep();
+    };
+    document.addEventListener('click', interceptBack, true);
+    registerCleanup(() => document.removeEventListener('click', interceptBack, true));
+    const pending = (await inProgressSessions())[0] || null;
+    if (token !== viewToken) return;
+
+    const config = MODE_CONFIG[selectedMode];
+    const heading = el('h1', { text: 'طريقة الإجابة', tabindex: '-1' });
+
     const readinessStrip = el('div', { class: 'simulation-readiness-strip' });
     const drawReadiness = () => readinessStrip.replaceChildren(
       icon(answerMode === 'voice' ? 'microphone' : 'answer'),
@@ -614,18 +667,49 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       ),
       el('span', { class: 'ready-dot', 'aria-hidden': 'true' })
     );
-    const drawAnswerSwitch = () => {
-      answerSwitch.replaceChildren(...[
-        ['text', '▤', 'إجابة نصية'],
-        ['voice', '◉', 'إجابة صوتية']
-      ].map(([id, icon, label]) => el('button', {
-        type: 'button',
-        class: answerMode === id ? 'active' : '',
-        'aria-pressed': String(answerMode === id),
-        on: { click: () => { answerMode = id; drawAnswerSwitch(); drawReadiness(); } }
-      }, el('span', { text: icon }), document.createTextNode(label))));
+
+    // لا يُطلب إذن الميكروفون هنا؛ يُطلب عند أول تسجيل فقط.
+    const methods = [
+      { id: 'voice', icon: 'microphone', title: 'إجابة صوتية', text: 'تحدث بصوتك وسيتم تقييم إجابتك بالذكاء الاصطناعي.', badge: 'موصى بها ✦', disabled: !voiceSupported },
+      { id: 'text', icon: 'answer', title: 'إجابة نصية', text: 'اكتب إجابتك وسيتم تقييمها بالذكاء الاصطناعي.' }
+    ];
+    const answerSwitch = el('div', { class: 'simulation-answer-switch simulation-method-options', role: 'radiogroup', 'aria-label': 'طريقة الإجابة' });
+    const chooseMethod = (id, focus = false) => {
+      answerMode = id;
+      drawMethods();
+      drawReadiness();
+      if (focus) answerSwitch.querySelector(`[data-method="${id}"]`)?.focus();
     };
-    drawAnswerSwitch();
+    const moveWithArrows = event => {
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      const enabled = methods.filter(item => !item.disabled).map(item => item.id);
+      const step = event.key === 'ArrowUp' || event.key === 'ArrowRight' ? -1 : 1;
+      chooseMethod(enabled[(enabled.indexOf(answerMode) + step + enabled.length) % enabled.length], true);
+    };
+    const drawMethods = () => {
+      answerSwitch.replaceChildren(...methods.map(item => {
+        const checked = answerMode === item.id;
+        return el('button', {
+          type: 'button',
+          role: 'radio',
+          class: `simulation-method-card ${checked ? 'active' : ''}`.trim(),
+          'aria-checked': String(checked),
+          tabindex: checked ? '0' : '-1',
+          disabled: Boolean(item.disabled),
+          dataset: { method: item.id },
+          on: { click: () => chooseMethod(item.id), keydown: moveWithArrows }
+        },
+        el('span', { class: 'method-radio', 'aria-hidden': 'true' }),
+        el('span', { class: 'simulation-method-icon' }, icon(item.icon)),
+        el('span', { class: 'simulation-method-copy' },
+          el('strong', {}, item.title, item.badge && !item.disabled ? el('span', { class: 'method-badge', text: item.badge }) : null),
+          el('small', { text: item.text }),
+          item.disabled ? el('small', { class: 'method-unsupported', text: 'التسجيل الصوتي غير مدعوم على هذا المتصفح.' }) : null
+        ));
+      }));
+    };
+    drawMethods();
     drawReadiness();
 
     const scope = el('select', { class: 'input', 'aria-label': 'مجال المحاكاة' },
@@ -640,7 +724,7 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
       followupsEnabled = followupToggle.checked;
       localStorage.setItem('lic:followups', followupsEnabled ? 'on' : 'off');
     });
-    selfIntroToggle = el('input', { type: 'checkbox', checked: includeSelfIntro });
+    const selfIntroToggle = el('input', { type: 'checkbox', checked: includeSelfIntro });
     selfIntroToggle.addEventListener('change', () => { includeSelfIntro = selfIntroToggle.checked; });
     const durationSelect = el('select', { class: 'input compact-select', 'aria-label': 'مدة تقديم الذات' },
       el('option', { value: '60', text: 'حتى 60 ثانية' }),
@@ -648,16 +732,19 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
     );
     durationSelect.value = String(selfIntroDuration);
     durationSelect.addEventListener('change', () => { selfIntroDuration = Number(durationSelect.value) === 120 ? 120 : 60; });
-    introOptions = el('div', { class: 'simulation-intro-options', hidden: selectedMode === 'single' },
+    const full = selectedMode === 'full';
+    if (full) includeSelfIntro = true;
+    selfIntroToggle.checked = includeSelfIntro;
+    selfIntroToggle.disabled = full;
+    const introOptions = el('div', { class: 'simulation-intro-options', hidden: selectedMode === 'single' },
       el('label', { class: 'toggle-row' }, selfIntroToggle,
         el('span', {},
           el('strong', { text: 'ابدأ بتقديم الذات' }),
-          selfIntroHelp = el('small', { text: 'اختياري في المحاكاة الواقعية والممتدة.' })
+          el('small', { text: full ? 'جزء ثابت من المقابلة الكاملة.' : 'اختياري في المحاكاة الواقعية والممتدة.' })
         )
       ),
       el('label', { class: 'field' }, el('span', { text: 'المدة المستهدفة' }), durationSelect)
     );
-    syncIntroOptions();
 
     const startSession = async () => {
       const questions = await buildQuestionSet(data, selectedMode, selectedScope, params.get('question'));
@@ -681,21 +768,48 @@ export async function renderSimulation(root, data, params = new URLSearchParams(
         question_ids: questions.map(item => item.id),
         responses: []
       };
+      cleanupSimulation();
+      await leaveMethodStepEntry();
       drawPrivacyGate(session, questions, pending);
     };
 
-    root.append(el('section', { class: 'card simulation-setup-card section-block' },
-      el('h2', { text: 'نوع المحاكاة' }), modeGrid,
-      el('h2', { text: 'طريقة الإجابة' }), answerSwitch,
-      el('label', { class: 'field' }, el('span', { text: 'الكفاءة أو المسار' }), scope),
-      el('label', { class: 'toggle-row' }, followupToggle,
-        el('span', {}, el('strong', { text: 'أسئلة المتابعة' }), el('small', { text: 'حتى سؤالين عند وجود نقص واضح فقط.' }))
+    root.append(el('section', { class: 'simulation-method-step' },
+      el('div', { class: 'simulation-stepper' },
+        el('div', { class: 'simulation-stepper-row' },
+          el('span', { class: 'simulation-step-label', text: 'الخطوة 2 من 2' }),
+          el('button', { type: 'button', class: 'simulation-step-back', on: { click: backToTypeStep } },
+            el('span', { 'aria-hidden': 'true', text: '→' }), el('span', { text: 'رجوع' }))
+        ),
+        el('div', { class: 'simulation-step-bar', 'aria-hidden': 'true' }, el('span', { class: 'done' }), el('span', { class: 'done' }))
       ),
-      introOptions,
+      el('header', { class: 'simulation-method-head' },
+        heading,
+        el('p', { text: selectedMode === 'single' ? 'اختر كيف تريد الإجابة على هذا السؤال' : 'اختر كيف تريد الإجابة على أسئلة هذه المحاكاة' })
+      ),
+      el('article', { class: 'simulation-type-summary', 'aria-label': 'نوع المحاكاة المختار' },
+        el('span', { class: 'simulation-mode-icon' }, icon(config.icon)),
+        el('div', {}, el('strong', { text: config.title }), el('p', { text: config.description })),
+        el('span', { class: 'simulation-duration-badge', text: config.minutes })
+      ),
+      answerSwitch,
       readinessStrip,
-      notice('هذه أداة تدريبية؛ لا تصدر نجاحًا أو رسوبًا ولا تتنبأ بنتيجة المقابلة الفعلية.', 'warning'),
-      button('ابدأ المحاكاة', { className: 'wide simulation-start', onClick: startSession })
+      el('section', { class: 'card simulation-setup-card' },
+        el('label', { class: 'field' }, el('span', { text: 'الكفاءة أو المسار' }), scope),
+        el('label', { class: 'toggle-row' }, followupToggle,
+          el('span', {}, el('strong', { text: 'أسئلة المتابعة' }), el('small', { text: 'حتى سؤالين عند وجود نقص واضح فقط.' }))
+        ),
+        introOptions
+      ),
+      el('div', { class: 'notice warning simulation-method-notice', role: 'note' },
+        el('strong', { class: 'notice-icon', 'aria-hidden': 'true', text: 'ⓘ' }),
+        el('div', {},
+          el('p', { text: 'يمكنك اختيار الطريقة قبل بدء المحاكاة. لا يمكن تغييرها أثناء الجلسة.' }),
+          el('p', { text: 'هذه أداة تدريبية؛ لا تصدر نجاحًا أو رسوبًا ولا تتنبأ بنتيجة المقابلة الفعلية.' })
+        )
+      ),
+      button('متابعة', { className: 'wide simulation-start', onClick: startSession })
     ));
+    heading.focus({ preventScroll: true });
   };
 
   const drawSelfIntroduction = async (session, questions) => {
