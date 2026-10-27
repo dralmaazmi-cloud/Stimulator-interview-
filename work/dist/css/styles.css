@@ -3709,7 +3709,7 @@ body[data-page="questions"] .app-main {
   .simulation-readiness-strip > div { flex: 1; display: grid; }
   .simulation-readiness-strip small { color: var(--muted); }
   .ready-dot { inline-size: 10px; block-size: 10px; border-radius: 50%; background: var(--success); }
-  .simulation-start {
+  .simulation-start, .simulation-next {
     position: sticky; inset-block-end: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + var(--s-2)); z-index: 20; min-block-size: 52px; box-shadow: 0 6px 20px rgba(8,59,57,.28), 0 0 0 6px color-mix(in srgb, var(--surface-2) 90%, transparent);
   }
   .resume-card { display: grid; gap: var(--s-3); border-inline-start: 3px solid var(--gold); box-shadow: var(--e-1); }
@@ -4429,6 +4429,74 @@ body[data-page="questions"] .app-main {
     .ai-question-card .question-id { display: none; }
     .ai-question-card h2 { font-size: 1.25rem; line-height: 1.6; }
   }
+}
+
+@layer screens {
+  /* ================= Simulation setup: two steps (type, then answer method) ================= */
+  .simulation-hero h1:focus, .simulation-method-head h1:focus { outline: none; }
+  .simulation-hero h1:focus-visible, .simulation-method-head h1:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .simulation-next { display: flex; align-items: center; justify-content: center; gap: var(--s-2); }
+  .simulation-next .button-arrow { font-size: 1.15em; line-height: 1; }
+  .simulation-method-step { display: grid; gap: var(--s-4); }
+  .simulation-method-step > * { margin: 0; }
+  .simulation-stepper { display: grid; gap: var(--s-2); }
+  .simulation-stepper-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+  .simulation-step-label { color: var(--gold-text); font-weight: 700; font-size: var(--fs-small); }
+  .simulation-step-back {
+    min-block-size: 44px; min-inline-size: 44px; padding: 0 var(--s-2); display: inline-flex; align-items: center; gap: var(--s-1);
+    border: 0; background: none; color: var(--brand-text); font: inherit; font-weight: 700; font-size: var(--fs-small); cursor: pointer;
+  }
+  .simulation-step-back:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--r-sm); }
+  .simulation-step-bar { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+  .simulation-step-bar > span { block-size: 6px; border-radius: var(--r-pill); background: var(--bg-sunk); }
+  .simulation-step-bar > span.done { background: var(--brand-text); }
+  .simulation-method-head { display: grid; gap: var(--s-1); }
+  .simulation-method-head > * { margin: 0; }
+  .simulation-method-head h1 { font-size: var(--fs-h1); color: var(--ink); }
+  .simulation-method-head p { color: var(--muted); font-size: var(--fs-small); }
+  .simulation-type-summary {
+    display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: var(--s-3);
+    padding: var(--s-3); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface-2);
+  }
+  .simulation-type-summary .simulation-mode-icon { inline-size: 44px; block-size: 44px; }
+  .simulation-type-summary .simulation-mode-icon svg { inline-size: 24px; block-size: 24px; }
+  .simulation-type-summary > div { display: grid; gap: 2px; min-inline-size: 0; }
+  .simulation-type-summary strong { font-size: var(--fs-ui); }
+  .simulation-type-summary p { margin: 0; color: var(--muted); font-size: var(--fs-caption); line-height: 1.5; }
+  .simulation-duration-badge {
+    padding: 4px 10px; border-radius: var(--r-pill); background: var(--brand-tint); color: var(--brand-text);
+    font-size: var(--fs-caption); font-weight: 700; white-space: nowrap;
+  }
+  .simulation-method-options.simulation-answer-switch { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-3); inline-size: 100%; }
+  .simulation-method-options > .simulation-method-card {
+    position: relative; min-block-size: 88px; inline-size: 100%; padding: var(--s-4); padding-inline-end: calc(var(--s-4) + 32px);
+    display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: var(--s-3);
+    border: 1.5px solid var(--line); border-radius: var(--r-lg); background: var(--surface); color: var(--ink);
+    font: inherit; text-align: start; cursor: pointer; box-shadow: none;
+    transition: transform var(--d-fast) var(--ease), background-color var(--d-fast), border-color var(--d-fast);
+  }
+  .simulation-method-options > .simulation-method-card:active { transform: scale(.985); }
+  .simulation-method-options > .simulation-method-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .simulation-method-options > .simulation-method-card.active { border: 2px solid var(--brand-text); background: var(--brand-tint); padding: calc(var(--s-4) - .5px); padding-inline-end: calc(var(--s-4) + 31.5px); }
+  .simulation-method-options > .simulation-method-card:disabled { cursor: not-allowed; opacity: .62; }
+  .simulation-method-options > .simulation-method-card > span { display: grid; }
+  .simulation-method-card .method-radio {
+    position: absolute; inset-block-start: 50%; inset-inline-end: var(--s-4); inline-size: 24px; block-size: 24px; margin-block-start: -12px;
+    border-radius: 50%; border: 2px solid var(--line-strong); place-content: center; background: transparent;
+  }
+  .simulation-method-card.active .method-radio { background: var(--brand); border-color: var(--brand); }
+  .simulation-method-card.active .method-radio::after { content: ""; inline-size: 6px; block-size: 11px; margin-block-start: -2px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+  .simulation-method-icon { inline-size: 52px; block-size: 52px; place-items: center; border-radius: 50%; background: var(--brand-tint); color: var(--brand-text); }
+  .simulation-method-card.active .simulation-method-icon { background: var(--surface); }
+  .simulation-method-icon svg { inline-size: 26px; block-size: 26px; }
+  .simulation-method-copy { gap: 4px; min-inline-size: 0; }
+  .simulation-method-copy strong { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); font-size: var(--fs-ui); line-height: 1.5; }
+  .simulation-method-card.active .simulation-method-copy strong { color: var(--brand-text); }
+  .simulation-method-copy small { color: var(--muted); font-size: var(--fs-caption); line-height: 1.6; font-weight: 400; }
+  .simulation-method-copy .method-unsupported { color: var(--warning-ink); font-weight: 700; }
+  .method-badge { padding: 2px 8px; border-radius: var(--r-pill); background: var(--warning-soft); color: var(--gold-text); font-size: var(--fs-caption); font-weight: 700; }
+  .simulation-method-step .simulation-setup-card { margin-block-start: 0; }
+  .simulation-method-notice > div { display: grid; gap: var(--s-1); }
 }
 
 @layer themes {

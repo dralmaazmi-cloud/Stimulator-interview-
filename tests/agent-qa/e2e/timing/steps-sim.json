@@ -4,5 +4,7 @@
   { "action": "wait", "ms": 1500 },
   { "name": "simulation mode select (2nd card, realistic)", "action": "tap", "selector": ".simulation-mode-card >> nth=1", "feedback": ".simulation-mode-card:nth-child(2).selected" },
   { "action": "wait", "ms": 400 },
-  { "name": "answer-method toggle (voice)", "action": "tap", "selector": ".simulation-answer-switch button >> nth=1", "feedback": ".simulation-answer-switch button:nth-child(2).active" }
+  { "name": "next (step 2)", "action": "tap", "selector": ".simulation-next", "feedback": ".simulation-method-step" },
+  { "action": "wait", "ms": 400 },
+  { "name": "answer-method radio (text)", "action": "tap", "selector": ".simulation-method-card[data-method=\"text\"]", "feedback": ".simulation-method-card[data-method=\"text\"][aria-checked=\"true\"]" }
 ]
