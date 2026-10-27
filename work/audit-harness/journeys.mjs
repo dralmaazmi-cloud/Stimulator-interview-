@@ -20,6 +20,15 @@ async function newPage(opts = {}) {
 const text = async (page, sel) => (await page.locator(sel).first().innerText().catch(() => '')).replace(/\s+/g, ' ');
 const shot = (page, name) => page.screenshot({ path: `${OUT}/j-${name}.png`, fullPage: true });
 const gotoHash = async (page, url) => { await page.goto(url.split('#')[0] + '#/home'); await page.waitForTimeout(250); await page.goto(url); await page.waitForTimeout(250); };
+// two-step setup: step 1 «التالي» → step 2 (method; text unless the URL asks for voice) → «متابعة» (.simulation-start).
+const startFromStep2 = async page => {
+  if (!(await page.locator('.simulation-start').isVisible().catch(() => false))) {
+    await page.locator('.simulation-next').click();
+    await page.waitForSelector('.simulation-start');
+    if (!page.url().includes('answer=voice')) await page.locator('.simulation-method-card[data-method="text"]').click();
+  }
+  await page.locator('.simulation-start').click();
+};
 // alpha-10: every simulation starts with the privacy screen; tick the box, then «فهمت، متابعة». The continue button must stay disabled until the box is ticked.
 let privacyGateChecked = false;
 const passPrivacyGate = async (page, label = '') => {
@@ -46,14 +55,17 @@ const passPrivacyGateIfShown = async page => {
 {
   const { browser, page, errors } = await newPage();
   await page.goto(BASE + '/#/simulation');
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
   await page.waitForTimeout(500);
   log('J1 health notice', await text(page, '.ai-health-host'));
   const modes = await page.locator('.simulation-mode-card').allInnerTexts();
   log('J1 modes', modes.map(m => m.replace(/\n/g, ' / ')).join(' || '));
   log('J1 default mode', await page.locator('.simulation-mode-card.selected strong').innerText());
-  log('J1 default answer mode', await page.locator('.simulation-answer-switch button.active').innerText());
-  await page.locator('.simulation-start').click();
+  await page.locator('.simulation-next').click();
+  await page.waitForSelector('.simulation-start');
+  log('J1 default answer mode', await page.locator('.simulation-answer-switch [aria-checked="true"]').innerText());
+  await page.locator('.simulation-method-card[data-method="text"]').click();
+  await startFromStep2(page);
   await page.waitForSelector('.simulation-privacy-page');
   log('J1 privacy screen shown before the first question', (await text(page, '.simulation-privacy-page h1')) + ' :: tick=' + String(await page.locator('#simulation-privacy-acknowledgement').count()));
   await passPrivacyGate(page, 'J1 privacy');
@@ -125,8 +137,8 @@ const passPrivacyGateIfShown = async page => {
   await page.emulateMedia({ media: 'screen' });
   // second session for comparison
   await gotoHash(page, BASE + '/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' نحن كفريق أنجزنا ذلك.');
@@ -139,8 +151,8 @@ const passPrivacyGateIfShown = async page => {
   await shot(page, '1b-summary-compare');
   // save & exit mid-session: is it resumable?
   await gotoHash(page, BASE + '/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill('مسودة غير مرسلة');
@@ -156,7 +168,7 @@ const passPrivacyGateIfShown = async page => {
   // ---- item 6: resume → same question, same draft → submit → report → finish → completed, no in_progress copy left
   const pendingQid = await page.evaluate(() => new Promise(resolve => { const r = indexedDB.open('leadership-interview-coach'); r.onsuccess = () => { const tx = r.result.transaction('sessions'); const g = tx.objectStore('sessions').getAll(); g.onsuccess = () => resolve(g.result.find(s => s.status === 'in_progress')?.question_ids?.[0] || ''); }; }));
   await gotoHash(page, BASE + '/#/simulation');
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
   log('J1d resume card shown on simulation setup', String(await page.locator('.resume-card').count()) + ' :: ' + (await text(page, '.resume-card')).slice(0, 80));
   await page.locator('.resume-card button:has-text("استئناف")').click();
   await page.waitForSelector('.ai-question-card');
@@ -179,8 +191,8 @@ const passPrivacyGateIfShown = async page => {
 {
   const { browser, page, errors } = await newPage();
   await page.goto(BASE + '/#/simulation?answer=voice');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.voice-answer-panel');
   log('J2 voice panel', (await text(page, '.voice-answer-panel')).slice(0, 200));
@@ -218,8 +230,8 @@ const passPrivacyGateIfShown = async page => {
 {
   const { browser, page, errors } = await newPage();
   await page.goto('http://localhost:4176/#/simulation?answer=voice');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.voice-answer-panel');
   await page.locator('.privacy-consent input').check();
@@ -266,8 +278,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const { browser, page, errors } = await newPage();
   await page.addInitScript(ALPHA4_INIT);
   await page.goto(BASE + '/#/simulation?answer=voice');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.voice-answer-panel');
   await page.locator('.privacy-consent input').check();
@@ -286,7 +298,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('A3 pending recording stored in IndexedDB', JSON.stringify(pendingBefore.map(p => ({ dur: Math.round(p.duration), size: p.size > 0, mime: p.mime }))));
   // reload → resume → the pending recording card must come back from IndexedDB
   await page.reload();
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
   await page.locator('.resume-card button:has-text("استئناف")').click();
   await page.waitForSelector('.interrupted-recording', { timeout: 10000 });
   log('A3 restored after reload', (await text(page, '.interrupted-recording')).slice(0, 90));
@@ -326,8 +338,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('A3 expired recording purged on start (fresh kept)', JSON.stringify((await idbPending(page)).map(p => p.id)));
   for (let round = 0; round < 4; round += 1) {
     await gotoHash(page, BASE + '/#/simulation?answer=voice');
-    await page.waitForSelector('.simulation-start');
-    await page.locator('.simulation-start').click();
+    await page.waitForSelector('.simulation-next');
+    await startFromStep2(page);
     await passPrivacyGate(page);
     await page.waitForSelector('.voice-answer-panel');
     await page.goto(BASE + '/#/home');
@@ -341,8 +353,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const { browser, page } = await newPage();
   await page.addInitScript(ALPHA4_INIT);
   await page.goto(BASE + '/#/simulation?mode=realistic');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   const q1 = await text(page, '.ai-question-card .question-id');
@@ -352,7 +364,7 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const draftSaved = (await idbSessions(page)).find(s => s.status === 'in_progress');
   log('A4 draft saved on hide with question id', String(draftSaved?.draft_question_id === q1 && String(draftSaved?.draft_answer || '').startsWith('مسودة السؤال الأول')));
   await page.reload();
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
   await page.locator('.resume-card button:has-text("استئناف")').click();
   await page.waitForSelector('.ai-question-card');
   log('A4 draft restored after reload on the same question', String((await page.locator('textarea.simulation-answer-input').inputValue()).startsWith('مسودة السؤال الأول') && (await text(page, '.ai-question-card .question-id')) === q1));
@@ -371,8 +383,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const { browser, page } = await newPage();
   await page.addInitScript(ALPHA4_INIT);
   await page.goto('http://localhost:4178/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
@@ -390,8 +402,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('B5 resend enabled after 15s', String(await page.locator('.resend-evaluation').isEnabled()) + ' :: ' + await text(page, '.retry-countdown'));
   log('B5 double click produced one request (server-side usage lines counted below)', 'calls=' + calls4178.length);
   await page.goto('http://localhost:4179/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
@@ -425,8 +437,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   await page.goto(BASE + '/#/simulation');
   await page.waitForTimeout(1500);
   log('J3 offline simulation notice', await text(page, '.ai-health-host'));
-  log('J3 offline start button enabled?', String(await page.locator('.simulation-start').isEnabled()));
-  await page.locator('.simulation-start').click();
+  log('J3 offline start button enabled?', String(await page.locator('.simulation-next').isEnabled()));
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
@@ -444,10 +456,10 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 {
   const { browser, page } = await newPage();
   await page.goto('http://localhost:4175/#/simulation');
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
   await page.waitForTimeout(600);
   log('J4 unconfigured notice', await text(page, '.ai-health-host'));
-  await page.locator('.simulation-start').click();
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
@@ -462,8 +474,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
 {
   const { browser, page } = await newPage();
   await gotoHash(page, 'http://localhost:4176/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER);
@@ -473,8 +485,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('J5 R6 lock ≤ 120s and message by duration', String(/حاول بعد \d+ ثانية|بعد نحو \d+ دقيقة/.test(await text(page, '.evaluation-status'))) + ' :: ' + await text(page, '.retry-countdown'));
   await shot(page, '5-provider-429');
   await gotoHash(page, BASE + '/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' BADQUOTES');
@@ -483,8 +495,8 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   log('J5 untrusted report hero', await text(page, '.score-hero') + ' :: ' + await text(page, '.evaluation-report .notice'));
   await shot(page, '5-untrusted');
   await gotoHash(page, BASE + '/#/simulation');
-  await page.waitForSelector('.simulation-start');
-  await page.locator('.simulation-start').click();
+  await page.waitForSelector('.simulation-next');
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('.ai-question-card');
   await page.locator('textarea.simulation-answer-input').fill(ANSWER + ' BADJSON');
@@ -500,10 +512,13 @@ const idbPending = page => page.evaluate(() => new Promise(resolve => { const r 
   const { browser, page } = await newPage();
   for (const [mode, scope] of [['realistic', ''], ['extended', ''], ['full', ''], ['extended', 'mission']]) {
     await gotoHash(page, BASE + `/#/simulation?mode=${mode}${scope ? '&competency=' + scope : ''}`);
-    await page.waitForSelector('.simulation-start');
+    await page.waitForSelector('.simulation-next');
     await page.waitForTimeout(300);
+    await page.locator('.simulation-next').click();
+    await page.waitForSelector('.simulation-start');
+    await page.locator('.simulation-method-card[data-method="text"]').click();
     if (mode !== 'full') await page.locator('.simulation-intro-options input[type=checkbox]').check();
-    await page.locator('.simulation-start').click();
+    await startFromStep2(page);
     await passPrivacyGate(page);
     await page.waitForTimeout(600);
     log(`J6 ${mode}/${scope || 'random'} first screen`, await text(page, '.page-head h1'));
@@ -616,9 +631,9 @@ for (const theme of ['light', 'dark']) {
   await page.waitForSelector('.home-dashboard');
   await page.evaluate(value => localStorage.setItem('lic:theme', value), theme);
   await gotoHash(page, BASE + '/#/simulation?mode=full');
-  await page.waitForSelector('.simulation-start');
+  await page.waitForSelector('.simulation-next');
   log(`J9[${theme}] full card description (F7/D1)`, (await page.locator('.simulation-mode-card').nth(3).innerText()).replace(/\n/g, ' / '));
-  await page.locator('.simulation-start').click();
+  await startFromStep2(page);
   await passPrivacyGate(page);
   await page.waitForSelector('textarea.simulation-answer-input');
   await page.locator('textarea.simulation-answer-input').fill('أنا مدير فريق العمليات. بدأت مسيرتي مشرف عمليات ثم تدرجت إلى إدارة وحدة. من أبرز ما حققته خفض زمن الإنجاز. وأتطلع مستقبلًا إلى توسيع أثر التحسين.');
